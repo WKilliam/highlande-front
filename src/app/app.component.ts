@@ -1,8 +1,5 @@
-import {Component, inject} from '@angular/core';
-import {NgSwitch, NgSwitchDefault, NgSwitchCase, NgForOf} from '@angular/common';
-import {io} from 'socket.io-client';
-import {FormsModule} from "@angular/forms";
-import {ChatService} from "./web.io";
+import {Component} from '@angular/core';
+import {RouterOutlet} from "@angular/router";
 
 @Component({
   selector: 'app-root',
@@ -10,29 +7,25 @@ import {ChatService} from "./web.io";
   styleUrls: ['./app.component.scss'],
   standalone: true,
   imports: [
-    NgSwitch,
-    NgSwitchDefault,
-    NgSwitchCase,
-    FormsModule,
-    NgForOf,
+    RouterOutlet
   ]
 })
 export class AppComponent {
-  title = 'highlande-front';
-  newMessage: string ='';
-  messageList: string[] = [];
-  readonly #chatService: ChatService = inject(ChatService);
-
-  ngOnInit() {
-    this.#chatService.getNewMessage().subscribe((message: string) => {
-      this.messageList.push(message);
-    })
-  }
-
-  sendMessage() {
-    this.#chatService.sendMessage(this.newMessage);
-    this.newMessage = '';
-  }
+  // title = 'highlande-front';
+  // newMessage: string ='';
+  // messageList: string[] = [];
+  // readonly #chatService: ChatService = inject(ChatService);
+  //
+  // ngOnInit() {
+  //   this.#chatService.getNewMessage().subscribe((message: string) => {
+  //     this.messageList.push(message);
+  //   })
+  // }
+  //
+  // sendMessage() {
+  //   this.#chatService.sendMessage(this.newMessage);
+  //   this.newMessage = '';
+  // }
 
   // message: string = '';
   // socket = io('http://localhost:3000',{ transports : ['websocket'] });

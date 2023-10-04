@@ -1,0 +1,10 @@
+.map-container {
+  position: relative; /* Permet de positionner les éléments enfants relativement à ce conteneur */
+  width: 970px;
+  height: 512px;
+}
+.map-content {
+  width: 103.2%;
+  height: 103%;
+  /* Autres styles pour l'image de la carte */
+}

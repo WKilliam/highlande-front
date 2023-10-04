@@ -7,7 +7,12 @@
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
-          "style": "scss",
+          "standalone": true
+        },
+        "@schematics/angular:directive": {
+          "standalone": true
+        },
+        "@schematics/angular:pipe": {
           "standalone": true
         }
       },
@@ -65,14 +70,14 @@
             "browserTarget": "highlande-front:build"
           }
         },
-        "test" :  {
-          "builder" :  "@angular-devkit/build-angular:jest" ,
-          "options" :  {
-            "polyfills" :  [
-              "zone.js" ,
+        "test": {
+          "builder": "@angular-devkit/build-angular:jest",
+          "options": {
+            "polyfills": [
+              "zone.js",
               "zone.js/testing"
-            ] ,
-            "tsConfig" :  "tsconfig.spec.json"
+            ],
+            "tsConfig": "tsconfig.spec.json"
           }
         }
       }
