@@ -1,6 +1,5 @@
 import {Component} from '@angular/core';
 import {RouterOutlet} from "@angular/router";
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -8,9 +7,10 @@ import {RouterOutlet} from "@angular/router";
   standalone: true,
   imports: [
     RouterOutlet
-  ]
+  ],
 })
 export class AppComponent {
+
   // title = 'highlande-front';
   // newMessage: string ='';
   // messageList: string[] = [];
