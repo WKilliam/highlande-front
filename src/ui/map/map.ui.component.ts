@@ -1,8 +1,10 @@
 import {NgForOf} from "@angular/common";
 import {CelluleModule} from "../cell/cellule.module";
-import {Component, OnInit, ViewChild} from "@angular/core";
+import {Component, inject, OnInit, ViewChild} from "@angular/core";
 import {CharacterUiComponent} from "../character/character.ui.component";
 import {CellulesModels} from "../../models/cellules.models";
+import {ApiService} from "../../services/connect/api.service";
+import {Store} from "../../services/store/store";
 
 @Component({
   selector: 'ui-map',
@@ -26,9 +28,13 @@ import {CellulesModels} from "../../models/cellules.models";
           </ng-container>
         </ng-container>
       </div>
-      <button (click)="findCellsAtDistance(cellSelected, 1)">1</button>
-      <button (click)="findCellsAtDistance(cellSelected, 2)">2</button>
-      <button (click)="move(gridCellData[3][4])">3</button>
+      <div style="padding-top: 100px">
+        <button (click)="findCellsAtDistance(cellSelected, 1)">1</button>
+        <button (click)="findCellsAtDistance(cellSelected, 2)">2</button>
+        <button (click)="move(gridCellData[3][4])">3</button>
+        <button (click)="store.getData()">4</button>
+      </div>
+
     </div>
   `,
   styleUrls: ['./map.ui.component.scss'],
@@ -41,10 +47,13 @@ import {CellulesModels} from "../../models/cellules.models";
 export class MapUiComponent implements OnInit {
   characterComponent = 'idle';
   gridCellData: CellulesModels[][] = [];
+  readonly store = inject(Store);
 
   mapWidth: number = 970;
   mapHeight: number = 512;
   cellSelected: number = 258;
+  // mapWidth: number = 1920;
+  // mapHeight: number = 1080;
 
   characterX: number = 5;
   characterY: number = 5;
@@ -125,8 +134,6 @@ export class MapUiComponent implements OnInit {
     }
   }
 
-
-
   createGrid(): void {
     const cellWidth = 32;
     const cellHeight = 32;
@@ -192,4 +199,5 @@ export class MapUiComponent implements OnInit {
     console.log(`Cellules à une distance de ${distance} de la cellule de départ (ID: ${startId}) :`, result);
     return result;
   }
+
 }
