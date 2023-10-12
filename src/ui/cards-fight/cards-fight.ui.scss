@@ -1,0 +1,49 @@
+.rectangle {
+  width: 240px;
+  height: 448px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+
+  img {
+    width: 100%; /* Remplit la largeur du conteneur */
+    height: 100%; /* Remplit la hauteur du conteneur */
+    object-fit: cover;
+
+  }
+
+  .commun {
+    border-width: 6px;
+    border-style: solid;
+    border-image: var(--dl-commun-color);
+    border-image-slice: 1;
+  }
+
+  .uncommon {
+    border-width: 6px;
+    border-style: solid;
+    border-image: var(--dl-peu-commun-color);
+    border-image-slice: 1;
+  }
+
+  .rare {
+    border-width: 6px;
+    border-style: solid;
+    border-image: var(--dl-rare-color);
+    border-image-slice: 1;
+  }
+
+  .super-rare {
+    border-width: 6px;
+    border-style: solid;
+    border-image: var(--dl-super-rare-color);
+    border-image-slice: 1;
+  }
+
+  .legendary {
+    border-width: 6px;
+    border-style: solid;
+    border-image: var(--dl-legendary-color);
+    border-image-slice: 1;
+  }
+}

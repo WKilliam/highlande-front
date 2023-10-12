@@ -1,13 +1,15 @@
+@charset "UTF-8";
 :host {
   display: contents;
 }
+
 .page-container {
   height: 100vh; /* La hauteur sera égale à 100% de la hauteur de la fenêtre du navigateur */
   overflow: hidden; /* Ajoutez une barre de défilement si le contenu dépasse la hauteur de la fenêtre */
   margin-top: 1rem;
 }
 
-.position-content{
+.position-content {
   padding: 1rem;
   align-items: center;
   align-content: center;
@@ -20,3 +22,4 @@
   align-content: center;
 }
 
+/*# sourceMappingURL=game.session.component.css.map */

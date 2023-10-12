@@ -1,9 +1,9 @@
 import {Component, Input} from '@angular/core'
 import {Title} from '@angular/platform-browser'
-import {BackgroundcolorModel} from "../../models/backgroundcolor.model";
 
 @Component({
   selector: 'ui-cellule',
+  standalone: true,
   template: `
     <div
       class="cube"
@@ -12,7 +12,7 @@ import {BackgroundcolorModel} from "../../models/backgroundcolor.model";
     >
       <p>{{cellId}}</p>
     </div>`,
-  styleUrls: ['cellule.component.scss'],
+  styleUrls: ['cellule.ui.scss'],
 })
 export class Cellule {
   @Input() top: string = '0'; // Position verticale par défaut

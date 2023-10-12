@@ -1,7 +1,38 @@
-
+// style.scss
 :root{
   --color-test: #ff0505;
   --background-style: linear-gradient(0deg, #00274D 0%, #0D233E 5%, #030508 20%);
+  --dl-commun-color: linear-gradient(45deg,
+    #4d4b4b 50%,
+    #1D1B1B 100%);
+  --dl-peu-commun-color: linear-gradient(45deg,
+    #1D1B1B 10%,
+    #878383 50%,
+    #FFFFFF 100%);
+  --dl-rare-color: linear-gradient(45deg,
+    #FFFFFF 10%,
+    #CD7F32 50%,
+    #FFD700 100%
+  );
+  --dl-super-rare-color: linear-gradient(45deg,
+    #C0C0C0 35%,
+    #CD7F32 55%,
+    #FFD700 60%,
+    #00FF00 70%,
+    #007FFF 85%,
+    #7F00FF 100%
+  );
+  --dl-legendary-color: linear-gradient(45deg,
+    #FF0000 10%,
+    #FF7F00 20%,
+    #FFFF00 30%,
+    #00FF00 40%,
+    #00FF7F 50%,
+    #00FFFF 60%,
+    #007FFF 70%,
+    #0000FF 80%,
+    #7F00FF 90%,
+    #FF00FF 100%);
 }
 @font-face {
   font-family: irish-grover;
