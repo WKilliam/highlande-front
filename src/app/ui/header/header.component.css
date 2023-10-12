@@ -1,0 +1,19 @@
+.header-content {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  right: 1rem;
+  height: 5.625rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: rgba(26, 60, 96, 0.45);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+  border-bottom-left-radius: 12px;
+  border-bottom: 1px solid #5797c4; /* Bordure au bas */
+  box-shadow: 0 2px 5px rgba(87, 151, 196, 0.4);
+}
+
+/*# sourceMappingURL=header.component.css.map */

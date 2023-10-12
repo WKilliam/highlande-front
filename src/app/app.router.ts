@@ -1,15 +1,24 @@
 import { Routes } from '@angular/router';
 import {AppComponent} from "./app.component";
-import {GameSessionComponent} from "../features/game-session/game.session/game.session.component";
-
+import {NotFound} from "./pages/not-found/not.found.component";
+import {LandingComponent} from "./pages/landing/landing.component";
+import {GameComponent} from "./pages/game/game.component";
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'game',
+    redirectTo: 'landing',
     pathMatch: 'full'
   },
   {
+    path: 'landing',
+    component: LandingComponent
+  },
+  {
     path: 'game',
-    component: GameSessionComponent
+    component: GameComponent
+  },
+  {
+    path: '**',
+    component: NotFound
   }
 ];

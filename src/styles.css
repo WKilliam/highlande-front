@@ -1,5 +1,5 @@
+@charset "UTF-8";
 /* You can add global styles to this file, and also import other style files */
-
 :root {
   --dl-color-gray-500: #595959;
   --dl-color-gray-700: #999999;
@@ -49,3 +49,4 @@ html, body {
   align-items: center;
 }
 
+/*# sourceMappingURL=styles.css.map */
