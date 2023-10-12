@@ -1,8 +1,9 @@
-
-:root{
+@charset "UTF-8";
+:root {
   --color-test: #ff0505;
   --background-style: linear-gradient(0deg, #00274D 0%, #0D233E 5%, #030508 20%);
 }
+
 @font-face {
   font-family: irish-grover;
   src: url(./assets/fonts/Irish_Grover/IrishGrover-Regular.ttf);
@@ -24,3 +25,5 @@ html, body {
   justify-content: center;
   align-items: center;
 }
+
+/*# sourceMappingURL=styles.css.map */

@@ -11,7 +11,7 @@ import {MapUiComponent} from "../../../ui/map/map.ui.component";
     MapUiComponent
   ],
   template: `
-    <div>
+    <div class="container">
       <ui-map></ui-map>
 
 <!--            <ui-dice></ui-dice>-->
