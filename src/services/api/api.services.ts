@@ -7,16 +7,21 @@ import {MapsModels} from "../../models/maps.models";
 @Injectable({
   providedIn: 'root',
 })
-export class ApiServices{
-  readonly apiURL = 'http://localhost:3000';
+export class ApiServices {
+  readonly apiURL: string = 'http://localhost:3000';
   readonly httpClient: HttpClient = inject(HttpClient);
 
-  getAllCells(session:string){
+  getAllCells(session: string) {
     let params = new HttpParams().set('session', session);
-    return this.httpClient.get<Array<CellulesModels>>(`${this.apiURL}/maps`, {params})
+    return this.httpClient.get<Array<CellulesModels>>(`${this.apiURL}/json/getMapCells`, {params})
   }
 
-  getAllMaps(){
+  getAllMaps() {
     return this.httpClient.get<Array<MapsModels>>(`${this.apiURL}/maps/infos`)
+  }
+
+  postCreateSession(body: any) {
+    console.log("body", body)
+    return this.httpClient.get(`${this.apiURL}/json/test`)
   }
 }

@@ -51,10 +51,4 @@ export class GameLobbyPage {
   initSession: boolean = false;
   title: string = this.initSession ? "Lobby" : "Create a new session";
 
-  showPasswordField: boolean = false;
-
-  togglePasswordField() {
-    this.showPasswordField = (document.getElementById('selSessionType') as HTMLSelectElement).value === 'private';
-  }
-
 }

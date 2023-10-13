@@ -15,4 +15,9 @@ export class StoreServices{
   getAllMaps(){
     return this.api.getAllMaps();
   }
+
+  createSession(body:any){
+    return this.api.postCreateSession(body);
+  }
+
 }
