@@ -1,7 +1,8 @@
-import {DiceUiComponent} from "../../../ui/dice/dice.ui.component";
+import {DiceUiComponent} from "../../ui/dice/dice.ui.component";
 import {Component} from "@angular/core";
-import {MapUiComponent} from "../../../ui/map/map.ui.component";
-import {CardsFightUi} from "../../../ui/cards-fight/cards-fight.ui";
+import {MapUiComponent} from "../../ui/map/map.ui.component";
+import {CardsFightUi} from "../../ui/cards-fight/cards-fight.ui";
+import {LifeBarUi} from "../../ui/life-bar/life-bar.ui";
 
 
 @Component({
@@ -10,7 +11,8 @@ import {CardsFightUi} from "../../../ui/cards-fight/cards-fight.ui";
   imports: [
     DiceUiComponent,
     MapUiComponent,
-    CardsFightUi
+    CardsFightUi,
+    LifeBarUi
   ],
   template: `
     <div class="page-container">
@@ -19,17 +21,20 @@ import {CardsFightUi} from "../../../ui/cards-fight/cards-fight.ui";
           <div class="col-3">
             <div class="position-content">
               <ui-cards-fight class="card-center"></ui-cards-fight>
+              <div class="life-bar-position">
+                <ui-life-bar ></ui-life-bar>
+              </div>
             </div>
           </div>
           <div class="col-6">
             <ui-map></ui-map>
-            <div>
-              <ui-dice></ui-dice>
-            </div>
           </div>
           <div class="col-3">
             <div class="position-content">
               <ui-cards-fight class="card-center"></ui-cards-fight>
+              <div class="life-bar-position">
+                <ui-life-bar ></ui-life-bar>
+              </div>
             </div>
           </div>
         </div>

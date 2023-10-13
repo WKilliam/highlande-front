@@ -1,0 +1,74 @@
+<div class="card">
+  <div class="card-body">
+    <div class="row">
+      <div class="col">
+        <div class="form-floating">
+          <input type="text" class="form-control" id="txtSessionName" placeholder="The Killer" value="The Killer">
+          <label for="txtSessionName">Session Name</label>
+        </div>
+      </div>
+    </div>
+    <div class="row" style="margin-top: 1rem">
+      <div class="col-md">
+        <div a class="form-floating">
+          <input type="text" class="form-control" id="txtTeamOne" placeholder="Team One Name" value="Team One Name">
+          <label for="txtTeamOne">Team One Name</label>
+        </div>
+      </div>
+      <div class="col-md">
+        <div class="form-floating">
+          <input type="text" class="form-control" id="txtTeamTwo" placeholder="Team Two Name" value="Team Two Name">
+          <label for="txtTeamTwo">Team Two Name</label>
+        </div>
+      </div>
+    </div>
+    <div class="row" style="margin-top: 1rem">
+      <div class="col-md">
+        <div class="form-floating">
+          <input type="text" class="form-control" id="txtTeamThree" placeholder="Team Three Name" value="Team Three Name">
+          <label for="txtTeamThree">Team Three Name</label>
+        </div>
+      </div>
+      <div class="col-md">
+        <div class="form-floating">
+          <input type="text" class="form-control" id="txtTeamFour" placeholder="Team Four Name" value="Team Four Name">
+          <label for="txtTeamFour">Team Four Name</label>
+        </div>
+      </div>
+    </div>
+    <div class="row" style="margin-top: 1rem">
+      <div class="col">
+        <div class="form-floating">
+          <select class="form-select" id="selSessionOptionType" aria-label="Session Option">
+            <option value="public">Public</option>
+            <option value="private">Private</option>
+          </select>
+          <label for="selSessionOptionType">Select map</label>
+        </div>
+      </div>
+    </div>
+    <div class="row" style="margin-top: 1rem">
+      <div class="col">
+        <div class="form-floating">
+          <select class="form-select" id="selSessionOptionMap" aria-label="Session Option">
+            <option *ngFor="let map of maps" [value]="map.name">{{ map.name }}</option>
+          </select>
+          <label for="selSessionOptionMap">Select map</label>
+        </div>
+      </div>
+    </div>
+    <div class="row" style="margin-top: 1rem">
+      <div class="col-md">
+        <div class="form-floating" [style.display]="showPasswordField ? 'block' : 'none'">
+          <input type="password" class="form-control" id="txtPassword" placeholder="Password">
+          <label for="txtPassword">Password</label>
+        </div>
+      </div>
+    </div>
+    <div class="row" style="margin-top: 1rem">
+      <div class="col-md">
+        <button class="btn btn-success w-100">Start</button>
+      </div>
+    </div>
+  </div>
+</div>

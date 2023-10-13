@@ -1,0 +1,17 @@
+.circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #ccc;
+  display: inline-block;
+  margin: 5px;
+}
+
+.image-content {
+  width: 450px;
+  height: 450px;
+  background-image: url('./../../assets/map/lobby.png');
+  background-size: cover;
+  position: relative;
+}
+
