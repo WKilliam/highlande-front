@@ -2,6 +2,7 @@ import {inject, Injectable} from "@angular/core";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {CellulesModels} from "../../models/cellules.models";
 import {MapsModels} from "../../models/maps.models";
+import {SessionModelRequest} from "../../models/sessions";
 
 
 @Injectable({
@@ -20,8 +21,7 @@ export class ApiServices {
     return this.httpClient.get<Array<MapsModels>>(`${this.apiURL}/maps/infos`)
   }
 
-  postCreateSession(body: any) {
-    console.log("body", body)
-    return this.httpClient.get(`${this.apiURL}/json/test`)
+  postCreateSession(body: SessionModelRequest) {
+    return this.httpClient.post(`${this.apiURL}/sessions/new`,body)
   }
 }

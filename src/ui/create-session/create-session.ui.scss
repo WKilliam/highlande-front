@@ -1,0 +1,16 @@
+.btn-danger {
+  background-color: red;
+  color: white;
+}
+
+/* Style pour la popup d'erreur */
+.popup {
+  display: none;
+  background-color: red;
+  color: white;
+  padding: 10px;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}

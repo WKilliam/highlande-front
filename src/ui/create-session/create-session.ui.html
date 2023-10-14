@@ -90,8 +90,12 @@
       <div class="row" style="margin-top: 1rem">
         <div class="col-md">
           <div class="form-floating">
-            <select class="form-select" id="selSessionOptionType" aria-label="Session Option"
-                    (change)="togglePasswordField($event)">
+            <select
+              class="form-select"
+              id="selSessionOptionType"
+              aria-label="Session Option"
+              formControlName="type"
+              (change)="togglePasswordField($event)">
               <option value="public">Public</option>
               <option value="private">Private</option>
             </select>
@@ -109,8 +113,14 @@
       </div>
       <div class="row" style="margin-top: 1rem">
         <div class="col-md">
-          <button class="btn btn-success w-100" (click)="onStartButtonClick()">Start</button>
+          <button class="btn w-100" [ngClass]="{'btn-success': !isError, 'btn-danger': isError}"
+                  (click)="onStartButtonClick()">Start
+          </button>
         </div>
+      </div>
+      <!-- Popup d'erreur -->
+      <div class="popup" *ngIf="isError">
+        <p>Une erreur s'est produite. Tous les champs doivent être remplis.</p>
       </div>
     </form>
   </div>
