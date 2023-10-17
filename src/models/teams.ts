@@ -12,3 +12,11 @@ export interface Teams{
   player1: PlayersModel
   player2: PlayersModel
 }
+
+export interface TeamSessionContent{
+  one: Teams;
+  two: Teams;
+  three: Teams;
+  four: Teams;
+}
+

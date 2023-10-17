@@ -21,4 +21,8 @@ export class StoreServices{
     return this.api.postCreateSession(body);
   }
 
+  login(email:string, password:string){
+    return this.api.login(email, password);
+  }
+
 }

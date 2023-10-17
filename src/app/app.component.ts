@@ -1,5 +1,7 @@
-import {Component} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {RouterOutlet} from "@angular/router";
+import {SocketIoModule} from "ngx-socket-io";
+import {SocketService} from "../services/socket/socket.service";
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -9,7 +11,16 @@ import {RouterOutlet} from "@angular/router";
     RouterOutlet
   ],
 })
-export class AppComponent {
+export class AppComponent implements OnInit{
+
+  socketService = inject(SocketService)
+
+  ngOnInit(): void {
+    // this.socketService.initSocket();
+  }
+
+  socket = inject(SocketService)
+
 
   // title = 'highlande-front';
   // newMessage: string ='';
@@ -42,4 +53,6 @@ export class AppComponent {
   //   this.socket.emit('messageFromClient', this.message);
   //   this.message = ''; // Effacez le champ de saisie après l'envoi
   // }
+
+
 }

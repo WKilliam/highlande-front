@@ -8,3 +8,10 @@ export interface PlayersModel{
   maxHp: number,
   card: CardsModel
 }
+
+export interface PlayerInGameModel{
+  id: number
+  pseudo: string
+  bearcoin: number
+  avatar: string
+}

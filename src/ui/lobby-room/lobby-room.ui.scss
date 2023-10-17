@@ -5,6 +5,17 @@
   background-color: #ccc;
   display: inline-block;
   margin: 5px;
+  overflow: hidden; /* Pour s'assurer que l'image de l'avatar ne dépasse pas le cercle */
+}
+
+.circle.active {
+  background-color: transparent; /* Fond transparent pour les utilisateurs actifs */
+}
+
+.circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ajuste l'image de l'avatar à la taille du cercle */
 }
 
 .image-content {

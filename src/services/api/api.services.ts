@@ -24,4 +24,8 @@ export class ApiServices {
   postCreateSession(body: SessionModelRequest) {
     return this.httpClient.post(`${this.apiURL}/sessions/new`,body)
   }
+
+  login(email:string, password:string){
+    return this.httpClient.post(`${this.apiURL}/user/login`, {email, password})
+  }
 }

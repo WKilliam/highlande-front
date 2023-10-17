@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, EventEmitter, inject, OnInit, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {StoreServices} from "../../services/store/store.services";
 import {MapsModels} from "../../models/maps.models";
@@ -27,6 +27,7 @@ export class CreateSessionUi implements OnInit {
     teamThree: new FormControl(''),
     teamFour: new FormControl(''),
   })
+  @Output() onInitSession: EventEmitter<any> = new EventEmitter();
 
   togglePasswordField(event: any) {
     const selectedOption = event.target.value;
@@ -42,6 +43,9 @@ export class CreateSessionUi implements OnInit {
     this.store.getAllMaps().subscribe((maps: Array<MapsModels>) => {
       this.maps = maps;
     })
+    this.store.login("john.doe@example.com","motdepasse").subscribe((res) => {
+      localStorage.setItem('user', JSON.stringify(res));
+    })
   }
 
   onStartButtonClick() {
@@ -53,9 +57,9 @@ export class CreateSessionUi implements OnInit {
     const teamTwo = this.formCreateSession.get('teamTwo')?.value as string;
     const teamThree = this.formCreateSession.get('teamThree')?.value as string;
     const teamFour = this.formCreateSession.get('teamFour')?.value as string;
-
+    const user = JSON.parse(localStorage.getItem('user') as string);
     const sessionModelRequest: SessionModelRequest = {
-      ownerId: 1,
+      ownerId: user.id,
       name: nameSession,
       createdAt: new Date().toLocaleDateString(),
       updatedAt: new Date().toLocaleDateString(),
@@ -83,16 +87,22 @@ export class CreateSessionUi implements OnInit {
       }else if (sessionModelRequest.statusAccess === StatusGame.PRIVATE &&
         sessionModelRequest.password !== ''){
         this.store.postCreateSession(sessionModelRequest).subscribe((res) => {
-          console.log(res)
+          localStorage.setItem('session', JSON.stringify(res));
+          this.initSession()
         })
       }else{
         this.store.postCreateSession(sessionModelRequest).subscribe((res) => {
-          console.log(res)
+          localStorage.setItem('session', JSON.stringify(res));
+          this.initSession()
         })
       }
     } else {
       this.isError = true;
       console.log('error fields empty')
     }
+  }
+
+  initSession() {
+    this.onInitSession.emit();
   }
 }
