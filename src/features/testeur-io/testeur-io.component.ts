@@ -1,27 +1,34 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {SocketService} from "../../services/socket/socket.service";
 
 @Component({
   selector: 'app-testeur-io',
   standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule],
-  template:`
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  template: `
     <div>
       <h1>Chat en direct</h1>
+      <p>{{alerte}}</p>
       <div>
         <label for="roomSelect">Choisir une salle :</label>
-        <select id="roomSelect" [(ngModel)]="currentRoom" (change)="joinRoom(currentRoom)">
+        <select id="roomSelect"
+                [(ngModel)]="switchRoom"
+                (change)="joinRoom(switchRoom)"
+        >
+          <option value="default">Default</option>
           <option value="room1">Salle 1</option>
           <option value="room2">Salle 2</option>
-          <!-- Ajoutez autant d'options de salle que nécessaire -->
         </select>
       </div>
 
       <div>
         <input type="text" [(ngModel)]="message" placeholder="Entrez votre message">
-        <button (click)="sendMessage()">Envoyer</button>
+        <button (click)="sendMessageToRoom()">Envoyer</button>
+      </div>
+      <div style="background-color: #FFFFFF">
+        {{message}}
       </div>
     </div>
   `,
@@ -29,35 +36,33 @@ import {SocketService} from "../../services/socket/socket.service";
 })
 export class TesteurIOComponent implements OnInit {
 
-  currentRoom: string = 'default'; // Définissez la salle par défaut
+  currentRoom: string = 'default';
+  switchRoom: string = 'default';
   message: string = '';
-  socketService = inject(SocketService)
+  alerte: string = '';
+  socket = inject(SocketService)
 
   ngOnInit(): void {
-    this.socketService.joinRoom(this.currentRoom)
-    this.socketService.receiveMessageOnRoom(this.currentRoom)
-    this.socketService.message$.subscribe((data: string) => {
-      console.log('Message from server:', data)
-      this.message = data
-      this.message = ''
-    });
+    this.socket.initSocket();
+    this.socket.getEventMessage(this.currentRoom)
+    this.socket.getAlterServer().subscribe((message: string) => {
+      this.alerte = message;
+    })
+    this.socket.getEventMessageSend()
+    this.socket.getMessage().subscribe((message: string) => {
+      this.message = message;
+    })
+    this.message = '';
   }
 
   joinRoom(room: string) {
-    this.leaveRoom(this.currentRoom);
+    this.socket.joinRoom(room, this.currentRoom);
     this.currentRoom = room;
-    this.socketService.joinRoom(room);
-    this.socketService.receiveMessageOnRoom(room)
   }
 
-  sendMessage() {
-    this.socketService.sendMessageOnRoom(this.message, this.currentRoom);
-    this.message = ''; // Réinitialisez le champ de message après l'envoi
+  //
+  sendMessageToRoom() {
+    this.socket.sendMessageToRoom(this.message, this.currentRoom);
+    this.message = '';
   }
-
-  leaveRoom(room: string) {
-    this.socketService.leaveRoom(room);
-    this.currentRoom = '';
-  }
-
 }
