@@ -15,3 +15,18 @@ export interface PlayerInGameModel{
   bearcoin: number
   avatar: string
 }
+
+
+export interface PlayersLobbyModels{
+  avatar: string,
+  pseudo: string,
+  cards: Array<CardsModel>,
+}
+
+export interface PlayersGameModels{
+  avatar: string,
+  pseudo: string,
+  life: number,
+  maxLife: number,
+  cardsPosessed: Array<number>,
+}

@@ -1,4 +1,3 @@
-import {Teams} from "./teams";
 import {PlayersModel} from "./players.model";
 
 const player1: PlayersModel = {
@@ -41,15 +40,3 @@ const player2: PlayersModel = {
   }
 }
 
-export const DATATEAM: Teams = {
-  characterTeam: "team1",
-  teamName: "Les Highlanders",
-  teamMaxLife: player1.maxHp + player2.maxHp,
-  player1: player1,
-  player2: player2,
-  teamAtk: player1.card.atk + player2.card.atk,
-  teamDef: player1.card.def + player2.card.def,
-  teamSpd: player1.card.spd + player2.card.spd,
-  teamLuk: player1.card.luk + player2.card.luk,
-  teamLife: player1.currentHp + player2.currentHp,
-};

@@ -5,6 +5,8 @@ import {LobbyRoomUi} from "../../ui/lobby-room/lobby-room.ui";
 import {MatDialogModule} from "@angular/material/dialog";
 import {CreateSessionUi} from "../../ui/create-session/create-session.ui";
 import {SocketService} from "../../services/socket/socket.service";
+import {TeamBodyModels, TeamsModels} from "../../models/teams";
+import {GameModels} from "../../models/parties.models";
 
 @Component({
   selector: 'app-game.lobby',
@@ -17,8 +19,8 @@ import {SocketService} from "../../services/socket/socket.service";
         <div class="row" *ngIf="initSession; else notInit">
           <div class="col">
             <div class="row">
-              <ui-team-card [teamNumber]="1"></ui-team-card>
-              <ui-team-card [teamNumber]="3"></ui-team-card>
+              <ui-team-card></ui-team-card>
+              <ui-team-card></ui-team-card>
             </div>
           </div>
           <div class="col d-flex justify-content-center align-items-center" style="height: 80vh;">
@@ -26,8 +28,8 @@ import {SocketService} from "../../services/socket/socket.service";
           </div>
           <div class="col">
             <div class="row">
-              <ui-team-card [teamNumber]="2"></ui-team-card>
-              <ui-team-card [teamNumber]="4"></ui-team-card>
+              <ui-team-card></ui-team-card>
+              <ui-team-card></ui-team-card>
             </div>
           </div>
         </div>
@@ -35,40 +37,36 @@ import {SocketService} from "../../services/socket/socket.service";
           <div class="row" style="padding: 2rem">
             <div class="col-3">
             </div>
-            <div class="col-6" >
+            <div class="col-6">
               <ui-create-session (onInitSession)="initSessionEvent()"></ui-create-session>
             </div>
             <div class="col-3">
             </div>
           </div>
         </ng-template>
-<!--        <button (click)="test()">test</button>-->
       </div>
     </div>
   `,
   styleUrls: ['./game.lobby.page.scss']
 })
-export class GameLobbyPage implements OnInit{
+export class GameLobbyPage implements OnInit {
 
   initSession: boolean = false;
   title: string = this.initSession ? "Lobby" : "Create a new session";
   socket = inject(SocketService)
+  gameKeySession = localStorage.getItem('gameKeySession');
+  game  = localStorage.getItem('game');
 
   ngOnInit(): void {
-    const value = localStorage.getItem('session');
-    if (value) {
+    if (this.gameKeySession) {
       this.initSession = true;
       this.title = "Lobby";
-    }else{
+    } else {
       this.initSession = false;
       this.title = "Create a new session";
+      console.log(this.game)
     }
-
   }
-
-  // test() {
-  //   this.socket.sendMessage('Test de message au serveur');
-  // }
 
   initSessionEvent() {
     this.initSession = true;

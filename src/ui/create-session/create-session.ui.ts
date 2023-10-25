@@ -4,6 +4,7 @@ import {StoreServices} from "../../services/store/store.services";
 import {MapsModels} from "../../models/maps.models";
 import {FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
 import {SessionModelRequest, StatusGame} from "../../models/sessions";
+import {PartiesModelsJson} from "../../models/parties.models";
 
 @Component({
   selector: 'ui-create-session',
@@ -86,13 +87,13 @@ export class CreateSessionUi implements OnInit {
         console.log('error fields password is empty')
       }else if (sessionModelRequest.statusAccess === StatusGame.PRIVATE &&
         sessionModelRequest.password !== ''){
-        this.store.postCreateSession(sessionModelRequest).subscribe((res) => {
-          localStorage.setItem('session', JSON.stringify(res));
+        this.store.postCreateSession(sessionModelRequest).subscribe((res:PartiesModelsJson) => {
+          this.initData(res)
           this.initSession()
         })
       }else{
-        this.store.postCreateSession(sessionModelRequest).subscribe((res) => {
-          localStorage.setItem('session', JSON.stringify(res));
+        this.store.postCreateSession(sessionModelRequest).subscribe((res:PartiesModelsJson) => {
+          this.initData(res)
           this.initSession()
         })
       }
@@ -100,6 +101,13 @@ export class CreateSessionUi implements OnInit {
       this.isError = true;
       console.log('error fields empty')
     }
+  }
+
+  initData(res:PartiesModelsJson){
+    localStorage.setItem('map', JSON.stringify(res.map));
+    localStorage.setItem('gameKeySession', JSON.stringify(res.gameKeySession));
+    localStorage.setItem('game', JSON.stringify(res.game));
+    localStorage.setItem('infoGame', JSON.stringify(res.infoGame));
   }
 
   initSession() {

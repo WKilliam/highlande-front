@@ -3,6 +3,7 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 import {CellulesModels} from "../../models/cellules.models";
 import {MapsModels} from "../../models/maps.models";
 import {SessionModelRequest} from "../../models/sessions";
+import {PartiesModelsJson} from "../../models/parties.models";
 
 
 @Injectable({
@@ -22,7 +23,7 @@ export class ApiServices {
   }
 
   postCreateSession(body: SessionModelRequest) {
-    return this.httpClient.post(`${this.apiURL}/sessions/new`,body)
+    return this.httpClient.post<PartiesModelsJson>(`${this.apiURL}/sessions/new`,body)
   }
 
   login(email:string, password:string){

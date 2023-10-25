@@ -16,3 +16,7 @@ export enum StatusGame{
   PRIVATE = "PRIVATE",
   PUBLIC = "PUBLIC"
 }
+
+export interface GameKeySession{
+  key: string
+}
