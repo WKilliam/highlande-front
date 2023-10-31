@@ -1,25 +1,19 @@
-import { Routes } from '@angular/router';
-import {AppComponent} from "./app.component";
-import {GameSessionComponent} from "../features/game.session/game.session.component";
+import {Routes} from '@angular/router';
 import {GameLobbyPage} from "../features/game.lobby/game.lobby.page";
 import {TesteurIOComponent} from "../features/testeur-io/testeur-io.component";
 
 export const routes: Routes = [
-  {
-    path: '',
-    redirectTo: 'lobby',
-    pathMatch: 'full'
-  },
-  {
-    path: 'game',
-    component: GameSessionComponent
-  },
-  {
-    path: 'test',
-    component: TesteurIOComponent
-  },
+  {path: '', redirectTo: 'testeurio', pathMatch: 'full'},
   {
     path: 'lobby',
-    component: GameLobbyPage
-  }
+    component: GameLobbyPage,
+  },
+  {
+    path: 'lobby/:sessionKey',
+    component: GameLobbyPage,
+  },
+  {
+    path: 'testeurio',
+    component: TesteurIOComponent,
+  },
 ];

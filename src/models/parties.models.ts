@@ -1,22 +1,9 @@
 import {MapModels} from "./maps.models";
-import {PlayersLobbyModels} from "./players.model";
-import {TeamsModels} from "./teams";
-import {GameKeySession} from "./sessions";
+import {GameModels} from "./game.models";
+import {InfoGame} from "./info.game.models";
 
 export interface PartiesModelsJson {
   map: MapModels
-  gameKeySession: GameKeySession
   game: GameModels
-  infoGame: PartiesInfoGameModels
-}
-
-export interface GameModels {
-  lobby: Array<PlayersLobbyModels>;
-  teams: TeamsModels,
-  monsters:TeamsModels,
-}
-
-export interface PartiesInfoGameModels {
-  turnCount: number;
-  orderTurn: Array<string>;
+  infoGame: InfoGame
 }

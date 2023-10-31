@@ -3,7 +3,7 @@ import {Component, inject, OnInit} from "@angular/core";
 import {CharacterUiComponent} from "../character/character.ui.component";
 import {CellulesModels} from "../../models/cellules.models";
 import {Cellule} from "../cell/cellule.ui";
-import {StoreServices} from "../../services/store/store.services";
+import {StoreServicesApi} from "../../services/store-Api/store.services.api";
 
 @Component({
   selector: 'ui-map',
@@ -40,7 +40,7 @@ import {StoreServices} from "../../services/store/store.services";
 export class MapUiComponent implements OnInit {
   characterComponent = 'idle';
   gridCellData: CellulesModels[][] = [];
-  readonly store = inject(StoreServices);
+  readonly store = inject(StoreServicesApi);
 
   mapWidth: number = 936;
   mapHeight: number = 620;
@@ -56,9 +56,11 @@ export class MapUiComponent implements OnInit {
   }
 
   pullCell(){
-    const key = 'AvHZA'
+    const key = 'SQMPa'
     this.store.getAllCellsBySession(key).subscribe(result=>{
       this.transformerListeEnGrille(result)
+      this.characterX = result[0].x
+      this.characterY = result[0].y
     })
   }
 

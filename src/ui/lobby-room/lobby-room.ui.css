@@ -29,8 +29,9 @@
 .image-content {
   width: 450px;
   height: 450px;
-  background-image: url('./../../assets/map/lobby.png');
+  background-image: url("./../../assets/map/lobby.png");
   background-size: cover;
   position: relative;
 }
 
+/*# sourceMappingURL=lobby-room.ui.css.map */

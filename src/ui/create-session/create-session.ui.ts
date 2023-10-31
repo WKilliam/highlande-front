@@ -1,6 +1,6 @@
 import {Component, EventEmitter, inject, OnInit, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {StoreServices} from "../../services/store/store.services";
+import {StoreServicesApi} from "../../services/store-Api/store.services.api";
 import {MapsModels} from "../../models/maps.models";
 import {FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
 import {SessionModelRequest, StatusGame} from "../../models/sessions";
@@ -17,7 +17,7 @@ export class CreateSessionUi implements OnInit {
 
   showPasswordField: boolean = false;
   isError: boolean = false;
-  readonly store = inject(StoreServices)
+  readonly storeServicesApi = inject(StoreServicesApi)
   formCreateSession = new FormGroup({
     nameSession: new FormControl(''),
     type: new FormControl(''),
@@ -41,10 +41,10 @@ export class CreateSessionUi implements OnInit {
   }
 
   pullMaps() {
-    this.store.getAllMaps().subscribe((maps: Array<MapsModels>) => {
+    this.storeServicesApi.getAllMaps().subscribe((maps: Array<MapsModels>) => {
       this.maps = maps;
     })
-    this.store.login("john.doe@example.com","motdepasse").subscribe((res) => {
+    this.storeServicesApi.login("john.doe@example.com","motdepasse").subscribe((res) => {
       localStorage.setItem('user', JSON.stringify(res));
     })
   }
@@ -87,12 +87,12 @@ export class CreateSessionUi implements OnInit {
         console.log('error fields password is empty')
       }else if (sessionModelRequest.statusAccess === StatusGame.PRIVATE &&
         sessionModelRequest.password !== ''){
-        this.store.postCreateSession(sessionModelRequest).subscribe((res:PartiesModelsJson) => {
+        this.storeServicesApi.postCreateSession(sessionModelRequest).subscribe((res:PartiesModelsJson) => {
           this.initData(res)
           this.initSession()
         })
       }else{
-        this.store.postCreateSession(sessionModelRequest).subscribe((res:PartiesModelsJson) => {
+        this.storeServicesApi.postCreateSession(sessionModelRequest).subscribe((res:PartiesModelsJson) => {
           this.initData(res)
           this.initSession()
         })
@@ -105,7 +105,6 @@ export class CreateSessionUi implements OnInit {
 
   initData(res:PartiesModelsJson){
     localStorage.setItem('map', JSON.stringify(res.map));
-    localStorage.setItem('gameKeySession', JSON.stringify(res.gameKeySession));
     localStorage.setItem('game', JSON.stringify(res.game));
     localStorage.setItem('infoGame', JSON.stringify(res.infoGame));
   }

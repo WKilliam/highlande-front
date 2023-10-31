@@ -1,5 +1,4 @@
-// style.scss
-:root{
+:root {
   --color-test: #ff0505;
   --background-style: linear-gradient(0deg, #00274D 0%, #0D233E 5%, #030508 20%);
   --background-style-light: linear-gradient(0deg, #0052a2 0%, #235fa8 5%, #1d3150 20%);
@@ -35,6 +34,7 @@
     #7F00FF 90%,
     #FF00FF 100%);
 }
+
 @font-face {
   font-family: irish-grover;
   src: url(./assets/fonts/Irish_Grover/IrishGrover-Regular.ttf);
@@ -46,7 +46,6 @@ html, body {
   background-attachment: fixed;
   margin: 0;
   padding: 0;
-
 }
 
 .content-web-app {
@@ -102,5 +101,13 @@ html, body {
   border-image-slice: 1;
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+/*# sourceMappingURL=styles.css.map */

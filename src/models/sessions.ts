@@ -12,6 +12,12 @@ export interface SessionModelRequest{
   teamNameFour: string,
 }
 
+export interface SessionGamePlace {
+  gameKeySession: string,
+  avatar: string,
+  pseudo: string,
+}
+
 export enum StatusGame{
   PRIVATE = "PRIVATE",
   PUBLIC = "PUBLIC"

@@ -8,50 +8,33 @@ import {BehaviorSubject, Observable} from "rxjs";
 export class SocketService {
   socketEndPoints = 'highlander-socket';
   socket = io('http://localhost:3000', {transports: ['websocket']});
-  private messageSubject = new BehaviorSubject<string>('');
-  message$: Observable<string> = this.messageSubject.asObservable();
-  private alerteSubject = new BehaviorSubject<string>('');
-  alert$: Observable<string> = this.alerteSubject.asObservable();
+  // private messageSubject = new BehaviorSubject<string>('');
+  // message$: Observable<string> = this.messageSubject.asObservable();
+  // private alerteSubject = new BehaviorSubject<string>('');
+  // alert$: Observable<string> = this.alerteSubject.asObservable();
 
-  initSocket() {
-    this.socket.emit('join', {
-      joinnedRoom: `${this.socketEndPoints}-default`
-    });
+  joinDefaultRoom() {
+    return this.socket.emit('join-default');
   }
 
-  joinRoom(room: string,oldRoom:string) {
-    console.log(`connection to room: ${this.socketEndPoints}-${room} and left room: ${this.socketEndPoints}-${oldRoom}`)
-    this.socket.emit('join', {
-      joinnedRoom: `${this.socketEndPoints}-${room}`,
-      oldRoom: `${this.socketEndPoints}-${oldRoom}`,
-    });
+  appConnectedEvent(gameKey: string) {
+    if(gameKey === 'default'){
+      return this.socket.on('app-connected', (message: string) => {
+        console.log(message)
+      });
+    }else{
+      return this.socket.on(`app-connected-${gameKey}`, (message: string) => {
+        console.log(message)
+      });
+    }
   }
 
-  getEventMessage(room: string) {
-    this.socket.on(`send-alerte`, (message: string) => {
-      this.alerteSubject.next(message);
-    });
+  joinRoom(room: string) {
+     return this.socket.emit('join-session', {roomjoin: room});
   }
 
-  getAlterServer() {
-    return this.alert$;
-  }
+  joinTeamCard(room: string) {
 
-  sendMessageToRoom(message: string, room: string) {
-    this.socket.emit('messageFromClient', {
-      message: message,
-      room: `${this.socketEndPoints}-${room}`
-    });
-  }
-
-  getEventMessageSend(){
-    this.socket.on(`messageFromServer`, (message: string) => {
-      this.messageSubject.next(message);
-    });
-  }
-
-  getMessage(){
-    return this.message$;
   }
 
 }

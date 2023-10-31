@@ -22,7 +22,6 @@ import {LifeBarUi} from "../../ui/life-bar/life-bar.ui";
             <div class="position-content">
               <ui-cards-fight class="card-center"></ui-cards-fight>
               <div class="life-bar-position">
-<!--                <ui-life-bar ></ui-life-bar>-->
               </div>
             </div>
           </div>
@@ -33,7 +32,6 @@ import {LifeBarUi} from "../../ui/life-bar/life-bar.ui";
             <div class="position-content">
               <ui-cards-fight class="card-center"></ui-cards-fight>
               <div class="life-bar-position">
-<!--                <ui-life-bar ></ui-life-bar>-->
               </div>
             </div>
           </div>
