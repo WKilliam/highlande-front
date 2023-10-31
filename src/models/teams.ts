@@ -24,4 +24,3 @@ export interface TeamsModels {
   teamThree: TeamBodyModels;
   teamFour: TeamBodyModels;
 }
-

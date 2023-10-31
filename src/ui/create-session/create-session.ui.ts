@@ -5,6 +5,8 @@ import {MapsModels} from "../../models/maps.models";
 import {FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
 import {SessionModelRequest, StatusGame} from "../../models/sessions";
 import {PartiesModelsJson} from "../../models/parties.models";
+import {LocalstorageServices} from "../../services/localsotrage/localstorage.services";
+import {UserModels} from "../../models/user.models";
 
 @Component({
   selector: 'ui-create-session',
@@ -29,6 +31,7 @@ export class CreateSessionUi implements OnInit {
     teamFour: new FormControl(''),
   })
   @Output() onInitSession: EventEmitter<any> = new EventEmitter();
+  local = inject(LocalstorageServices)
 
   togglePasswordField(event: any) {
     const selectedOption = event.target.value;
@@ -44,9 +47,6 @@ export class CreateSessionUi implements OnInit {
     this.storeServicesApi.getAllMaps().subscribe((maps: Array<MapsModels>) => {
       this.maps = maps;
     })
-    this.storeServicesApi.login("john.doe@example.com","motdepasse").subscribe((res) => {
-      localStorage.setItem('user', JSON.stringify(res));
-    })
   }
 
   onStartButtonClick() {
@@ -58,7 +58,7 @@ export class CreateSessionUi implements OnInit {
     const teamTwo = this.formCreateSession.get('teamTwo')?.value as string;
     const teamThree = this.formCreateSession.get('teamThree')?.value as string;
     const teamFour = this.formCreateSession.get('teamFour')?.value as string;
-    const user = JSON.parse(localStorage.getItem('user') as string);
+    const user = this.local.getStorageUser() as UserModels;
     const sessionModelRequest: SessionModelRequest = {
       ownerId: user.id,
       name: nameSession,
@@ -104,9 +104,9 @@ export class CreateSessionUi implements OnInit {
   }
 
   initData(res:PartiesModelsJson){
-    localStorage.setItem('map', JSON.stringify(res.map));
-    localStorage.setItem('game', JSON.stringify(res.game));
-    localStorage.setItem('infoGame', JSON.stringify(res.infoGame));
+    this.local.createStorageByKey('map', res.map)
+    this.local.createStorageByKey('game', res.game)
+    this.local.createStorageByKey('infoGame', res.infoGame)
   }
 
   initSession() {

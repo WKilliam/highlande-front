@@ -2,7 +2,6 @@ import {Component, ElementRef, HostListener, Renderer2} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {CardsFightUi} from "../cards-fight/cards-fight.ui";
 import {LittleCardSelectorUi} from "../little-card-selector/little-card-selector.ui";
-import {CarouselModule, OwlOptions} from "ngx-owl-carousel-o";
 
 @Component({
   selector: 'ui-swiper-card',
@@ -11,18 +10,8 @@ import {CarouselModule, OwlOptions} from "ngx-owl-carousel-o";
   template:`
     <div class="content-carousel">
       <div class="container">
-        <div class="cards-container">
+        <div class="cards-container" *ngFor="let item of items">
           <ui-little-card-selector [points]="1"></ui-little-card-selector>
-          <ui-little-card-selector [points]="2"></ui-little-card-selector>
-          <ui-little-card-selector [points]="3"></ui-little-card-selector>
-          <ui-little-card-selector [points]="4"></ui-little-card-selector>
-          <ui-little-card-selector [points]="5"></ui-little-card-selector>
-          <ui-little-card-selector [points]="6"></ui-little-card-selector>
-          <ui-little-card-selector [points]="7"></ui-little-card-selector>
-          <ui-little-card-selector [points]="8" ></ui-little-card-selector>
-          <ui-little-card-selector [points]="9"></ui-little-card-selector>
-          <ui-little-card-selector [points]="10"></ui-little-card-selector>
-          <ui-little-card-selector [points]="11"></ui-little-card-selector>
         </div>
       </div>
     </div>
@@ -31,6 +20,7 @@ import {CarouselModule, OwlOptions} from "ngx-owl-carousel-o";
 })
 export class SwiperCardUi {
 
+  items: Array<any> = new Array(100);
 
   private isDown = false;
   private startX: number | undefined;

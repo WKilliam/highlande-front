@@ -5,6 +5,9 @@ import {TeamBodyModels, TeamsModels} from "../../models/teams";
 import {UserModels} from "../../models/user.models";
 import {GameModels} from "../../models/game.models";
 import {SwiperCardUi} from "../swiper-card/swiper-card.ui";
+import {StoreServicesSocket} from "../../services/store-Socket/store.services.socket";
+import {InfoGame} from "../../models/info.game.models";
+import {SocketJoinTeamCard} from "../../models/socket.models";
 
 @Component({
   selector: 'ui-team-card',
@@ -93,12 +96,23 @@ export class TeamCardUi implements OnInit {
   teamSpd: number = 0;
   teamLuk: number = 0;
   gameModels: GameModels = JSON.parse(localStorage.getItem('game') || '{}');
-  storeSocketService = inject(SocketService)
+  infoGame: InfoGame = JSON.parse(localStorage.getItem('infoGame') || '{}');
+  user: UserModels = JSON.parse(localStorage.getItem('user') || '{}');
+  storeSocketService = inject(StoreServicesSocket)
 
 
 
   JoinPlayer1() {
-
+    if(JSON.stringify(this.infoGame) !== '{}'){
+      let socketJoinTeamCard : SocketJoinTeamCard = {
+        gameKey: this.infoGame.gameKeySession.key,
+        teamTag: this.teamTag,
+        userAvatar: this.user.avatar,
+        userPseudo: this.user.pseudo,
+        position: 1
+      }
+      this.storeSocketService.joinTeamEvent(socketJoinTeamCard)
+    }
   }
 
   JoinPlayer2() {

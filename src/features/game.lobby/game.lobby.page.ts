@@ -91,6 +91,7 @@ export class GameLobbyPage implements OnInit {
     } else {
       this.router.navigateByUrl(`/testeurio`);
     }
+    this.listenSocketApp()
   }
 
   initSessionEvent() {
@@ -104,13 +105,20 @@ export class GameLobbyPage implements OnInit {
       avatar: this.user.avatar,
       pseudo: this.user.pseudo
     }).subscribe((received :FormatModel) => {
-      console.log(received)
       if (received.code >= 200 && received.code < 300) {
-        this.storeServicesSocket.joinSessionEvent(this.sessionKey)
+        this.storeServicesSocket.joinSessionEvent({
+          roomjoin: this.sessionKey,
+          userAvatar: this.user.avatar,
+          userPseudo: this.user.pseudo
+        })
       }else{
         this.router.navigateByUrl(`/testeurio`);
       }
     })
+  }
+
+  listenSocketApp() {
+    this.storeServicesSocket.appReceivedConnectedEvent(this.sessionKey)
   }
 
 }

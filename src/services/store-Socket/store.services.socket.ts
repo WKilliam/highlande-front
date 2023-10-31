@@ -1,9 +1,8 @@
 import {inject, Injectable} from "@angular/core";
-import {ApiServices} from "../api/api.services";
-import {SessionGamePlace, SessionModelRequest} from "../../models/sessions";
 import {SocketService} from "../socket/socket.service";
-import {StoreServicesApi} from "../store-Api/store.services.api";
-import {FormatModel} from "../../models/format.model";
+import {SocketJoinSession, SocketJoinTeamCard} from "../../models/socket.models";
+import {BehaviorSubject} from "rxjs";
+import {PartiesModelsJson} from "../../models/parties.models";
 
 @Injectable({
   providedIn: 'root',
@@ -11,17 +10,25 @@ import {FormatModel} from "../../models/format.model";
 export class StoreServicesSocket {
 
   readonly socket: SocketService = inject(SocketService);
+  // private alerteSubject = new BehaviorSubject<string>('');
+  // alert$: Observable<string> = this.alerteSubject.asObservable();
+  private messageSubject = new BehaviorSubject<PartiesModelsJson | null>(null);
+  // message$: BehaviorSubject<PartiesModelsJson | null> = this.messageSubject.asObservable();
+
 
   joinSessionDefaultEvent() {
     this.socket.joinDefaultRoom();
   }
 
   appReceivedConnectedEvent(gameKey: string) {
-    return this.socket.appConnectedEvent(gameKey);
+    this.socket.appConnectedEvent(gameKey);
   }
 
-  joinSessionEvent(gameKey: string) {
-    return this.socket.joinRoom(gameKey);
+  joinSessionEvent(socketJoinSession:SocketJoinSession) {
+    return this.socket.joinRoom(socketJoinSession);
   }
 
+  joinTeamEvent(socketJoinTeamCard: SocketJoinTeamCard) {
+    return this.socket.joinTeamCard(socketJoinTeamCard);
+  }
 }

@@ -5,6 +5,7 @@ import {GameKeySession} from "../../models/sessions";
 import {GameModels} from "../../models/game.models";
 import {InfoGame} from "../../models/info.game.models";
 import {SwiperCardUi} from "../swiper-card/swiper-card.ui";
+import {CardsModel} from "../../models/cards.model";
 
 @Component({
   selector: 'ui-lobby-room',
@@ -24,7 +25,7 @@ import {SwiperCardUi} from "../swiper-card/swiper-card.ui";
           <button>Start Game</button>
         </div>
       </div>
-      <ui-swiper-card class="card-selector"></ui-swiper-card>
+      <ui-swiper-card *ngIf="isActiveSelectorCard" class="card-selector"></ui-swiper-card>
     </div>
   `,
   styleUrls: ['./lobby-room.ui.scss']
@@ -34,6 +35,7 @@ export class LobbyRoomUi implements OnInit {
   players: Array<PlayersLobbyModels> = []
   grayCircles: any[] = new Array(8);
   infoGame: InfoGame = JSON.parse(localStorage.getItem('infoGame') || '{}');
+  isActiveSelectorCard: boolean = false;
 
   ngOnInit(): void {
     if (JSON.stringify(this.infoGame) !== '{}') {

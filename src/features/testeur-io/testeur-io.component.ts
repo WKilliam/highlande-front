@@ -5,6 +5,7 @@ import {SocketService} from "../../services/socket/socket.service";
 import {StoreServicesApi} from "../../services/store-Api/store.services.api";
 import {Router} from "@angular/router";
 import {SwiperCardUi} from "../../ui/swiper-card/swiper-card.ui";
+import {LocalstorageServices} from "../../services/localsotrage/localstorage.services";
 
 @Component({
   selector: 'app-testeur-io',
@@ -13,38 +14,38 @@ import {SwiperCardUi} from "../../ui/swiper-card/swiper-card.ui";
   template: `
     <div>
       <ui-swiper-card></ui-swiper-card>
-<!--      <h1>Chat en direct</h1>-->
-<!--      <p>{{alerte}}</p>-->
-<!--      <div>-->
-<!--        <label for="roomSelect">Choisir une salle :</label>-->
-<!--        <select id="roomSelect"-->
-<!--                [(ngModel)]="switchRoom"-->
-<!--                (change)="joinRoom(switchRoom)"-->
-<!--        >-->
-<!--          <option value="default">Default</option>-->
-<!--          <option value="room1">Salle 1</option>-->
-<!--          <option value="room2">Salle 2</option>-->
-<!--        </select>-->
-<!--      </div>-->
+      <h1>Chat en direct</h1>
+      <p>{{alerte}}</p>
+      <div>
+        <label for="roomSelect">Choisir une salle :</label>
+        <select id="roomSelect"
+                [(ngModel)]="switchRoom"
+                (change)="joinRoom(switchRoom)"
+        >
+          <option value="default">Default</option>
+          <option value="room1">Salle 1</option>
+          <option value="room2">Salle 2</option>
+        </select>
+      </div>
 
-<!--      <div>-->
-<!--        <input type="text" [(ngModel)]="message" placeholder="Entrez votre message">-->
-<!--        <button (click)="sendMessageToRoom()">Envoyer</button>-->
-<!--      </div>-->
-<!--      <div style="background-color: #FFFFFF">-->
-<!--        {{message}}-->
-<!--      </div>-->
-<!--      <div>-->
-<!--        <label for="roomSelect">Choisir user :</label>-->
-<!--        <select id="roomSelect"-->
-<!--                [(ngModel)]="userSwitch"-->
-<!--                (change)="joinRoom(switchRoom)"-->
-<!--        >-->
-<!--          <option value="User1">User1</option>-->
-<!--          <option value="User2">User2</option>-->
-<!--        </select>-->
-<!--        <button (click)="connectUser()">Login</button>-->
-<!--      </div>-->
+      <div>
+        <input type="text" [(ngModel)]="message" placeholder="Entrez votre message">
+        <button (click)="sendMessageToRoom()">Envoyer</button>
+      </div>
+      <div style="background-color: #FFFFFF">
+        {{message}}
+      </div>
+      <div>
+        <label for="roomSelect">Choisir user :</label>
+        <select id="roomSelect"
+                [(ngModel)]="userSwitch"
+                (change)="joinRoom(switchRoom)"
+        >
+          <option value="User1">User1</option>
+          <option value="User2">User2</option>
+        </select>
+        <button (click)="connectUser()">Login</button>
+      </div>
     </div>
   `,
   styleUrls: ['./testeur-io.component.scss']
@@ -58,6 +59,7 @@ export class TesteurIOComponent implements OnInit {
   alerte: string = '';
   socket = inject(SocketService)
   storeApi = inject(StoreServicesApi)
+  local = inject(LocalstorageServices)
   router = inject(Router)
 
   ngOnInit(): void {
@@ -88,12 +90,15 @@ export class TesteurIOComponent implements OnInit {
     if(this.userSwitch === 'User1') {
       this.storeApi.login('john.doe@example.com','motdepasse').subscribe(received=>{
         if(received){
+          this.local.createStorageByKey('user',received)
           this.router.navigateByUrl(`/lobby`);
         }
       })
     } else {
       this.storeApi.login('john2.doe@example.com','motdepasse').subscribe(received=>{
+        console.log(received)
         if(received){
+          this.local.createStorageByKey('user',received)
           this.router.navigateByUrl(`/lobby`);
         }
       })
