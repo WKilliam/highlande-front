@@ -39,9 +39,9 @@ import {LifeBarUi} from "../../ui/life-bar/life-bar.ui";
       </div>
     </div>
   `,
-  styleUrls: ['./game.session.component.scss']
+  styleUrls: ['./game-session-page.component.scss']
 })
-export class GameSessionComponent {
+export class GameSessionPage {
   circles = [
     { text: '25%', active: true },
     { text: '50%', active: false },

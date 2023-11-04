@@ -3,7 +3,7 @@ import {GameModels} from "./game.models";
 import {InfoGame} from "./info.game.models";
 
 export interface PartiesModelsJson {
-  map: MapModels
-  game: GameModels
-  infoGame: InfoGame
+  map: MapModels | null
+  game: GameModels | null
+  infoGame: InfoGame | null
 }

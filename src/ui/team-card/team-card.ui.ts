@@ -1,13 +1,25 @@
-import {Component, inject, Input, OnInit} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  Inject,
+  inject,
+  Input,
+  OnInit,
+  signal,
+  WritableSignal
+} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {SocketService} from "../../services/socket/socket.service";
-import {TeamBodyModels, TeamsModels} from "../../models/teams";
 import {UserModels} from "../../models/user.models";
-import {GameModels} from "../../models/game.models";
+import { GameModels} from "../../models/game.models";
 import {SwiperCardUi} from "../swiper-card/swiper-card.ui";
 import {StoreServicesSocket} from "../../services/store-Socket/store.services.socket";
 import {InfoGame} from "../../models/info.game.models";
-import {SocketJoinTeamCard} from "../../models/socket.models";
+import {LocalstorageServices} from "../../services/localsotrage/localstorage.services";
+import {MapModels} from "../../models/maps.models";
+import {TeamsModels} from "../../models/teams";
+import {distinctUntilChanged, tap} from "rxjs";
+import {SocketJoinSession, SocketJoinTeamCard} from "../../models/socket.models";
 
 @Component({
   selector: 'ui-team-card',
@@ -23,7 +35,7 @@ import {SocketJoinTeamCard} from "../../models/socket.models";
           <div class="col-6">
             <div class="row">
               <div class="col">
-                <div class="rectangle" (click)="call($event)">
+                <div class="rectangle">
                   <img
                     [src]="imageSrcPlayerOne"
                     alt="Image"
@@ -34,14 +46,17 @@ import {SocketJoinTeamCard} from "../../models/socket.models";
                 </div>
               </div>
               <div class="col">
-                <button type="button" class="join-btn" (click)="JoinPlayer1()">Join</button>
+                <button type="button" class="join-btn">Join</button>
+              </div>
+              <div style="color: #FFFFFF">
+                Player : {{playerOnePseudo}}
               </div>
             </div>
           </div>
           <div class="col-6">
             <div class="row">
               <div class="col">
-                <div class="rectangle" (click)="call($event)">
+                <div class="rectangle">
                   <img
                     [src]="imageSrcPlayerTwo"
                     alt="Image"
@@ -52,7 +67,10 @@ import {SocketJoinTeamCard} from "../../models/socket.models";
                 </div>
               </div>
               <div class="col">
-                <button type="button" class="join-btn" (click)="JoinPlayer2()">Join</button>
+                <button type="button" class="join-btn">Join</button>
+              </div>
+              <div style="color: #FFFFFF">
+                Player : {{ playerTwoPseudo}}
               </div>
             </div>
           </div>
@@ -85,9 +103,8 @@ import {SocketJoinTeamCard} from "../../models/socket.models";
 export class TeamCardUi implements OnInit {
 
   @Input() teamTag: string = ''
-
-  imageSrcPlayerOne: string = 'https://cdn.discordapp.com/attachments/1060501071056879618/1168479278174830602/kyrasw_the_frame_of_a_back_tarot_card_game_rpg_in_png_format_or_379c9eb1-9bea-4ea4-bd56-c5629407e849.png?ex=6551ea21&is=653f7521&hm=6c6f2206917ece648f45a5e47c078b653280858dfed24979dedf207d22795991&';
-  imageSrcPlayerTwo: string = 'https://cdn.discordapp.com/attachments/1060501071056879618/1168479278174830602/kyrasw_the_frame_of_a_back_tarot_card_game_rpg_in_png_format_or_379c9eb1-9bea-4ea4-bd56-c5629407e849.png?ex=6551ea21&is=653f7521&hm=6c6f2206917ece648f45a5e47c078b653280858dfed24979dedf207d22795991&';
+  imageSrcPlayerOne: string = ''
+  imageSrcPlayerTwo: string = ''
   rarityPlayerOne: string = 'common';
   rarityPlayerTwo: string = 'common';
   teamName: string = 'Team #';
@@ -95,91 +112,103 @@ export class TeamCardUi implements OnInit {
   teamDef: number = 0;
   teamSpd: number = 0;
   teamLuk: number = 0;
-  gameModels: GameModels = JSON.parse(localStorage.getItem('game') || '{}');
-  infoGame: InfoGame = JSON.parse(localStorage.getItem('infoGame') || '{}');
-  user: UserModels = JSON.parse(localStorage.getItem('user') || '{}');
+  playerOnePseudo: string = '';
+  playerTwoPseudo: string = '';
+  private local = inject(LocalstorageServices)
+  private eventUser = this.local.getUser()
+  private eventInfoGame = this.local.getInfoGame()
+  private eventGame = this.local.getGame()
   storeSocketService = inject(StoreServicesSocket)
+  private effectRef: any
 
+  private eventGameSignal = this.local.eventGameSignal()
 
-
-  JoinPlayer1() {
-    if(JSON.stringify(this.infoGame) !== '{}'){
-      let socketJoinTeamCard : SocketJoinTeamCard = {
-        gameKey: this.infoGame.gameKeySession.key,
-        teamTag: this.teamTag,
-        userAvatar: this.user.avatar,
-        userPseudo: this.user.pseudo,
-        position: 1
-      }
-      this.storeSocketService.joinTeamEvent(socketJoinTeamCard)
-    }
-  }
-
-  JoinPlayer2() {
-
-  }
 
   ngOnInit(): void {
-    // console.log(this.teamsModels)
-    this.init()
+    this.effectRef = effect(() => {
+      effect(() => {
+        if(this.eventInfoGame() !== null){
+          console.log('inside eventInfoGame')
+        }
+      })
+    })
   }
 
-  init() {
-    if (JSON.stringify(this.gameModels) !== '{}') {
-      let value: TeamsModels = this.gameModels.teams
-      switch (this.teamTag) {
-        case 'teamOne':
-          this.teamName = value.teamOne.teamName
-          this.teamAtk = value.teamOne.commonAttack
-          this.teamDef = value.teamOne.commonDefense
-          this.teamSpd = value.teamOne.commonSpeed
-          this.teamLuk = value.teamOne.commonLuck
-          this.imageSrcPlayerOne = value.teamOne.cardOne.image != '' ? value.teamOne.cardOne.image : this.imageSrcPlayerOne
-          this.imageSrcPlayerTwo = value.teamOne.cardTwo.image != '' ? value.teamOne.cardTwo.image : this.imageSrcPlayerTwo
-          this.rarityPlayerOne = value.teamOne.cardOne.rarity != '' ? value.teamOne.cardOne.rarity : this.rarityPlayerOne
-          this.rarityPlayerTwo = value.teamOne.cardTwo.rarity != '' ? value.teamOne.cardTwo.rarity : this.rarityPlayerTwo
-          break
-        case 'teamTwo':
-          this.teamName = value.teamTwo.teamName
-          this.teamAtk = value.teamTwo.commonAttack
-          this.teamDef = value.teamTwo.commonDefense
-          this.teamSpd = value.teamTwo.commonSpeed
-          this.teamLuk = value.teamTwo.commonLuck
-          this.imageSrcPlayerOne = value.teamTwo.cardOne.image != '' ? value.teamTwo.cardOne.image : this.imageSrcPlayerOne
-          this.imageSrcPlayerTwo = value.teamTwo.cardTwo.image != '' ? value.teamTwo.cardTwo.image : this.imageSrcPlayerTwo
-          this.rarityPlayerOne = value.teamTwo.cardOne.rarity != '' ? value.teamTwo.cardOne.rarity : this.rarityPlayerOne
-          this.rarityPlayerTwo = value.teamTwo.cardTwo.rarity != '' ? value.teamTwo.cardTwo.rarity : this.rarityPlayerTwo
-          break
-        case 'teamThree':
-          this.teamName = value.teamThree.teamName
-          this.teamAtk = value.teamThree.commonAttack
-          this.teamDef = value.teamThree.commonDefense
-          this.teamSpd = value.teamThree.commonSpeed
-          this.teamLuk = value.teamThree.commonLuck
-          this.imageSrcPlayerOne = value.teamThree.cardOne.image != '' ? value.teamThree.cardOne.image : this.imageSrcPlayerOne
-          this.imageSrcPlayerTwo = value.teamThree.cardTwo.image != '' ? value.teamThree.cardTwo.image : this.imageSrcPlayerTwo
-          this.rarityPlayerOne = value.teamThree.cardOne.rarity != '' ? value.teamThree.cardOne.rarity : this.rarityPlayerOne
-          this.rarityPlayerTwo = value.teamThree.cardTwo.rarity != '' ? value.teamThree.cardTwo.rarity : this.rarityPlayerTwo
-          break
-        case 'teamFour':
-          this.teamName = value.teamFour.teamName
-          this.teamAtk = value.teamFour.commonAttack
-          this.teamDef = value.teamFour.commonDefense
-          this.teamSpd = value.teamFour.commonSpeed
-          this.teamLuk = value.teamFour.commonLuck
-          this.imageSrcPlayerOne = value.teamFour.cardOne.image != '' ? value.teamFour.cardOne.image : this.imageSrcPlayerOne
-          this.imageSrcPlayerTwo = value.teamFour.cardTwo.image != '' ? value.teamFour.cardTwo.image : this.imageSrcPlayerTwo
-          this.rarityPlayerOne = value.teamFour.cardOne.rarity != '' ? value.teamFour.cardOne.rarity : this.rarityPlayerOne
-          this.rarityPlayerTwo = value.teamFour.cardTwo.rarity != '' ? value.teamFour.cardTwo.rarity : this.rarityPlayerTwo
-          break
-        default:
-          break
-      }
-    }
-  }
-
-  call($event: any) {
-    console.log($event)
-  }
-
+  // JoinPlayer1() {
+  //   if(this.user !== null && this.infoGame !== null){
+  //     let socketJoin: SocketJoinTeamCard = {
+  //       room: this.infoGame.gameKeySession.key,
+  //       pseudo: this.user.pseudo,
+  //       avatar: this.user.avatar,
+  //       teamTag: this.teamTag,
+  //       position: 1
+  //     }
+  //     this.storeSocketService.selectPlaceTeam(socketJoin)
+  //   }else{
+  //     console.log('error')
+  //   }
+  // }
+  //
+  // JoinPlayer2() {
+  //   // this.storeSocketService.joinTeamCardEvent(this.teamTag, 2)
+  // }
+  //
+  // initVIew(){
+  //   if(this.game !== null){
+  //     switch (this.teamTag) {
+  //       case 'teamOne':
+  //         this.teamName = this.game.teams.teamOne.teamName
+  //         this.teamAtk = this.game.teams.teamOne.cardOne.atk + this.game.teams.teamOne.cardTwo.atk
+  //         this.teamDef = this.game.teams.teamOne.cardOne.def + this.game.teams.teamOne.cardTwo.def
+  //         this.teamSpd = this.game.teams.teamOne.cardOne.spd + this.game.teams.teamOne.cardTwo.spd
+  //         this.teamLuk = this.game.teams.teamOne.cardOne.luk + this.game.teams.teamOne.cardTwo.luk
+  //         this.imageSrcPlayerOne = this.game.teams.teamOne.cardOne.image
+  //         this.imageSrcPlayerTwo = this.game.teams.teamOne.cardTwo.image
+  //         this.playerOnePseudo = this.game.teams.teamOne.playerOne.pseudo
+  //         this.playerTwoPseudo = this.game.teams.teamOne.playerTwo.pseudo
+  //         this.rarityPlayerOne = this.game.teams.teamOne.cardOne.rarity
+  //         this.rarityPlayerTwo = this.game.teams.teamOne.cardTwo.rarity
+  //         break
+  //       case 'teamTwo':
+  //         this.teamName = this.game.teams.teamTwo.teamName
+  //         this.teamAtk = this.game.teams.teamTwo.cardOne.atk + this.game.teams.teamTwo.cardTwo.atk
+  //         this.teamDef = this.game.teams.teamTwo.cardOne.def + this.game.teams.teamTwo.cardTwo.def
+  //         this.teamSpd = this.game.teams.teamTwo.cardOne.spd + this.game.teams.teamTwo.cardTwo.spd
+  //         this.teamLuk = this.game.teams.teamTwo.cardOne.luk + this.game.teams.teamTwo.cardTwo.luk
+  //         this.imageSrcPlayerOne = this.game.teams.teamTwo.cardOne.image
+  //         this.imageSrcPlayerTwo = this.game.teams.teamTwo.cardTwo.image
+  //         this.playerOnePseudo = this.game.teams.teamTwo.playerOne.pseudo
+  //         this.playerTwoPseudo = this.game.teams.teamTwo.playerTwo.pseudo
+  //         this.rarityPlayerOne = this.game.teams.teamTwo.cardOne.rarity
+  //         this.rarityPlayerTwo = this.game.teams.teamTwo.cardTwo.rarity
+  //         break
+  //       case 'teamThree':
+  //         this.teamName = this.game.teams.teamThree.teamName
+  //         this.teamAtk = this.game.teams.teamThree.cardOne.atk + this.game.teams.teamThree.cardTwo.atk
+  //         this.teamDef = this.game.teams.teamThree.cardOne.def + this.game.teams.teamThree.cardTwo.def
+  //         this.teamSpd = this.game.teams.teamThree.cardOne.spd + this.game.teams.teamThree.cardTwo.spd
+  //         this.teamLuk = this.game.teams.teamThree.cardOne.luk + this.game.teams.teamThree.cardTwo.luk
+  //         this.imageSrcPlayerOne = this.game.teams.teamThree.cardOne.image
+  //         this.imageSrcPlayerTwo = this.game.teams.teamThree.cardTwo.image
+  //         this.playerOnePseudo = this.game.teams.teamThree.playerOne.pseudo
+  //         this.playerTwoPseudo = this.game.teams.teamThree.playerTwo.pseudo
+  //         this.rarityPlayerOne = this.game.teams.teamThree.cardOne.rarity
+  //         this.rarityPlayerTwo = this.game.teams.teamThree.cardTwo.rarity
+  //         break
+  //       case 'teamFour':
+  //         this.teamName = this.game.teams.teamFour.teamName
+  //         this.teamAtk = this.game.teams.teamFour.cardOne.atk + this.game.teams.teamFour.cardTwo.atk
+  //         this.teamDef = this.game.teams.teamFour.cardOne.def + this.game.teams.teamFour.cardTwo.def
+  //         this.teamSpd = this.game.teams.teamFour.cardOne.spd + this.game.teams.teamFour.cardTwo.spd
+  //         this.teamLuk = this.game.teams.teamFour.cardOne.luk + this.game.teams.teamFour.cardTwo.luk
+  //         this.imageSrcPlayerOne = this.game.teams.teamFour.cardOne.image
+  //         this.imageSrcPlayerTwo = this.game.teams.teamFour.cardTwo.image
+  //         this.playerOnePseudo = this.game.teams.teamFour.playerOne.pseudo
+  //         this.playerTwoPseudo = this.game.teams.teamFour.playerTwo.pseudo
+  //         this.rarityPlayerOne = this.game.teams.teamFour.cardOne.rarity
+  //         this.rarityPlayerTwo = this.game.teams.teamFour.cardTwo.rarity
+  //         break
+  //     }
+  //   }
+  // }
 }

@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, inject, Input, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {PlayersLobbyModels} from "../../models/players.model";
 import {GameKeySession} from "../../models/sessions";
@@ -6,6 +6,7 @@ import {GameModels} from "../../models/game.models";
 import {InfoGame} from "../../models/info.game.models";
 import {SwiperCardUi} from "../swiper-card/swiper-card.ui";
 import {CardsModel} from "../../models/cards.model";
+import {LocalstorageServices} from "../../services/localsotrage/localstorage.services";
 
 @Component({
   selector: 'ui-lobby-room',
@@ -34,11 +35,12 @@ export class LobbyRoomUi implements OnInit {
 
   players: Array<PlayersLobbyModels> = []
   grayCircles: any[] = new Array(8);
-  infoGame: InfoGame = JSON.parse(localStorage.getItem('infoGame') || '{}');
+  private eventInfoGame = inject(LocalstorageServices).getInfoGame()
   isActiveSelectorCard: boolean = false;
+  infoGame: InfoGame | null = this.eventInfoGame()?.toString() !== '{}' ? JSON.parse(this.eventInfoGame()?.toString() ?? '{}') : null;
 
   ngOnInit(): void {
-    if (JSON.stringify(this.infoGame) !== '{}') {
+    if (this.infoGame !== null) {
       this.players = this.infoGame?.lobby;
       // Initialisation des pastilles grises
       this.grayCircles = new Array(7);

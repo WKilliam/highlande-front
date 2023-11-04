@@ -57,11 +57,11 @@ export class MapUiComponent implements OnInit {
 
   pullCell(){
     const key = 'SQMPa'
-    this.store.getAllCellsBySession(key).subscribe(result=>{
-      this.transformerListeEnGrille(result)
-      this.characterX = result[0].x
-      this.characterY = result[0].y
-    })
+    // this.store.getAllCellsBySession(key).subscribe(result=>{
+    //   this.transformerListeEnGrille(result)
+    //   this.characterX = result[0].x
+    //   this.characterY = result[0].y
+    // })
   }
 
   transformerListeEnGrille(listeCellules: CellulesModels[]): void {
@@ -114,86 +114,5 @@ export class MapUiComponent implements OnInit {
       }
     }, 16);
   }
-
-  // findCellById(targetId: number): CellulesModels {
-  //   for (const rowArray of this.gridCellData) {
-  //     for (const cell of rowArray) {
-  //       if (cell.id === targetId) {
-  //         console.log(`Cellule avec l'ID ${targetId} trouvée.`)
-  //         return cell; // Retourne la cellule avec l'ID correspondant
-  //       }
-  //     }
-  //   }
-  //   console.error(`Cellule avec l'ID ${targetId} non trouvée.`);
-  //   return this.gridCellData[0][0];
-  // }
-
-  // placeCharacterRandomly(): void {
-  //   const {minX, maxX, minY, maxY} = this.getGridIndices();
-  //   const eligibleCells: { x: number, y: number }[] = [];
-  //   for (let x = minX; x <= maxX; x++) {
-  //     for (let y = minY; y <= maxY; y++) {
-  //       const cell = this.gridCellData[y][x];
-  //       if (cell.value !== -1) {
-  //         eligibleCells.push({x, y});
-  //       }
-  //     }
-  //   }
-  //   if (eligibleCells.length > 0) {
-  //     const randomIndex = Math.floor(Math.random() * eligibleCells.length);
-  //     const randomCell = eligibleCells[randomIndex];
-  //     this.characterY = randomCell.x * 32 + 5; // Mise à l'échelle avec la largeur de la cellule
-  //     this.characterX = randomCell.y * 32 + 5; // Mise à l'échelle avec la hauteur de la cellule
-  //     const characterCell = this.gridCellData[randomCell.y][randomCell.x];
-  //     console.log(`Le personnage a été placé sur la cellule ID: ${characterCell.id}`);
-  //   } else {
-  //     console.error("Aucune cellule éligible n'a été trouvée.");
-  //   }
-  // }
-
-
-  // getGridIndices(): { minX: number, maxX: number, minY: number, maxY: number } {
-  //   const numRows = this.gridCellData.length;
-  //   const numCols = this.gridCellData[0].length;
-  //   const minX = 0;
-  //   const maxX = numCols - 1;
-  //   const minY = 0;
-  //   const maxY = numRows - 1;
-  //   console.log(`Limites de la matrice : minRow=${minX}, maxRow=${maxX}, minCol=${minY}, maxCol=${maxY}`);
-  //   return {minX, maxX, minY, maxY};
-  // }
-
-  // findCellsAtDistance(startId: number, distance: number): CellulesModels[] {
-  //   const result: CellulesModels[] = [];
-  //   let startX: number | null = null;
-  //   let startY: number | null = null;
-  //   this.gridCellData.forEach((rowArray, rowIndex) => {
-  //     rowArray.forEach((cell, colIndex) => {
-  //       if (cell.id === startId) {
-  //         startX = rowIndex;
-  //         startY = colIndex;
-  //       }
-  //     });
-  //   });
-
-  //   if (startX === null || startY === null) {
-  //     console.error(`Cellule de départ avec l'ID ${startId} non trouvée.`);
-  //     return result;
-  //   }
-  //   const {minX, maxX, minY, maxY} = this.getGridIndices();
-  //   for (let x = minX; x <= maxX; x++) {
-  //     for (let y = minY; y <= maxY; y++) {
-  //       const dx = Math.abs(x - startY);
-  //       const dy = Math.abs(y - startX);
-  //       const manhattanDistance = dx + dy;
-  //       if (manhattanDistance === distance) {
-  //         result.push(this.gridCellData[y][x]);
-  //       }
-  //     }
-  //   }
-  //   this.move(result[0]);
-  //   console.log(`Cellules à une distance de ${distance} de la cellule de départ (ID: ${startId}) :`, result);
-  //   return result;
-  // }
 
 }

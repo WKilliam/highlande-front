@@ -7,6 +7,8 @@ import {SessionModelRequest, StatusGame} from "../../models/sessions";
 import {PartiesModelsJson} from "../../models/parties.models";
 import {LocalstorageServices} from "../../services/localsotrage/localstorage.services";
 import {UserModels} from "../../models/user.models";
+import {FormatModel} from "../../models/format.model";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'ui-create-session',
@@ -32,11 +34,14 @@ export class CreateSessionUi implements OnInit {
   })
   @Output() onInitSession: EventEmitter<any> = new EventEmitter();
   local = inject(LocalstorageServices)
+  user = this.local.getUser()
+  private router = inject(Router)
 
   togglePasswordField(event: any) {
     const selectedOption = event.target.value;
     this.showPasswordField = selectedOption === 'private';
   }
+
   maps: Array<MapsModels> = [];
 
   ngOnInit(): void {
@@ -44,8 +49,12 @@ export class CreateSessionUi implements OnInit {
   }
 
   pullMaps() {
-    this.storeServicesApi.getAllMaps().subscribe((maps: Array<MapsModels>) => {
-      this.maps = maps;
+    this.storeServicesApi.getAllMaps().subscribe((received: FormatModel) => {
+      if (received.code >= 200 && received.code < 300) {
+        this.maps = received.data
+      }else{
+        console.log(`code : ${received.code} , data : ${received.data} , message : ${received.message}`)
+      }
     })
   }
 
@@ -58,13 +67,14 @@ export class CreateSessionUi implements OnInit {
     const teamTwo = this.formCreateSession.get('teamTwo')?.value as string;
     const teamThree = this.formCreateSession.get('teamThree')?.value as string;
     const teamFour = this.formCreateSession.get('teamFour')?.value as string;
-    const user = this.local.getStorageUser() as UserModels;
+    const user = this.local.getUser()
+    let userModels: UserModels = JSON.parse(user?.toString() ?? '{}')
     const sessionModelRequest: SessionModelRequest = {
-      ownerId: user.id,
+      ownerId: userModels.id,
       name: nameSession,
       createdAt: new Date().toLocaleDateString(),
       updatedAt: new Date().toLocaleDateString(),
-      statusAccess: ( type === 'public' || type === '') ? StatusGame.PUBLIC : StatusGame.PRIVATE,
+      statusAccess: (type === 'public' || type === '') ? StatusGame.PUBLIC : StatusGame.PRIVATE,
       password: password,
       mapId: map === '' ? -1 : parseInt(map),
       teamNameOne: teamOne,
@@ -81,21 +91,15 @@ export class CreateSessionUi implements OnInit {
       sessionModelRequest.teamNameThree !== '' &&
       sessionModelRequest.teamNameFour !== ''
     ) {
-      if(sessionModelRequest.statusAccess === StatusGame.PRIVATE &&
-        sessionModelRequest.password === ''){
+      if (sessionModelRequest.statusAccess === StatusGame.PRIVATE &&
+        sessionModelRequest.password === '') {
         this.isError = true;
         console.log('error fields password is empty')
-      }else if (sessionModelRequest.statusAccess === StatusGame.PRIVATE &&
-        sessionModelRequest.password !== ''){
-        this.storeServicesApi.postCreateSession(sessionModelRequest).subscribe((res:PartiesModelsJson) => {
-          this.initData(res)
-          this.initSession()
-        })
-      }else{
-        this.storeServicesApi.postCreateSession(sessionModelRequest).subscribe((res:PartiesModelsJson) => {
-          this.initData(res)
-          this.initSession()
-        })
+      } else if (sessionModelRequest.statusAccess === StatusGame.PRIVATE &&
+        sessionModelRequest.password !== '') {
+        this.createSession(sessionModelRequest)
+      } else {
+        this.createSession(sessionModelRequest)
       }
     } else {
       this.isError = true;
@@ -103,10 +107,22 @@ export class CreateSessionUi implements OnInit {
     }
   }
 
-  initData(res:PartiesModelsJson){
-    this.local.createStorageByKey('map', res.map)
-    this.local.createStorageByKey('game', res.game)
-    this.local.createStorageByKey('infoGame', res.infoGame)
+  createSession(sessionModelRequest: SessionModelRequest) {
+    this.storeServicesApi.postCreateSession(sessionModelRequest).subscribe((received: FormatModel) => {
+      if(received.code >= 200 && received.code < 300){
+        this.initData(received.data)
+        this.initSession()
+        this.router.navigateByUrl(`/lobby/${received.data.infoGame.gameKeySession.key}`);
+      }else{
+        console.log(`code : ${received.code} , data : ${received.data} , message : ${received.message}`)
+      }
+    })
+  }
+
+  initData(res: PartiesModelsJson) {
+    this.local.setGame(res.game)
+    this.local.setMap(res.map)
+    this.local.setInfoGame(res.infoGame)
   }
 
   initSession() {

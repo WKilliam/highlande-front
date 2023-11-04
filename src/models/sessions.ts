@@ -12,8 +12,7 @@ export interface SessionModelRequest{
   teamNameFour: string,
 }
 
-export interface SessionGamePlace {
-  gameKeySession: string,
+export interface SessionCheckUser {
   avatar: string,
   pseudo: string,
 }

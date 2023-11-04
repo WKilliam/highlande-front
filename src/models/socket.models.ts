@@ -1,16 +1,16 @@
 
 
 export interface SocketJoinSession {
-  roomjoin: string;
-  userAvatar: string;
-  userPseudo: string;
+  room: string;
+  avatar: string;
+  pseudo: string;
 }
 
 export interface SocketJoinTeamCard {
-  gameKey: string;
+  room: string;
+  avatar: string;
+  pseudo: string;
   teamTag: string;
-  userAvatar: string;
-  userPseudo: string;
   position: number;
 }
 

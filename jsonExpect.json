@@ -1,0 +1,96 @@
+{
+  "turnCount": 0,
+  "playerTurn": 7,
+  "orderTurn": [],
+  "lobby": [
+    {
+      "avatar": "https://www.w3schools.com/howto/img_avatar.png",
+      "pseudo": "JohnDoe",
+      "cards": [
+        {
+          "id": 1,
+          "name": "Angel of Death",
+          "description": "Call of Death Guardian",
+          "image": "https://i.pinimg.com/originals/fd/c1/53/fdc15338eee7d61d57af6f12f3c47fec.png",
+          "rarity": "COMMUN",
+          "atk": 1,
+          "def": 1,
+          "spd": 1,
+          "luk": 1,
+          "decks": [
+            {
+              "id": 1,
+              "name": "Starter",
+              "createdAt": "2023-10-24T17:43:27.442Z",
+              "updatedAt": "2023-10-24T17:43:27.442Z",
+              "description": "Call of Death Guardian",
+              "image": "https://i.pinimg.com/originals/fd/c1/53/fdc15338eee7d61d57af6f12f3c47fec.png",
+              "type": "MONSTER",
+              "rarity": "COMMUN",
+              "count": 3
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "name": "Gruktar, le Croquemitaine des Cauchemars",
+          "description": "A dark and nightmarish creature with luminescent eyes and sharp claws, haunting the dreams of children",
+          "image": "https://cdn.discordapp.com/attachments/1060501071056879618/1162699220403367966/kyrasw_A_dark_and_nightmarish_creature_with_luminescent_eyes_an_2f9afc03-559b-46a7-93dc-48c0af0c97ef.png?ex=653ce308&is=652a6e08&hm=e390068e6c48196be2a8ee356d55bd429b74b702a2f1d4b90d8cd6bbd1bec3b6&",
+          "rarity": "RARE",
+          "atk": 1,
+          "def": 1,
+          "spd": 1,
+          "luk": 1,
+          "decks": [
+            {
+              "id": 1,
+              "name": "Starter",
+              "createdAt": "2023-10-24T17:43:27.442Z",
+              "updatedAt": "2023-10-24T17:43:27.442Z",
+              "description": "Call of Death Guardian",
+              "image": "https://i.pinimg.com/originals/fd/c1/53/fdc15338eee7d61d57af6f12f3c47fec.png",
+              "type": "MONSTER",
+              "rarity": "COMMUN",
+              "count": 3
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "name": "Angel of Death",
+          "description": "Call of Death Guardian",
+          "image": "https://i.pinimg.com/originals/fd/c1/53/fdc15338eee7d61d57af6f12f3c47fec.png",
+          "rarity": "COMMUN",
+          "atk": 1,
+          "def": 1,
+          "spd": 1,
+          "luk": 1,
+          "decks": [
+            {
+              "id": 1,
+              "name": "Starter",
+              "createdAt": "2023-10-24T17:43:27.442Z",
+              "updatedAt": "2023-10-24T17:43:27.442Z",
+              "description": "Call of Death Guardian",
+              "image": "https://i.pinimg.com/originals/fd/c1/53/fdc15338eee7d61d57af6f12f3c47fec.png",
+              "type": "MONSTER",
+              "rarity": "COMMUN",
+              "count": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "gameKeySession": {
+    "key": "ZPFAq",
+    "statusGame": "ON"
+  },
+  "allPlayers": [
+    {
+      "avatar": "https://www.w3schools.com/howto/img_avatar.png",
+      "pseudo": "JohnDoe",
+      "teamTag": ""
+    }
+  ]
+}
