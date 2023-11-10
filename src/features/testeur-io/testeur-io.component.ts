@@ -1,94 +1,66 @@
-import {Component, effect, inject, OnDestroy, OnInit} from '@angular/core';
+import {Component, effect, inject, OnInit, signal} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {SocketService} from "../../services/socket/socket.service";
+import {TesteurIoService} from "./testeur-io.service";
+import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {UsersLogin} from "../../models/users.models";
 import {StoreServicesApi} from "../../services/store-Api/store.services.api";
-import {SwiperCardUi} from "../../ui/swiper-card/swiper-card.ui";
-import {LocalstorageServices} from "../../services/localsotrage/localstorage.services";
-import {UserModels} from "../../models/user.models";
-import {Router} from "@angular/router";
+import {TextConstante} from "../../app/text.constante";
 
 @Component({
   selector: 'app-testeur-io',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, SwiperCardUi],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   template: `
     <div style="padding: 3rem">
       <div>
-        <label for="roomSelect">Choisir user :</label>
-        <select id="roomSelect" [(ngModel)]="userSwitch" (change)="joinRoom(switchRoom)">
-          <option value="User1">User1</option>
-          <option value="User2">User2</option>
-        </select>
-        <button (click)="connectUser()">Login</button>
+        <form #form="ngForm" (ngSubmit)="testeurioService.login(loginUser)">
+          <fieldset class="form-group">
+            <input
+              [(ngModel)]="loginUser.email"
+              class="form-control form-control-lg"
+              type="text"
+              placeholder="Email"
+              name="email"
+              required
+              email
+            />
+          </fieldset>
+          <fieldset class="form-group">
+            <input
+              [(ngModel)]="loginUser.password"
+              class="form-control form-control-lg"
+              type="password"
+              placeholder="Password"
+              name="password"
+              password
+            />
+          </fieldset>
+          <button
+            type="submit"
+            class="btn btn-lg btn-primary pull-xs-right"
+          >
+            {{textMap.textUi.get('login')}}
+          </button>
+        </form>
+      </div>
+      <div style="color: #FFFFFF;font-size: 0.9rem;padding: 2rem">
+        {{ testeurioService.getUser() | json }}
       </div>
       <div>
-        <p style="font-size: 16px;color: #FFFFFF">User : {{this.eventUser}}</p>
-        <p>{{this.userModel | json}}</p>
+        <button
+          class="btn btn-lg btn-primary pull-xs-right"
+          (click)="testeurioService.moveCreateSession()">
+          {{textMap.textUi.get('goToSession')}}</button>
       </div>
     </div>
   `,
   styleUrls: ['./testeur-io.component.scss']
 })
-export class TesteurIOComponent implements OnInit {
+export class TesteurIOComponent {
 
-  currentRoom: string = 'default';
-  switchRoom: string = 'default';
-  userSwitch: string = 'User1';
-  message: string = '';
-  alerte: string = '';
-  socket = inject(SocketService)
-  storeApi = inject(StoreServicesApi)
-  local = inject(LocalstorageServices)
-  private readonly router = inject(Router)
-
-  readonly eventUser = inject(LocalstorageServices).eventUserSignal
-  private eventInfoGame = inject(LocalstorageServices).eventInfoGameSignal()
-  private eventGame = inject(LocalstorageServices).eventGameSignal()
-  private eventMap = inject(LocalstorageServices).eventMapSignal()
-  private effectRef: any
-  userModel: UserModels | null = null
-
-  constructor() {
-    this.effectRef = effect(() => {
-      if(this.eventUser() !== null) {
-        let user = this.eventUser()
-        this.userModel = JSON.parse(user?.toString() ?? '{}')
-        console.log(this.userModel)
-      }
-    })
-  }
-
-  ngOnInit(): void {
-  }
-
-  joinRoom(room: string) {
-    this.currentRoom = room;
-  }
-
-  connectUser() {
-    if (this.userSwitch === 'User1') {
-      this.storeApi.login('john.doe@example.com', 'motdepasse').subscribe(received => {
-        if (received) {
-          this.local.setUser(received.data)
-          if (this.local.getUser() !== null) {
-            console.log(this.local.getUser())
-            this.router.navigateByUrl(`/session`);
-          }
-        }
-      })
-    } else {
-      this.storeApi.login('john2.doe@example.com', 'motdepasse').subscribe(received => {
-        if (received) {
-          this.local.setUser(received.data)
-          if (this.local.getUser() !== null) {
-            console.log(this.local.getUser())
-            this.router.navigateByUrl(`/session`);
-          }
-        }
-      })
-    }
-  }
+  protected readonly testeurioService: TesteurIoService = inject(TesteurIoService);
+  protected loginUser: UsersLogin = {email: '', password: ''};
+  protected textMap: TextConstante = inject(TextConstante)
 
 
 }

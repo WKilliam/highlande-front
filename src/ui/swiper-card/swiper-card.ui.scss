@@ -1,6 +1,7 @@
 .content-carousel {
   overflow: hidden;
   background-color: transparent;
+  display: flex;
 
   .container {
     display: flex;
@@ -41,4 +42,10 @@
   .image-content {
     /* Ajoutez tout style supplémentaire pour le contenu de l'image ici */
   }
+}
+.auto-size {
+  display: inline-block;
+  max-width: max-content;
+  width: min-content;
+  overflow-x: auto;
 }

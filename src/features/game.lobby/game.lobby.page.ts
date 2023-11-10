@@ -1,39 +1,45 @@
-import {Component, effect, inject, Input, OnInit} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {TeamCardUi} from "../../ui/team-card/team-card.ui";
-import {LobbyRoomUi} from "../../ui/lobby-room/lobby-room.ui";
 import {MatDialogModule} from "@angular/material/dialog";
 import {CreateSessionUi} from "../../ui/create-session/create-session.ui";
-import {Router} from "@angular/router";
-import {StoreServicesApi} from "../../services/store-Api/store.services.api";
-import {StoreServicesSocket} from "../../services/store-Socket/store.services.socket";
-import {InfoGame} from "../../models/info.game.models";
-import {UserModels} from "../../models/user.models";
 import {SwiperCardUi} from "../../ui/swiper-card/swiper-card.ui";
-import {LocalstorageServices} from "../../services/localsotrage/localstorage.services";
+import {LittleCardSelectorUi} from "../../ui/little-card-selector/little-card-selector.ui";
+import {GameLobbyPageServices} from "./game.lobby.page.services";
+import {LobbyRoomUi} from "../../ui/lobby-room/lobby-room.ui";
 
 @Component({
   selector: 'app-game.lobby',
   standalone: true,
-  imports: [CommonModule, TeamCardUi, LobbyRoomUi, MatDialogModule, CreateSessionUi, SwiperCardUi,],
+  imports: [CommonModule, TeamCardUi, MatDialogModule, CreateSessionUi, SwiperCardUi, LittleCardSelectorUi, LobbyRoomUi,],
   template: `
     <div style="padding-top: 4rem">
       <div class="container-fluid">
-        <div class="page-title">{{title}} : </div>
+        <div class="page-title">{{gameLobbyPageServices.title}}</div>
         <div class="row">
           <div class="col">
             <div class="row">
-              <ui-team-card [teamTag]="teamOne"></ui-team-card>
-              <ui-team-card [teamTag]="teamThree"></ui-team-card>
+              <ui-team-card [teamTag]="0"></ui-team-card>
+              <ui-team-card [teamTag]="1"></ui-team-card>
             </div>
           </div>
           <div class="col d-flex justify-content-center align-items-center" style="height: 80vh;">
             <ui-lobby-room></ui-lobby-room>
+<!--            <ui-swiper-card class="select-card"-->
+<!--                            *ngIf="gameLobbyPageServices.openSelectorCard"-->
+<!--                            [userId]="userModel?.id ?? -1"-->
+<!--                            [teamTagByCard]="teamTagByCard"-->
+<!--                            [positionByCard]="positionByCard"-->
+<!--                            [room]="infoGame?.gameKeySession?.key ?? ''"-->
+<!--                            [avatar]="userModel?.avatar ?? ''"-->
+<!--                            [pseudo]="userModel?.pseudo ?? ''"-->
+<!--            >-->
+<!--            </ui-swiper-card>-->
           </div>
           <div class="col">
             <div class="row">
-              <ui-team-card [teamTag]="teamTwo"></ui-team-card>
-              <ui-team-card [teamTag]="teamFour"></ui-team-card>
+              <ui-team-card [teamTag]="2"></ui-team-card>
+              <ui-team-card [teamTag]="3"></ui-team-card>
             </div>
           </div>
         </div>
@@ -42,29 +48,7 @@ import {LocalstorageServices} from "../../services/localsotrage/localstorage.ser
   `,
   styleUrls: ['./game.lobby.page.scss']
 })
-export class GameLobbyPage {
+export class GameLobbyPage{
 
-
-  teamOne : string = "teamOne"
-  teamTwo : string = "teamTwo"
-  teamThree : string = "teamThree"
-  teamFour : string = "teamFour"
-  title: string =  "Lobby";
-  private storeServicesSocket = inject(StoreServicesSocket)
-  private storeServiceApi = inject(StoreServicesApi)
-  private local = inject(LocalstorageServices)
-  private user = this.local.getUser()
-  infoGame = this.local.getInfoGame()
-  game = this.local.getGame()
-  private router = inject(Router)
-  private effectRef:any
-
-  constructor() {
-    this.effectRef = effect(() => {
-      if(this.user !== null && this.game !== null && this.infoGame !== null) {
-        console.log(this.user)
-      }
-    })
-  }
-
+  readonly gameLobbyPageServices = inject(GameLobbyPageServices);
 }

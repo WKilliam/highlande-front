@@ -30,8 +30,12 @@ image-content-card{
   }
 }
 
-#passwordField {
-  display: none;
+.select-card{
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin-top: 15%;
+  margin-left: 15%;
+  z-index: 10;
 }
-
 

@@ -1,8 +1,9 @@
 import {inject, Injectable} from "@angular/core";
 import {ApiServices} from "../api/api.services";
-import {SessionCheckUser, SessionModelRequest} from "../../models/sessions";
 import {Observable} from "rxjs";
-import {FormatModel} from "../../models/format.model";
+import {FormatRestApiModels} from "../../models/formatRestApi.models";
+import {UsersLogin} from "../../models/users.models";
+import {TextConstante} from "../../app/text.constante";
 
 @Injectable({
   providedIn: 'root',
@@ -10,27 +11,32 @@ import {FormatModel} from "../../models/format.model";
 export class StoreServicesApi {
 
   readonly api: ApiServices = inject(ApiServices);
+  readonly text = inject(TextConstante)
 
-  getAllCellsBySession(sessionKey:string):Observable<FormatModel>{
-    return this.api.getAllCells(sessionKey)
+
+  /***
+    * Session
+    */
+  getSessions(room: string): Observable<FormatRestApiModels> {
+    return this.api.getSessions(room);
   }
 
-  getAllMaps() :Observable<FormatModel>{
-    return this.api.getAllMaps();
+  getIfUserInsideRoom(token: string): Observable<FormatRestApiModels> {
+    return this.api.getIfUserInsideRoom(token);
   }
 
-  login(email:string, password:string):Observable<FormatModel>{
-    return this.api.login(email, password);
+  createSession(session: any): Observable<FormatRestApiModels> {
+    return this.api.createSession(session);
   }
 
-  /**
-   * Session
-   */
-  postCreateSession(body:SessionModelRequest):Observable<FormatModel> {
-    return this.api.postCreateSession(body);
+  getMaps(): Observable<FormatRestApiModels> {
+    return this.api.getMaps();
   }
 
-  checkIfUserInsideSession(user:SessionCheckUser) : Observable<FormatModel> {
-    return this.api.checkIfUserInsideSession(user);
+  /***
+    * User
+    */
+  login(userLogin:UsersLogin): Observable<FormatRestApiModels> {
+    return this.api.login(userLogin);
   }
 }

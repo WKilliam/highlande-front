@@ -1,12 +1,7 @@
-import {Component, inject, Input, OnInit} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {PlayersLobbyModels} from "../../models/players.model";
-import {GameKeySession} from "../../models/sessions";
-import {GameModels} from "../../models/game.models";
-import {InfoGame} from "../../models/info.game.models";
 import {SwiperCardUi} from "../swiper-card/swiper-card.ui";
-import {CardsModel} from "../../models/cards.model";
-import {LocalstorageServices} from "../../services/localsotrage/localstorage.services";
+import {CommonModule} from "@angular/common";
+import {Component, inject, Input} from "@angular/core";
+import {LobbyRoomUiServices} from "./lobby-room.ui.services";
 
 @Component({
   selector: 'ui-lobby-room',
@@ -16,7 +11,7 @@ import {LocalstorageServices} from "../../services/localsotrage/localstorage.ser
     <div>
       <div class="card text-center card-header">
         <div class="circles-container card-header">
-          <div *ngFor="let circle of grayCircles; let i = index" class="circle">
+          <div *ngFor="let circle of lobbyRoomUiServices.grayCircles; let i = index" class="circle">
             <img [src]="circle" alt="Gray Circle" *ngIf="circle">
           </div>
         </div>
@@ -31,24 +26,8 @@ import {LocalstorageServices} from "../../services/localsotrage/localstorage.ser
   `,
   styleUrls: ['./lobby-room.ui.scss']
 })
-export class LobbyRoomUi implements OnInit {
+export class LobbyRoomUi {
 
-  players: Array<PlayersLobbyModels> = []
-  grayCircles: any[] = new Array(8);
-  private eventInfoGame = inject(LocalstorageServices).getInfoGame()
-  isActiveSelectorCard: boolean = false;
-  infoGame: InfoGame | null = this.eventInfoGame()?.toString() !== '{}' ? JSON.parse(this.eventInfoGame()?.toString() ?? '{}') : null;
-
-  ngOnInit(): void {
-    if (this.infoGame !== null) {
-      this.players = this.infoGame?.lobby;
-      // Initialisation des pastilles grises
-      this.grayCircles = new Array(7);
-
-      // Remplissage des pastilles avec les avatars des joueurs
-      for (let i = 0; i < this.infoGame?.lobby.length; i++) {
-        this.grayCircles.push(this.players[i].avatar);
-      }
-    }
-  }
+  readonly lobbyRoomUiServices = inject(LobbyRoomUiServices);
+  @Input() isActiveSelectorCard: boolean = false;
 }

@@ -12,8 +12,8 @@
     #FFFFFF 100%);
   --dl-rare-color: linear-gradient(45deg,
     #FFFFFF 10%,
-    #CD7F32 50%,
-    #FFD700 100%
+    #e7c1a6 50%,
+    #aaff00 100%
   );
   --dl-super-rare-color: linear-gradient(45deg,
     #C0C0C0 35%,
@@ -39,6 +39,8 @@
   font-family: irish-grover;
   src: url(./assets/fonts/Irish_Grover/IrishGrover-Regular.ttf);
 }
+
+
 html, body {
   height: 100vh;
   width: 100%;
