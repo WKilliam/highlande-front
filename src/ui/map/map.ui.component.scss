@@ -8,3 +8,7 @@
   width: 100%;
   height: 100%; /* Réglez la hauteur sur 100% pour correspondre à la hauteur de la colonne */
 }
+
+.character-move {
+  transition: top 1s ease, left 1s ease;
+}

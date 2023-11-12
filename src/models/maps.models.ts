@@ -16,7 +16,7 @@ export interface MapsSimplify {
 }
 
 export interface Cells {
-    id?: number;
+    id: number;
     x: number;
     y: number;
     value: number;

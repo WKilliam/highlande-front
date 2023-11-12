@@ -42,5 +42,6 @@ export class CharacterUiComponent {
   @Input() direction = 'idle';
   @Input() top: string = '0'; // Position verticale par défaut
   @Input() left: string = '0'; // Position horizontale par défaut
+  @Input() render: string = '';
 
 }

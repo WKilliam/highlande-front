@@ -12,3 +12,9 @@ export interface PlayerLobby {
     pseudo: string;
     cards :Array<CardEntitySimplify>;
 }
+
+export interface Character {
+  X: number;
+  Y: number;
+  render: string;
+}
