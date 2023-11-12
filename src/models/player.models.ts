@@ -1,4 +1,4 @@
-import {CardByEntityPlaying} from "./cards.models";
+import {CardByEntityPlaying, CardEntitySimplify, CardsRestApi} from "./cards.models";
 
 export interface PlayerCards {
     avatar: string;
@@ -10,5 +10,5 @@ export interface PlayerLobby {
     score: number;
     avatar: string;
     pseudo: string;
-    cards :Array<CardByEntityPlaying>;
+    cards :Array<CardEntitySimplify>;
 }

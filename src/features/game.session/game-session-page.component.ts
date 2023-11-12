@@ -42,24 +42,5 @@ import {LifeBarUi} from "../../ui/life-bar/life-bar.ui";
   styleUrls: ['./game-session-page.component.scss']
 })
 export class GameSessionPage {
-  circles = [
-    { text: '25%', active: true },
-    { text: '50%', active: false },
-    { text: '75%', active: false },
-    { text: '100%', active: false }
-  ];
-  progressWidth: string | undefined;
 
-  ngOnInit() {
-    this.update(2); // Mettez le numéro de l'étape initiale ici
-  }
-
-  update(currentActive: number) {
-    this.circles.forEach((circle, i) => {
-      circle.active = i < currentActive;
-    });
-
-    const activeCircles = this.circles.filter(circle => circle.active);
-    this.progressWidth = ((activeCircles.length - 1) / (this.circles.length - 1)) * 100 + '%';
-  }
 }

@@ -18,7 +18,7 @@ import {LobbyRoomUiServices} from "./lobby-room.ui.services";
         <div class="image-content">
         </div>
         <div class="card-footer text-muted">
-          <button>Start Game</button>
+          <button class="btn btn-lg btn-primary pull-xs-right" (click)="lobbyRoomUiServices.startGame()">{{lobbyRoomUiServices.textUi.textUi.get('Start')}}</button>
         </div>
       </div>
       <ui-swiper-card *ngIf="isActiveSelectorCard" class="card-selector"></ui-swiper-card>

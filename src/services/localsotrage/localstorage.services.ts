@@ -1,5 +1,5 @@
 import {Injectable, signal} from "@angular/core";
-import {UserFrontData} from "../../models/users.models";
+import {UserFrontData, UserPosition} from "../../models/users.models";
 import {Game, SessionStatusGame, StatusGame} from "../../models/room.content.models";
 import {Maps} from "../../models/maps.models";
 
@@ -13,12 +13,14 @@ export class LocalstorageServices {
   readonly #gameSignal = signal(window.localStorage.getItem('Game'))
   readonly #mapSignal = signal(window.localStorage.getItem('Map'))
   readonly #sessionStatusGameSignal = signal(window.localStorage.getItem('Session'))
+  readonly #playerPosition = signal(window.localStorage.getItem('Position'))
 
   readonly eventCurrentRoomSignal = this.#currentRoom.asReadonly()
   readonly eventUserSignal = this.#userSignal.asReadonly()
   readonly eventGameSignal = this.#gameSignal.asReadonly()
   readonly eventMapSignal = this.#mapSignal.asReadonly()
   readonly eventSessionsSignal = this.#sessionStatusGameSignal.asReadonly()
+  readonly eventPlayerPosition = this.#playerPosition.asReadonly()
 
 
   constructor() {
@@ -36,6 +38,9 @@ export class LocalstorageServices {
     }
     if (this.eventMapSignal() === null) {
       this.createStorageByKey('Map', null)
+    }
+    if (this.eventPlayerPosition() === null) {
+      this.createStorageByKey('Position', null)
     }
   }
 
@@ -152,4 +157,22 @@ export class LocalstorageServices {
     this.createStorageByKey('Map', map)
     this.#mapSignal.set(JSON.stringify(map))
   }
+
+  /**
+   * Position
+   */
+  getPlayerPosition(): UserPosition {
+    let position = this.eventPlayerPosition()
+    if (position === null) {
+      return {teamTag: -1, cardTag: -1}
+    } else {
+      return JSON.parse(position)
+    }
+  }
+
+  setPlayerPosition(position: UserPosition) {
+    this.createStorageByKey('Position', position)
+    this.#playerPosition.set(JSON.stringify(position))
+  }
+
 }

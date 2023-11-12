@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, effect, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {TeamCardUi} from "../../ui/team-card/team-card.ui";
 import {MatDialogModule} from "@angular/material/dialog";
@@ -7,6 +7,7 @@ import {SwiperCardUi} from "../../ui/swiper-card/swiper-card.ui";
 import {LittleCardSelectorUi} from "../../ui/little-card-selector/little-card-selector.ui";
 import {GameLobbyPageServices} from "./game.lobby.page.services";
 import {LobbyRoomUi} from "../../ui/lobby-room/lobby-room.ui";
+import {AppServices} from "../../app/app.services";
 
 @Component({
   selector: 'app-game.lobby',
@@ -15,7 +16,7 @@ import {LobbyRoomUi} from "../../ui/lobby-room/lobby-room.ui";
   template: `
     <div style="padding-top: 4rem">
       <div class="container-fluid">
-        <div class="page-title">{{gameLobbyPageServices.title}}</div>
+        <div class="page-title">{{gameLobbyPageServices.title}}{{appServices.room}}</div>
         <div class="row">
           <div class="col">
             <div class="row">
@@ -25,16 +26,11 @@ import {LobbyRoomUi} from "../../ui/lobby-room/lobby-room.ui";
           </div>
           <div class="col d-flex justify-content-center align-items-center" style="height: 80vh;">
             <ui-lobby-room></ui-lobby-room>
-<!--            <ui-swiper-card class="select-card"-->
-<!--                            *ngIf="gameLobbyPageServices.openSelectorCard"-->
-<!--                            [userId]="userModel?.id ?? -1"-->
-<!--                            [teamTagByCard]="teamTagByCard"-->
-<!--                            [positionByCard]="positionByCard"-->
-<!--                            [room]="infoGame?.gameKeySession?.key ?? ''"-->
-<!--                            [avatar]="userModel?.avatar ?? ''"-->
-<!--                            [pseudo]="userModel?.pseudo ?? ''"-->
-<!--            >-->
-<!--            </ui-swiper-card>-->
+            <ui-swiper-card
+              class="select-card"
+              *ngIf="this.appServices.getOpenSelectorCard()"
+            >
+            </ui-swiper-card>
           </div>
           <div class="col">
             <div class="row">
@@ -51,4 +47,6 @@ import {LobbyRoomUi} from "../../ui/lobby-room/lobby-room.ui";
 export class GameLobbyPage{
 
   readonly gameLobbyPageServices = inject(GameLobbyPageServices);
+  readonly appServices = inject(AppServices);
+
 }

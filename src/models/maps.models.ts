@@ -1,5 +1,5 @@
 export interface Maps {
-    id?: number;
+    id: number;
     backgroundImg: string;
     cellsGrid: Array<Cells>;
     height: number;

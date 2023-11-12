@@ -5,6 +5,7 @@ import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from "@angular
 import {UsersLogin} from "../../models/users.models";
 import {StoreServicesApi} from "../../services/store-Api/store.services.api";
 import {TextConstante} from "../../app/text.constante";
+import {AppServices} from "../../app/app.services";
 
 @Component({
   selector: 'app-testeur-io',
@@ -62,5 +63,9 @@ export class TesteurIOComponent {
   protected loginUser: UsersLogin = {email: '', password: ''};
   protected textMap: TextConstante = inject(TextConstante)
 
+  private readonly appServices = inject(AppServices);
 
+  constructor() {
+    this.appServices.httpGetIfUserInsideRoom()
+  }
 }

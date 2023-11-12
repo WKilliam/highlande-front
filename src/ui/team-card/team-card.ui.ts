@@ -34,13 +34,21 @@ import {TeamCardUiServices} from "./team-card.ui.services";
                 <button
                   type="button"
                   class="join-btn"
-                  (click)="teamCardUiServices.joinCard(0)"
+                  *ngIf="teamCardUiServices.teamByPositionPlayer(teamTag,0) === 'Player #'"
+                  (click)="teamCardUiServices.joinCard(teamTag,0)"
                 >Join
                 </button>
                 <div style="color: #FFFFFF">
                   Player :
-                  <p>{{teamCardUiServices.teamByPositionPlayer(teamTag,0)}}</p>
+                  <p>{{teamCardUiServices.teamByPositionPlayer(teamTag, 0)}}</p>
                 </div>
+                <button
+                  type="button"
+                  class="join-btn"
+                  *ngIf="teamCardUiServices.selectCardBtnIfPlayer(teamTag,0)"
+                  (click)="teamCardUiServices.openSelectorCard()"
+                >Select card
+                </button>
               </div>
             </div>
           </div>
@@ -61,13 +69,21 @@ import {TeamCardUiServices} from "./team-card.ui.services";
                 <button
                   type="button"
                   class="join-btn"
-                  (click)="teamCardUiServices.joinCard(1)"
+                  *ngIf="teamCardUiServices.teamByPositionPlayer(teamTag,1) === 'Player #'"
+                  (click)="teamCardUiServices.joinCard(teamTag,1)"
                 >Join
                 </button>
                 <div style="color: #FFFFFF">
                   Player :
-                  <p>{{ teamCardUiServices.teamByPositionPlayer(teamTag,1) }}</p>
+                  <p>{{ teamCardUiServices.teamByPositionPlayer(teamTag, 1) }}</p>
                 </div>
+                <button
+                  type="button"
+                  class="join-btn"
+                  *ngIf="teamCardUiServices.selectCardBtnIfPlayer(teamTag,1)"
+                  (click)="teamCardUiServices.openSelectorCard()"
+                >Select card
+                </button>
               </div>
             </div>
           </div>
@@ -107,7 +123,8 @@ import {TeamCardUiServices} from "./team-card.ui.services";
 export class TeamCardUi {
 
   @Input() teamTag: number = -1
-  readonly teamCardUiServices = inject(TeamCardUiServices);
+  readonly teamCardUiServices: TeamCardUiServices = inject(TeamCardUiServices);
+
 
 
 }

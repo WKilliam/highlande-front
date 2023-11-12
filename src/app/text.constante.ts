@@ -25,5 +25,6 @@ export class TextConstante {
 
     ['sessionBtnLabel', 'Create the session'],
 
+    ['Start','Start Game']
   ])
 }

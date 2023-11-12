@@ -31,3 +31,7 @@ export interface TokenData {
     password: string;
 }
 
+export interface UserPosition {
+  teamTag :number,
+  cardTag :number,
+}

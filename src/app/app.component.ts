@@ -1,6 +1,6 @@
 import {Component, inject, OnInit} from '@angular/core';
 import { RouterOutlet} from "@angular/router";
-import {AppComponentServices} from "./app.component.services";
+import {AppServices} from "./app.services";
 
 @Component({
   selector: 'app-root',
@@ -18,8 +18,6 @@ import {AppComponentServices} from "./app.component.services";
 export class AppComponent
   implements OnInit
 {
-
-  private readonly appComponentServices: AppComponentServices = inject(AppComponentServices);
 
   ngOnInit(): void {
   }

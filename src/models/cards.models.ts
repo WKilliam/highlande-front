@@ -4,94 +4,97 @@ import {EntityStatus} from "./room.content.models";
 
 
 export enum action {
-    "ATK",
-    "DEF",
-    "SPD",
-    "LUK",
-    "NONE"
+  "ATK",
+  "DEF",
+  "SPD",
+  "LUK",
+  "NONE"
 }
 
 export enum attack {
-    "A" = "A"
+  "A" = "A"
 }
 
 export interface CardEntitySimplify {
-    id: number;
-    atk: number;
-    def: number;
-    spd: number;
-    luk: number;
-    rarity: string;
-    imageSrc: string;
-    effects: Array<Effects>;
-    attacks: Array<Attack>;
+  id: number;
+  atk: number;
+  def: number;
+  spd: number;
+  luk: number;
+  name: string;
+  description: string;
+  rarity: string;
+  image: string;
+  effects: Array<Effects>;
+  capacities: Array<Attack>;
 }
 
 export interface CardByEntityPlaying {
-    id: number;
-    player?: PlayerCards
-    atk: number;
-    def: number;
-    spd: number;
-    luk: number;
-    rarity: string;
-    status: EntityStatus;
-    imageSrc: string;
-    effects: Array<Effects>;
-    capacities: Array<Attack>;
+  player?: PlayerCards
+  atk: number;
+  def: number;
+  spd: number;
+  luk: number;
+  name: string;
+  description: string;
+  rarity: string;
+  status?: EntityStatus;
+  imageSrc: string;
+  effects: Array<Effects>;
+  capacities: Array<Attack>;
 }
 
 export interface CardsRestApi{
-    id?: number,
-    name : string,
-    description : string,
-    image : string,
-    rarity : string,
-    atk : number,
-    def : number,
-    spd : number,
-    luk : number,
-    effects :Array<number>
-    capacities : Array<number>
-    deckId?: number
+  id?: number,
+  name : string,
+  description : string,
+  image : string,
+  rarity : string,
+  atk : number,
+  def : number,
+  spd : number,
+  luk : number,
+  effects :Array<number>
+  capacities : Array<number>
+  deckId?: number
 }
 
 export interface CardDocumentSetter {
-    name: string,
-    commonLife: number,
-    commonMaxLife: number,
-    commonAttack: number,
-    commonDefense: number,
-    commonLuck: number,
-    commonSpeed: number,
-    cellPosition: Cells,
+  name: string,
+  commonLife: number,
+  commonMaxLife: number,
+  commonAttack: number,
+  commonDefense: number,
+  commonLuck: number,
+  commonSpeed: number,
+  cellPosition: Cells,
 }
 
 export interface CardCreateArg {
-    cards: Array<CardsRestApi>,
-    deck: number
+  cards: Array<CardsRestApi>,
+  deck: number
 }
 
 export interface CapacityRestApi {
-    name :string,
-    description :string,
-    icon :string,
-    action :string
+  name :string,
+  description :string,
+  icon :string,
+  action :string
 }
 
 export interface Effects {
-    id?: number;
-    name: string;
-    description: string;
-    icon: string;
-    rarity: string;
-    action: string;
+  id?: number;
+  name: string;
+  description: string;
+  icon: string;
+  rarity: string;
+  action: string;
 }
 
 export interface Attack {
-    id?: number;
-    name: string;
-    description: string;
-    icon: string;
-    action: string;
+  id?: number;
+  name: string;
+  description: string;
+  icon: string;
+  action: string;
 }

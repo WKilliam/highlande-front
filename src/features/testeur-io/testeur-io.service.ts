@@ -25,7 +25,6 @@ export class TesteurIoService {
   login(userLogin: UsersLogin) {
     this.#storeApi.login(userLogin).subscribe((response: FormatRestApiModels) => {
       if (response.code >= 200 && response.code < 300) {
-        console.log(response)
         this.#localStorage.setUser(response.data)
       }
     })
