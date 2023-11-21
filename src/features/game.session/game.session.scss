@@ -1,4 +1,4 @@
-@charset "UTF-8";
+
 :host {
   display: contents;
 }
@@ -28,4 +28,16 @@
   margin-top: 2rem;
 }
 
-/*# sourceMappingURL=game-session-page.component.css.map */
+.timeOutPrint {
+  font-family: irish-grover;
+  font-size: 1.5rem;
+  color: #FFFFFF;
+
+  .text {
+    padding:0.1rem;
+    align-items: center;
+    position: relative;
+    text-align: center;
+  }
+
+}

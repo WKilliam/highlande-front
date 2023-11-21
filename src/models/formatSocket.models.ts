@@ -1,4 +1,6 @@
-import {CardEntitySimplify} from "./cards.models";
+import {Cells} from "./maps.models";
+import {TurnListEntity} from "./room.content.models";
+import {Can} from "./emus";
 
 export interface FormatSocketModels{
     date: string;
@@ -27,4 +29,14 @@ export interface JoinSessionTeamCard {
   teamPosition: number;
   cardPosition: number;
   cardByPlayer:number
+}
+
+export interface CurrentTurnAction {
+  room: string;
+  isPlay: boolean;
+  turnEntity: TurnListEntity;
+  dice: number,
+  currentCell: Cells,
+  moves: Cells[],
+  move: Cells,
 }

@@ -1,7 +1,12 @@
 import {inject, Injectable} from "@angular/core";
 import {SocketService} from "../socket/socket.service";
 import {Router} from "@angular/router";
-import {JoinSessionSocket, JoinSessionTeam, JoinSessionTeamCard} from "../../models/formatSocket.models";
+import {
+  CurrentTurnAction,
+  JoinSessionSocket,
+  JoinSessionTeam,
+  JoinSessionTeamCard
+} from "../../models/formatSocket.models";
 import {LocalstorageServices} from "../localsotrage/localstorage.services";
 import {Utils} from "../Utils";
 import {CardByEntityPlaying, CardsRestApi} from "../../models/cards.models";
@@ -68,7 +73,25 @@ export class StoreServicesSocket {
     }
   }
 
-  startGame() {
-    this.socket.startGame()
+  createTurnList() {
+    this.socket.createTurnList(this.localStore.getCurrentRoom())
   }
+
+  whoIsTurn() {
+    this.socket.whoIsTurn(this.localStore.getCurrentRoom())
+  }
+
+  sendDice(data: CurrentTurnAction) {
+    this.socket.sendDice(data)
+  }
+
+  chooseMove(data: CurrentTurnAction) {
+    this.socket.chooseMove(data)
+  }
+
+  endMove(data: CurrentTurnAction) {
+    this.socket.endMove(data)
+  }
+
+
 }

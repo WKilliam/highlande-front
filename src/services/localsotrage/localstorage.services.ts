@@ -1,7 +1,9 @@
 import {Injectable, signal} from "@angular/core";
 import {UserFrontData, UserPosition} from "../../models/users.models";
-import {Game, SessionStatusGame, StatusGame} from "../../models/room.content.models";
+import {EntityCategorie, Game, SessionStatusGame, StatusGame} from "../../models/room.content.models";
 import {Maps} from "../../models/maps.models";
+import {CurrentTurnAction} from "../../models/formatSocket.models";
+import {Can} from "../../models/emus";
 
 @Injectable({
   providedIn: 'root',
@@ -14,6 +16,8 @@ export class LocalstorageServices {
   readonly #mapSignal = signal(window.localStorage.getItem('Map'))
   readonly #sessionStatusGameSignal = signal(window.localStorage.getItem('Session'))
   readonly #playerPosition = signal(window.localStorage.getItem('Position'))
+  readonly #currentTurn = signal(window.localStorage.getItem('Turn'))
+
 
   readonly eventCurrentRoomSignal = this.#currentRoom.asReadonly()
   readonly eventUserSignal = this.#userSignal.asReadonly()
@@ -21,6 +25,7 @@ export class LocalstorageServices {
   readonly eventMapSignal = this.#mapSignal.asReadonly()
   readonly eventSessionsSignal = this.#sessionStatusGameSignal.asReadonly()
   readonly eventPlayerPosition = this.#playerPosition.asReadonly()
+  readonly eventCurrentTurn = this.#currentTurn.asReadonly()
 
 
   constructor() {
@@ -41,6 +46,9 @@ export class LocalstorageServices {
     }
     if (this.eventPlayerPosition() === null) {
       this.createStorageByKey('Position', null)
+    }
+    if (this.eventCurrentTurn() === null) {
+      this.createStorageByKey('Turn', null)
     }
   }
 
@@ -72,6 +80,11 @@ export class LocalstorageServices {
     this.#userSignal.set(JSON.stringify(user))
   }
 
+  updateUser(user: UserFrontData) {
+    this.#userSignal.update(value => JSON.stringify(user))
+    this.#userSignal.set(JSON.stringify(user))
+  }
+
 
   /***
    * Room
@@ -90,6 +103,12 @@ export class LocalstorageServices {
     this.#currentRoom.set(room)
   }
 
+  updateCurrentRoom(room: string) {
+    this.#currentRoom.update(value => JSON.stringify(room))
+    this.#currentRoom.set(room)
+  }
+
+
   /**
    * Game
    */
@@ -99,6 +118,7 @@ export class LocalstorageServices {
       return {
         teams: [],
         monsters: [],
+        fightings: []
       }
     } else {
       return JSON.parse(game)
@@ -109,6 +129,12 @@ export class LocalstorageServices {
     this.createStorageByKey('Game', game)
     this.#gameSignal.set(JSON.stringify(game))
   }
+
+  updateGame(game: Game) {
+    this.#gameSignal.update(value => JSON.stringify(game))
+    this.#gameSignal.set(JSON.stringify(game))
+  }
+
 
   /**
    * Session
@@ -131,6 +157,11 @@ export class LocalstorageServices {
 
   setSessionStatusGame(game: SessionStatusGame) {
     this.createStorageByKey('Session', game)
+    this.#sessionStatusGameSignal.set(JSON.stringify(game))
+  }
+
+  updateSessionStatusGame(game: SessionStatusGame) {
+    this.#sessionStatusGameSignal.update(value => JSON.stringify(game))
     this.#sessionStatusGameSignal.set(JSON.stringify(game))
   }
 
@@ -158,6 +189,11 @@ export class LocalstorageServices {
     this.#mapSignal.set(JSON.stringify(map))
   }
 
+  updateMap(map: Maps) {
+    this.#mapSignal.update(value => JSON.stringify(map))
+    this.#mapSignal.set(JSON.stringify(map))
+  }
+
   /**
    * Position
    */
@@ -175,4 +211,50 @@ export class LocalstorageServices {
     this.#playerPosition.set(JSON.stringify(position))
   }
 
+  updatePlayerPosition(position: UserPosition) {
+    this.#playerPosition.update(value => JSON.stringify(position))
+    this.#playerPosition.set(JSON.stringify(position))
+  }
+
+  /**
+   * Turn
+   */
+
+  getCurrentTurn(): CurrentTurnAction {
+    let turn = this.eventCurrentTurn()
+    if (turn === null) {
+      return {
+        room: '',
+        isPlay: true,
+        turnEntity: {
+          pseudo: '',
+          teamIndex: -1,
+          cardIndex: -1,
+          luk : 0,
+          typeEntity: EntityCategorie.HUMAIN
+        },
+        currentCell: {
+          id: -1,
+          x: -1,
+          y: -1,
+          value: 0
+        },
+        dice: -1,
+        move: {
+          id: -1,
+          x: -1,
+          y: -1,
+          value: 0
+        },
+        moves: []
+      }
+    } else {
+      return JSON.parse(turn)
+    }
+  }
+
+  setCurrentTurn(turn: CurrentTurnAction) {
+    this.createStorageByKey('Turn', turn)
+    this.#currentTurn.set(JSON.stringify(turn))
+  }
 }

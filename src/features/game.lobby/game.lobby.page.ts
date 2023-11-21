@@ -12,7 +12,14 @@ import {AppServices} from "../../app/app.services";
 @Component({
   selector: 'app-game.lobby',
   standalone: true,
-  imports: [CommonModule, TeamCardUi, MatDialogModule, CreateSessionUi, SwiperCardUi, LittleCardSelectorUi, LobbyRoomUi,],
+  imports: [
+    CommonModule,
+    TeamCardUi,
+    MatDialogModule,
+    CreateSessionUi,
+    SwiperCardUi,
+    LittleCardSelectorUi,
+    LobbyRoomUi,],
   template: `
     <div style="padding-top: 4rem">
       <div class="container-fluid">
@@ -24,7 +31,9 @@ import {AppServices} from "../../app/app.services";
               <ui-team-card [teamTag]="1"></ui-team-card>
             </div>
           </div>
-          <div class="col d-flex justify-content-center align-items-center" style="height: 80vh;">
+          <div
+            class="col d-flex justify-content-center align-items-center"
+            style="height: 80vh;">
             <ui-lobby-room></ui-lobby-room>
             <ui-swiper-card
               class="select-card"

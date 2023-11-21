@@ -8,8 +8,8 @@ import { CommonModule } from '@angular/common';
     CommonModule
   ],
   template:`
-    <div class="ui-dice-content">
-      <ul class="d20">
+    <div class="ui-dice-content" (click)="stopAndShowValue()">
+      <ul [ngClass]="{ 'd20': true, 'animate': !isStopped }">
         <li class="one">1</li>
         <li class="two">2</li>
         <li class="three">3</li>
@@ -30,6 +30,7 @@ import { CommonModule } from '@angular/common';
         <li class="eighteen">18</li>
         <li class="nineteen">19</li>
         <li class="twenty">20</li>
+        <li *ngIf="isStopped" class="dice-result">{{ diceValue }}</li>
       </ul>
     </div>
   `,
@@ -39,6 +40,9 @@ import { CommonModule } from '@angular/common';
 export class DiceUiComponent {
   currentAngle = 0;
   state = 'in';
+  isStopped = false;
+  diceValue = -1;
+  animationClass = 'animate';
 
   constructor() { }
 
@@ -47,7 +51,20 @@ export class DiceUiComponent {
   }
 
   rotateDice(): void {
-    this.currentAngle = Math.floor(Math.random() * 360);
-    this.state = this.state === 'in' ? 'out' : 'in';
+    if (!this.isStopped) {
+      this.currentAngle = Math.floor(Math.random() * 360);
+      this.state = this.state === 'in' ? 'out' : 'in';
+      setTimeout(() => {
+        this.rotateDice();
+      }, 100);
+    }
+  }
+
+  stopAndShowValue(): void {
+    if (!this.isStopped) {
+      this.isStopped = true;
+      this.diceValue = Math.floor(Math.random() * 20) + 1;
+      this.animationClass = ''; // Arrêter l'animation
+    }
   }
 }

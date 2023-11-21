@@ -2,6 +2,7 @@ import {effect, EffectRef, inject, Injectable} from "@angular/core";
 import {LocalstorageServices} from "../../services/localsotrage/localstorage.services";
 import {PlayerLobby} from "../../models/player.models";
 import {TextConstante} from "../../app/text.constante";
+import {Router} from "@angular/router";
 import {StoreServicesSocket} from "../../services/store-Socket/store.services.socket";
 
 @Injectable({
@@ -13,7 +14,8 @@ export class LobbyRoomUiServices{
   readonly textUi = inject(TextConstante);
   readonly effectRef : EffectRef;
   grayCircles: any[] = new Array(8);
-  readonly storeSocket = inject(StoreServicesSocket);
+  private readonly router = inject(Router)
+  readonly storeSocketServices = inject(StoreServicesSocket);
 
   constructor() {
     this.effectRef = effect(()=>{
@@ -22,14 +24,22 @@ export class LobbyRoomUiServices{
           // Remplissage des pastilles avec les avatars des joueurs
           for (let i = 0; i < this.localStorage.getSessionStatusGame().lobby.length; i++) {
             const player :PlayerLobby= this.localStorage.getSessionStatusGame().lobby[i];
-            this.grayCircles.push(player.avatar);
+            if(!this.grayCircles.includes(player.avatar)){
+              this.grayCircles.push(player.avatar);
+            }
           }
         }
       }
     })
   }
 
-  startGame(){
-    this.storeSocket.startGame();
+  startGameSession(){
+    this.storeSocketServices.createTurnList()
+    if(this.localStorage.getSessionStatusGame().entityTurn.length === 0){
+      this.storeSocketServices.createTurnList()
+      this.router.navigate(['/game'])
+    }else{
+      this.router.navigate(['/game'])
+    }
   }
 }

@@ -2,6 +2,12 @@
   --base-size: 2rem;
   --base-height: 1.73rem;
   --d: calc(var(--base-size) * .69);
+  --random-x1: calc(360deg * random() - 180deg);
+  --random-y1: calc(360deg * random() - 180deg);
+  --random-z1: calc(360deg * random() - 180deg);
+  --random-x2: calc(360deg * random() - 180deg);
+  --random-y2: calc(360deg * random() - 180deg);
+  --random-z2: calc(360deg * random() - 180deg);
 
   font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   line-height: 1.4;
@@ -49,7 +55,7 @@
 
 @media screen and (prefers-reduced-motion: no-preference) {
   .d20 {
-    animation: rotate 10s infinite forwards;
+    animation: rotate 100s infinite linear;
   }
 }
 
@@ -58,7 +64,7 @@
     transform: rotateX(0deg) rotateY(360deg) rotateZ(360deg);
   }
   to {
-    transform: rotateX(360deg) rotateY(0deg) rotateZ(-360deg);
+    transform: rotateX(var(--random-x1)) rotateY(var(--random-y1)) rotateZ(var(--random-z1));
   }
 }
 

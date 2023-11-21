@@ -2,6 +2,7 @@ import {EffectRef, inject, Injectable} from "@angular/core";
 import {io} from "socket.io-client";
 import {Socket} from "socket.io-client";
 import {
+  CurrentTurnAction,
   FormatSocketModels,
   JoinSessionSocket,
   JoinSessionTeam,
@@ -12,6 +13,7 @@ import {Router} from "@angular/router";
 import {AppServices} from "../../app/app.services";
 import {Utils} from "../Utils";
 import {UserPosition} from "../../models/users.models";
+import {Can} from "../../models/emus";
 
 @Injectable({
   providedIn: 'root',
@@ -55,7 +57,7 @@ export class SocketService {
               } else {
                 console.log('error', data)
               }
-              if(this.localStore.getGame().monsters.length > 0){
+              if (this.localStore.getSessionStatusGame().status === 'START') {
                 this.router.navigate(['/game'])
               }
             } else {
@@ -79,12 +81,55 @@ export class SocketService {
     this.socket.emit('join-team', join);
   }
 
-  joinCard(joinCard:JoinSessionTeamCard){
+  joinCard(joinCard: JoinSessionTeamCard) {
     this.socket.emit('join-card', joinCard);
-
   }
 
-  startGame() {
-    this.socket.emit('start-game', {room: this.localStore.getCurrentRoom()});
+  createTurnList(room: string) {
+    this.socket.emit('createTurnList', {room: room});
+    this.onDataTurn()
   }
+
+  whoIsTurn(room: string) {
+    this.socket.emit('whoIsTurn', {room: room});
+    this.onDataTurn()
+  }
+
+  sendDice(data: CurrentTurnAction) {
+    this.socket.emit('sendDice', data);
+    this.onDataTurn()
+  }
+
+  chooseMove(data: CurrentTurnAction) {
+    this.socket.emit('chooseMove', data);
+    this.onDataTurn()
+  }
+
+  endMove(data: CurrentTurnAction) {
+    this.socket.emit('endMove', data);
+    this.onEndMove()
+  }
+
+  onDataTurn() {
+    this.socket.on(`${this.localStore.getCurrentRoom()}-turn`, (data: FormatSocketModels) => {
+      if(data !== null && data !== undefined) {
+        this.localStore.setCurrentTurn(data.data)
+      }else{
+        console.log('error', data)
+      }
+    })
+  }
+
+  onEndMove() {
+    this.socket.on(`${this.localStore.getCurrentRoom()}-turn`, (data: FormatSocketModels) => {
+      if(data !== null && data !== undefined) {
+        console.log('data', data)
+        // this.localStore.setSessionStatusGame(data.data.sessionStatusGame)
+      }else{
+        console.log('error', data)
+      }
+    })
+  }
+
+
 }
