@@ -6,21 +6,24 @@ import {StoreServicesApi} from "../services/store-Api/store.services.api";
 import {Router} from "@angular/router";
 import {Utils} from "../services/Utils";
 import {Game, SessionStatusGame} from "../models/room.content.models";
+import {UserPosition} from "../models/users.models";
 
 @Injectable({
   providedIn: 'root',
 })
 export class AppServices {
 
-  readonly #storeServicesSocket:StoreServicesSocket = new StoreServicesSocket();
-  readonly localStorage :LocalstorageServices= inject(LocalstorageServices)
+  readonly #storeServicesSocket: StoreServicesSocket = new StoreServicesSocket();
+  readonly localStorage: LocalstorageServices = inject(LocalstorageServices)
   readonly #localStore: LocalstorageServices = inject(LocalstorageServices);
   readonly storeApi: StoreServicesApi = inject(StoreServicesApi);
-  readonly #storeSocket: StoreServicesSocket = inject(StoreServicesSocket);
-  readonly #router:Router = inject(Router);
-  room: string = 'default'
+  readonly #router: Router = inject(Router);
+  readonly #room = signal<string>('default')
+
   readonly #openSelectorCard = signal(false)
   readonly eventOpenSelectorCard = this.#openSelectorCard.asReadonly();
+  readonly #openSelectorTeam = signal(false)
+
 
   getOpenSelectorCard(): boolean {
     return this.eventOpenSelectorCard()
@@ -30,54 +33,61 @@ export class AppServices {
     this.#openSelectorCard.set(value)
   }
 
-
-  httpGetIfUserInsideRoom() {
-    if(this.#localStore.getUser() !== null){
+  initCheck(){
+    if(this.localStorage.getUser() !== null){
       const token = this.#localStore.getUser().token
       this.storeApi.getIfUserInsideRoom(token).subscribe((response: FormatRestApiModels) => {
-        if(response !== null){
-          if(response.code >= 200 && response.code < 300 && response.data !== null && response.data.sessionStatusGame !== null) {
-            if(response.data.sessionStatusGame.status !== 'END'){
-              this.localStorage.setGame(response.data.game)
-              this.localStorage.setMap(response.data.maps)
-              this.localStorage.setCurrentRoom(response.data.sessionStatusGame.room)
-              this.localStorage.setSessionStatusGame(response.data.sessionStatusGame)
-              if(this.localStorage.getCurrentRoom() !== 'default' &&
-                this.localStorage.getGame() !== null &&
-                this.localStorage.getSessionStatusGame() !== null &&
-                this.localStorage.getMap() !== null &&
-                this.localStorage.getUser() !== null
-              ){
-                this.#storeSocket.joinRoom({
-                  room: response.data.sessionStatusGame.room,
-                  token: token
-                })
-                this.room = response.data.sessionStatusGame.room
-                this.#router.navigate([`/lobby/${response.data.sessionStatusGame.room}`]);
-              }else{
-                console.log('sessionStatusGame status END')
-              }
-            }else{
-              console.log('sessionStatusGame status END')
+        if (response !== null) {
+          if (response.code >= 200 && response.code < 300 && response.data !== null) {
+            this.localStorage.setGame(response.data.game)
+            this.localStorage.setMap(response.data.maps)
+            this.localStorage.setSessionStatusGame(response.data.sessionStatusGame)
+            let position: UserPosition = Utils.findPlayerIndex(
+              this.localStorage.getGame().teams,
+              this.localStorage.getUser().pseudo,
+              this.localStorage.getUser().avatar)
+            if (position.teamTag !== -1 && position.cardTag !== -1) {
+              this.localStorage.setPlayerPosition(position)
+            } else {
+              console.log('position not found')
             }
-          }else{
-            console.log('response code not 200-300', response.code, response.data)
+            this.#router.navigate([`/lobby/${response.data.sessionStatusGame.room}`]);
+          } else {
+            console.log('code not 200-300', response)
           }
-        }else{
-          console.log('response null')
+        } else {
+          console.log('response null', response)
+          this.#router.navigate(['/testeurio'])
         }
       })
     }else{
-      console.log('user null')
+      console.log('user not found')
+      this.#router.navigate(['/testeurio'])
     }
   }
 
-  // refreshGame(response:Game,pseudo:string,avatar:string){
-  //   // let position = Utils.findPlayerIndex(response.teams, pseudo, avatar)
-  // }
+  join(){
+    const token = this.#localStore.getUser().token
+    const room = this.localStorage.getSessionStatusGame().room
+    if(token !== null && room !== null){
+      this.#storeServicesSocket.joinRoom({
+        room: room,
+        token: token
+      })
+    }else{
+      this.#storeServicesSocket.joinRoom({
+        room: 'default',
+        token: token
+      })
+    }
+  }
 
-  refreshSessionStatusGame(response:FormatRestApiModels){
+  getRoom(): string {
+    return this.#room()
+  }
 
+  setRoom(value: string) {
+    this.#room.set(value)
   }
 
 }

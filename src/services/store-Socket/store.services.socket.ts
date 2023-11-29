@@ -5,7 +5,7 @@ import {
   CurrentTurnAction,
   JoinSessionSocket,
   JoinSessionTeam,
-  JoinSessionTeamCard
+  JoinSessionTeamCard, SocketTurn
 } from "../../models/formatSocket.models";
 import {LocalstorageServices} from "../localsotrage/localstorage.services";
 import {Utils} from "../Utils";
@@ -38,9 +38,9 @@ export class StoreServicesSocket {
     if (lobbyPosition === -1) {
       console.log('error lobbyPosition undefined')
     } else {
-      if (this.localStore.getCurrentRoom() !== 'default') {
+      if (this.localStore.getSessionStatusGame().room !== 'default') {
         let joinTeam: JoinSessionTeam = {
-          room: this.localStore.getCurrentRoom(),
+          room: this.localStore.getSessionStatusGame().room,
           lobbyPosition: lobbyPosition,
           teamPosition: teamTag,
           cardPosition: cardPosition
@@ -57,10 +57,10 @@ export class StoreServicesSocket {
     if (lobbyPosition === -1) {
       console.log('error lobbyPosition undefined')
     } else {
-      if (this.localStore.getCurrentRoom() !== 'default') {
+      if (this.localStore.getSessionStatusGame().room !== 'default') {
         let indexCard = Utils.indexLobbyPositionCard(this.localStore.getSessionStatusGame().lobby, this.localStore.getUser().pseudo, this.localStore.getUser().avatar, card.name)
         let joinCard: JoinSessionTeamCard = {
-          room: this.localStore.getCurrentRoom(),
+          room: this.localStore.getSessionStatusGame().room,
           lobbyPosition: Utils.indexLobbyPosition(this.localStore.getSessionStatusGame().lobby, this.localStore.getUser().pseudo, this.localStore.getUser().avatar),
           teamPosition: userPosition.teamTag,
           cardPosition: userPosition.cardTag,
@@ -74,24 +74,32 @@ export class StoreServicesSocket {
   }
 
   createTurnList() {
-    this.socket.createTurnList(this.localStore.getCurrentRoom())
+    this.socket.createTurnList()
   }
 
   whoIsTurn() {
-    this.socket.whoIsTurn(this.localStore.getCurrentRoom())
+    let room = this.localStore.getSessionStatusGame().room
+    this.socket.whoIsTurn(room)
   }
 
-  sendDice(data: CurrentTurnAction) {
+  startTurn(data:SocketTurn) {
+    this.socket.startTurn(data)
+  }
+
+  sendDice(data: SocketTurn) {
     this.socket.sendDice(data)
   }
 
-  chooseMove(data: CurrentTurnAction) {
+  chooseMove(data: SocketTurn) {
     this.socket.chooseMove(data)
   }
 
-  endMove(data: CurrentTurnAction) {
+  endMove(data: SocketTurn) {
     this.socket.endMove(data)
   }
 
+  endTurn(data: SocketTurn) {
+    this.socket.endTurn(data)
+  }
 
 }

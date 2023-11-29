@@ -32,11 +32,15 @@ export interface JoinSessionTeamCard {
 }
 
 export interface CurrentTurnAction {
-  room: string;
-  isPlay: boolean;
   turnEntity: TurnListEntity;
   dice: number,
   currentCell: Cells,
   moves: Cells[],
   move: Cells,
+  currentAction:string
+}
+
+export interface SocketTurn {
+  room: string;
+  action: CurrentTurnAction;
 }

@@ -1,6 +1,6 @@
 import {Injectable, signal} from "@angular/core";
 import {UserFrontData, UserPosition} from "../../models/users.models";
-import {EntityCategorie, Game, SessionStatusGame, StatusGame} from "../../models/room.content.models";
+import {EntityCategorie, Game, SessionStatusGame, StatusGame, TurnListEntity} from "../../models/room.content.models";
 import {Maps} from "../../models/maps.models";
 import {CurrentTurnAction} from "../../models/formatSocket.models";
 import {Can} from "../../models/emus";
@@ -29,9 +29,6 @@ export class LocalstorageServices {
 
 
   constructor() {
-    if (this.eventCurrentRoomSignal() === null) {
-      this.createStorageByKey('Room', null)
-    }
     if (this.eventUserSignal() === null) {
       this.createStorageByKey('User', null)
     }
@@ -54,6 +51,14 @@ export class LocalstorageServices {
 
   createStorageByKey(key: string, data: any) {
     return localStorage.setItem(key, JSON.stringify(data));
+  }
+
+  resetNullAllStorage() {
+    this.createStorageByKey('Session', null)
+    this.createStorageByKey('Game', null)
+    this.createStorageByKey('Map', null)
+    this.createStorageByKey('Position', null)
+    this.createStorageByKey('Turn', null)
   }
 
   /***
@@ -84,30 +89,6 @@ export class LocalstorageServices {
     this.#userSignal.update(value => JSON.stringify(user))
     this.#userSignal.set(JSON.stringify(user))
   }
-
-
-  /***
-   * Room
-   */
-  getCurrentRoom(): string {
-    let room = this.eventCurrentRoomSignal()
-    if (room === null) {
-      return ''
-    } else {
-      return room
-    }
-  }
-
-  setCurrentRoom(room: string) {
-    this.createStorageByKey('Room', room)
-    this.#currentRoom.set(room)
-  }
-
-  updateCurrentRoom(room: string) {
-    this.#currentRoom.update(value => JSON.stringify(room))
-    this.#currentRoom.set(room)
-  }
-
 
   /**
    * Game
@@ -148,7 +129,31 @@ export class LocalstorageServices {
         status: StatusGame.END,
         turnCount: 0,
         lobby: [],
-        entityTurn: []
+        entityTurn: [],
+        currentTurnEntity: {
+          turnEntity: {
+            pseudo: '',
+            teamIndex: -1,
+            cardIndex: -1,
+            luk: 0,
+            typeEntity: EntityCategorie.HUMAIN
+          },
+          currentCell: {
+            id: -1,
+            x: -1,
+            y: -1,
+            value: 0
+          },
+          dice: -1,
+          move: {
+            id: -1,
+            x: -1,
+            y: -1,
+            value: 0
+          },
+          moves: [],
+          currentAction: ''
+        }
       }
     } else {
       return JSON.parse(game)
@@ -220,40 +225,23 @@ export class LocalstorageServices {
    * Turn
    */
 
-  getCurrentTurn(): CurrentTurnAction {
+  getCurrentTurn(): TurnListEntity {
     let turn = this.eventCurrentTurn()
     if (turn === null) {
       return {
-        room: '',
-        isPlay: true,
-        turnEntity: {
-          pseudo: '',
-          teamIndex: -1,
-          cardIndex: -1,
-          luk : 0,
-          typeEntity: EntityCategorie.HUMAIN
-        },
-        currentCell: {
-          id: -1,
-          x: -1,
-          y: -1,
-          value: 0
-        },
-        dice: -1,
-        move: {
-          id: -1,
-          x: -1,
-          y: -1,
-          value: 0
-        },
-        moves: []
+        team: '',
+        pseudo: '',
+        teamIndex: -1,
+        cardIndex: -1,
+        typeEntity: EntityCategorie.HUMAIN,
+        luk: -100000
       }
     } else {
       return JSON.parse(turn)
     }
   }
 
-  setCurrentTurn(turn: CurrentTurnAction) {
+  setCurrentTurn(turn: TurnListEntity) {
     this.createStorageByKey('Turn', turn)
     this.#currentTurn.set(JSON.stringify(turn))
   }

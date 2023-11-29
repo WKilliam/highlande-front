@@ -5,7 +5,6 @@ import {MatDialogModule} from "@angular/material/dialog";
 import {CreateSessionUi} from "../../ui/create-session/create-session.ui";
 import {SwiperCardUi} from "../../ui/swiper-card/swiper-card.ui";
 import {LittleCardSelectorUi} from "../../ui/little-card-selector/little-card-selector.ui";
-import {GameLobbyPageServices} from "./game.lobby.page.services";
 import {LobbyRoomUi} from "../../ui/lobby-room/lobby-room.ui";
 import {AppServices} from "../../app/app.services";
 
@@ -23,7 +22,7 @@ import {AppServices} from "../../app/app.services";
   template: `
     <div style="padding-top: 4rem">
       <div class="container-fluid">
-        <div class="page-title">{{gameLobbyPageServices.title}}{{appServices.room}}</div>
+        <div class="page-title">Lobby Session : {{appServices.getRoom()}}</div>
         <div class="row">
           <div class="col">
             <div class="row">
@@ -55,7 +54,6 @@ import {AppServices} from "../../app/app.services";
 })
 export class GameLobbyPage{
 
-  readonly gameLobbyPageServices = inject(GameLobbyPageServices);
   readonly appServices = inject(AppServices);
 
 }

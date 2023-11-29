@@ -16,10 +16,7 @@ export class TesteurIoService {
   // readonly user: UserFrontData;
 
   constructor() {
-    // effect(() => {
-    //   if (this.#localStorage.getUser() !== null) {
-    //   }
-    // })
+    this.#localStorage.resetNullAllStorage()
   }
 
   login(userLogin: UsersLogin) {

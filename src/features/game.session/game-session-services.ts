@@ -5,19 +5,19 @@ import {Cells} from "../../models/maps.models";
 import {Can} from "../../models/emus";
 import {CurrentTurnAction} from "../../models/formatSocket.models";
 import {Character} from "../../models/player.models";
+import {CardByEntityPlaying, CardsRestApi} from "../../models/cards.models";
+import {AppServices} from "../../app/app.services";
 
 @Injectable({
   providedIn: 'root',
 })
 export class GameSessionServices {
 
-  private timerValue = 5;
   private timer: any;
-  private isChooseMoveCompleted = false;
-  private isInitialCountdownStarted = false;
   readonly localStore: LocalstorageServices = inject(LocalstorageServices)
   private readonly imgSrcCard = 'https://cdn.discordapp.com/attachments/1060501071056879618/1168479278174830602/kyrasw_the_frame_of_a_back_tarot_card_game_rpg_in_png_format_or_379c9eb1-9bea-4ea4-bd56-c5629407e849.png?ex=65645f21&is=6551ea21&hm=d18e7e7f839624cb7c13e4137e8b18ebd37daa96993f61ff4bd6399a1a688ef6&'
   private storeSocket: StoreServicesSocket = inject(StoreServicesSocket)
+  private appServices: AppServices = inject(AppServices)
 
   readonly #timerValueSignal = signal<number>(5);
   readonly #timerSignal = signal<any>(null);
@@ -28,10 +28,12 @@ export class GameSessionServices {
   readonly #diceResult = signal(-1)
   readonly #allCanMovePosition = signal<Array<Cells>>([])
   readonly #moveLocation = signal<Cells>({id: -1, x: -1, y: -1, value: 0,})
-  readonly #turnStatus = signal<string>(Can.START)
+  readonly #turnStatus = signal<string>(Can.START_GAME)
   readonly #characters = signal<Array<Character>>([])
   readonly #hiddenDice = signal<boolean>(false)
   readonly #nowPosition = signal<boolean>(false)
+  readonly #messageByAction = signal<string>('')
+  readonly #called = signal<boolean>(false)
 
 
   readonly timerValueSignal = this.#timerValueSignal.asReadonly();
@@ -47,182 +49,191 @@ export class GameSessionServices {
   readonly charactersSignal = this.#characters.asReadonly()
   readonly hiddenDiceSignal = this.#hiddenDice.asReadonly()
   readonly nowPositionSignal = this.#nowPosition.asReadonly()
+  readonly messageByActionSignal = this.#messageByAction.asReadonly()
+  readonly calledSignal = this.#called.asReadonly()
 
   constructor() {
-    const position = this.localStore.getPlayerPosition()
-    this.initCharacters()
-    this.storeSocket.joinRoom({room: this.localStore.getCurrentRoom(), token: this.localStore.getUser().token})
-    this.storeSocket.joinRoom({room: this.localStore.getCurrentRoom(), token: this.localStore.getUser().token})
-    const cards = this.localStore.getGame().teams[position.teamTag].cardsPlayer ?? []
-    if (position !== null) {
-      this.setimgSrcCardOne(cards[0].imageSrc === '' ? this.imgSrcCard : cards[0].imageSrc)
-      this.setimgSrcCardTwo(cards[1].imageSrc === '' ? this.imgSrcCard : cards[1].imageSrc)
-      this.setrarityCardOne(cards[0].rarity.toLowerCase() === '' ? 'common' : cards[0].rarity.toLowerCase())
-      this.setrarityCardTwo(cards[1].rarity.toLowerCase() === '' ? 'common' : cards[1].rarity.toLowerCase())
+
+    // const position = this.localStore.getPlayerPosition()
+    // this.initCharacters()
+    // const cards = this.localStore.getGame().teams[position.teamTag].cardsPlayer ?? []
+    // if (position !== null) {
+    //   this.setimgSrcCardOne(cards[0].imageSrc === '' ? this.imgSrcCard : cards[0].imageSrc)
+    //   this.setimgSrcCardTwo(cards[1].imageSrc === '' ? this.imgSrcCard : cards[1].imageSrc)
+    //   this.setrarityCardOne(cards[0].rarity.toLowerCase() === '' ? 'common' : cards[0].rarity.toLowerCase())
+    //   this.setrarityCardTwo(cards[1].rarity.toLowerCase() === '' ? 'common' : cards[1].rarity.toLowerCase())
+    // }
+    // // this.storeSocket.whoIsTurn()
+    // this.gameTurn()
+    // this.timerEvolving()
+  }
+
+  gameTurn() {
+    let entity = this.localStore.getSessionStatusGame().entityTurn[0]
+    this.localStore.setCurrentTurn(entity)
+    this.storeSocket.joinRoom({room: this.localStore.getSessionStatusGame().room, token: this.localStore.getUser().token})
+    if(this.localStore.getSessionStatusGame().currentTurnEntity.currentAction !== ''){
+      this.setTurnStatus(this.localStore.getSessionStatusGame().currentTurnEntity.currentAction)
     }
-    this.timerEvolving()
+  }
+
+  currentAction(){
+    switch (this.localStore.getSessionStatusGame().currentTurnEntity.currentAction){
+      case Can.START_GAME:
+        this.setTurnStatus(Can.START_GAME)
+        break;
+      case Can.START_TURN:
+        this.setTurnStatus(Can.START_TURN)
+        break;
+      case Can.SEND_DICE:
+        this.setTurnStatus(Can.SEND_DICE)
+        break;
+      case Can.CHOOSE_MOVE:
+        this.setTurnStatus(Can.CHOOSE_MOVE)
+        break;
+      case Can.MOVE:
+        this.setTurnStatus(Can.MOVE)
+        break;
+      case Can.END_MOVE:
+        this.setTurnStatus(Can.END_MOVE)
+        break;
+      case Can.END_TURN:
+        this.setTurnStatus(Can.END_TURN)
+        break;
+    }
   }
 
   timerEvolving() {
-    let isMethodCalled = true;
     this.timer = setInterval(() => {
       if (this.getTimerValue() > 0) {
         this.setTimerValue(this.getTimerValue() - 1)
-        switch (this.getTurnStatus()) {
-          case Can.START:
-            if(this.localStore.getSessionStatusGame().entityTurn.length === 0){
-              this.storeSocket.createTurnList()
-              this.storeSocket.whoIsTurn()
-            }else{
-              this.storeSocket.whoIsTurn()
-            }
-            break;
-          case Can.SEND_DICE:
-            if(this.localStore.getCurrentTurn().turnEntity.typeEntity === 'HUMAIN'){
-              const teamName = this.localStore.getGame().teams[this.localStore.getPlayerPosition().teamTag].name
-              const cardContent = this.localStore.getGame().teams[this.localStore.getPlayerPosition().teamTag].cardsPlayer ?? []
-              const nameUser =  cardContent[this.localStore.getPlayerPosition().cardTag]?.player?.pseudo ?? ''
-              if(nameUser !== '' && this.localStore.getSessionStatusGame().entityTurn[0].pseudo === `${teamName}-${nameUser}`){
-                this.setHiddenDice(true)
-                const diceResult = this.getDiceResult();
-                if (diceResult !== -1 && this.getTimerValue() > 0) {
-                  let currentTurn = {
-                    ...this.localStore.getCurrentTurn(),
-                    dice: this.getDiceResult(),
-                  };
-                  this.storeSocket.sendDice(currentTurn);
-                  this.setallCanMovePosition(this.localStore.getCurrentTurn().moves)
-                  if(this.localStore.getCurrentTurn().moves.length !== 0){
-                    this.switchStatusByCurrentStatus()
-                  }
-                }
-              }
-            }else{
-              this.roollingDice()
-              let currentTurn = {
-                ...this.localStore.getCurrentTurn(),
-                dice: this.getDiceResult(),
-              };
-              this.storeSocket.sendDice(currentTurn);
-              if(this.localStore.getCurrentTurn().moves.length !== 0){
-                this.switchStatusByCurrentStatus()
-              }
-            }
-            break
-          case Can.CHOOSE_MOVE:
-            if(this.localStore.getCurrentTurn().turnEntity.typeEntity === 'HUMAIN'){
-              const teamName = this.localStore.getGame().teams[this.localStore.getPlayerPosition().teamTag].name
-              const cardContent = this.localStore.getGame().teams[this.localStore.getPlayerPosition().teamTag].cardsPlayer ?? []
-              const nameUser =  cardContent[this.localStore.getPlayerPosition().cardTag]?.player?.pseudo ?? ''
-              if(nameUser !== '' && this.localStore.getSessionStatusGame().entityTurn[0].pseudo === `${nameUser}-${teamName}`){
-                this.setHiddenDice(false)
-                const moving = this.getMove()
-                if (moving.id !== -1 && this.getTimerValue() > 0) {
-                  let currentTurn = {
-                    ...this.localStore.getCurrentTurn(),
-                    move: this.getMove(),
-                  };
-                  this.storeSocket.chooseMove(currentTurn);
-                  if(this.getMove().id !== -1){
-                    this.switchStatusByCurrentStatus()
-                  }
-                }
-              }
-            }else{
-              this.storeSocket.chooseMove(this.localStore.getCurrentTurn());
-              if(this.localStore.getCurrentTurn().move.id !== -1){
-                this.switchStatusByCurrentStatus()
-              }
-            }
-            break;
-          case Can.MOVE:
-            let characters = this.getCharacters()
-            if(this.localStore.getSessionStatusGame().entityTurn[0].typeEntity === 'HUMAIN'){
-              const name = this.localStore.getSessionStatusGame().entityTurn[0].pseudo.split('-')[0]
-              if(characters.findIndex((character) => character.pseudo === name) !== -1){
-                let index = characters.findIndex((character) => character.pseudo === name)
-                this.move(this.getMove(),index)
-                if(this.getMove().id !== -1){
-                  this.switchStatusByCurrentStatus()
-                }
-              }
-            }else if(this.localStore.getSessionStatusGame().entityTurn[0].typeEntity === 'COMPUTER'){
-              const name = this.localStore.getSessionStatusGame().entityTurn[0].pseudo
-              if(characters.findIndex((character) => character.pseudo === name) !== -1){
-                let index = characters.findIndex((character) => character.pseudo === name)
-                this.move(this.localStore.getCurrentTurn().move,index)
-              }
-            }
-            break;
-          case Can.END_MOVE:
-            if(this.nowPositionSignal()){
-              console.log('end move')
-              this.setallCanMovePosition([])
-              this.setDiceResult(-1)
-              this.setMove({id: -1, x: -1, y: -1, value: 0,})
-              // this.storeSocket.endMove(this.localStore.getCurrentTurn())
-              this.switchStatusByCurrentStatus()
-            }else{
-              console.log('wait')
-            }
-            break;
-          case Can.END_TURN:
-            this.switchStatusByCurrentStatus()
-            break;
+        if(this.localStore.getCurrentTurn().typeEntity === 'HUMAIN') {
+          console.log('HUMAIN')
+        }else if(this.localStore.getCurrentTurn().typeEntity === 'COMPUTER') {
+          this.checkActionComputer()
+        }else {
+          console.log('ERROR')
         }
       } else {
-        isMethodCalled = true
-        this.switchStatusByCurrentStatus()
+        this.successionOfStatusesTime()
       }
     }, 1000);
   }
 
-  switchStatusByCurrentStatus() {
-    this.stopTimer()
+  checkActionComputer(){
     switch (this.getTurnStatus()) {
-      case Can.START:
-        this.setTimerValue(15)
-        this.timerEvolving()
-        this.setTurnStatus(Can.SEND_DICE)
-        break;
-      case Can.SEND_DICE:
-        if(this.localStore.getCurrentTurn().dice === -1){
-          this.setTurnStatus(Can.END_TURN)
+      case Can.START_GAME:
+        if(this.localStore.getSessionStatusGame().currentTurnEntity.currentAction === Can.START_TURN){
+          this.setTurnStatus(Can.START_TURN)
+          this.setMessageByAction('Computer is state Start Turn Resolve ...')
         }else{
-          this.setTimerValue(8)
-          this.timerEvolving()
-          this.setTurnStatus(Can.CHOOSE_MOVE)
+          this.storeSocket.whoIsTurn()
+          this.setMessageByAction('Computer is state Start Game ...')
+        }
+        break;
+      case Can.START_TURN:
+        if(this.localStore.getSessionStatusGame().currentTurnEntity.currentAction === Can.SEND_DICE){
+          this.setTurnStatus(Can.SEND_DICE)
+          this.setMessageByAction('Computer is state Send Dice Resolve ...')
+        }else{
+          this.storeSocket.startTurn({
+            action:this.localStore.getSessionStatusGame().currentTurnEntity,
+            room:this.localStore.getSessionStatusGame().room})
+          this.setMessageByAction('Computer is state Start Turn ...')
         }
         break
+      // case Can.SEND_DICE:
+      //   if(this.localStore.getSessionStatusGame().currentTurnEntity.currentAction === Can.CHOOSE_MOVE){
+      //     this.setTurnStatus(Can.CHOOSE_MOVE)
+      //     this.setMessageByAction('Computer is state Choose Move Resolve ...')
+      //   }else{
+      //     this.storeSocket.sendDice({
+      //       action:this.localStore.getSessionStatusGame().currentTurnEntity,
+      //       room:this.localStore.getCurrentRoom()})
+      //     this.setMessageByAction('Computer is state Send Dice ...')
+      //   }
+      //   break
+      // case Can.CHOOSE_MOVE:
+      //   if(this.localStore.getSessionStatusGame().currentTurnEntity.currentAction === Can.MOVE){
+      //     this.setTurnStatus(Can.CHOOSE_MOVE)
+      //     this.setMessageByAction('Computer is state Move Resolve ...')
+      //   }else{
+      //     this.storeSocket.chooseMove({
+      //       action:this.localStore.getSessionStatusGame().currentTurnEntity,
+      //       room:this.localStore.getCurrentRoom()})
+      //     this.setMessageByAction('Computer is state Choose Move ...')
+      //   }
+      //   break
+      // case Can.MOVE:
+      //   if(this.localStore.getSessionStatusGame().currentTurnEntity.currentAction === Can.END_MOVE){
+      //     this.setTurnStatus(Can.CHOOSE_MOVE)
+      //     this.setMessageByAction('Computer is state Move Resolve ...')
+      //   }else{
+      //     // this.storeSocket.chooseMove({
+      //     //   action:this.localStore.getSessionStatusGame().currentTurnEntity,
+      //     //   room:this.localStore.getCurrentRoom()})
+      //     this.setMessageByAction('Computer is state Choose Move ...')
+      //   }
+      //   break
+      // case Can.END_MOVE:
+      //   this.setMessageByAction('Computer is state End Move ...')
+      //   break;
+      // case Can.END_TURN:
+      //   this.setMessageByAction('Computer is state End Turn ...')
+      //   break;
+    }
+  }
+
+  checkActionHumain(){
+    switch (this.getTurnStatus()) {
+      case Can.START_GAME:
+        break;
+      case Can.START_TURN:
+        break
+      case Can.SEND_DICE:
+        break
       case Can.CHOOSE_MOVE:
-        if(this.localStore.getCurrentTurn().turnEntity.typeEntity === 'HUMAIN'){
-          if(this.getallCanMovePosition().length === 0){
-            this.setTurnStatus(Can.END_TURN)
-          }else{
-            this.setTimerValue(8)
-            this.timerEvolving()
-            this.setTurnStatus(Can.MOVE)
-          }
-        }else{
-          this.setTimerValue(8)
-          this.timerEvolving()
-          this.setTurnStatus(Can.MOVE)
-        }
+        break
+      case Can.MOVE:
+        break;
+      case Can.END_MOVE:
+        break;
+      case Can.END_TURN:
+        break;
+    }
+  }
+
+
+
+  successionOfStatusesTime() {
+    switch (this.getTurnStatus()) {
+      case Can.START_GAME:
+        this.setTimerValue(10)
+        this.setTurnStatus(Can.END_TURN)
+        break;
+      case Can.START_TURN:
+        this.setTimerValue(2)
+        this.setTurnStatus(Can.SEND_DICE)
+        break
+      case Can.SEND_DICE:
+        this.setTimerValue(2)
+        this.setTurnStatus(Can.CHOOSE_MOVE)
+        break
+      case Can.CHOOSE_MOVE:
+        this.setTimerValue(2)
+        this.setTurnStatus(Can.MOVE)
         break;
       case Can.MOVE:
-        this.setTimerValue(8)
-        this.timerEvolving()
+        this.setTimerValue(2)
         this.setTurnStatus(Can.END_MOVE)
         break;
       case Can.END_MOVE:
-        this.setTimerValue(8)
-        this.timerEvolving()
+        this.setTimerValue(2)
         this.setTurnStatus(Can.END_TURN)
         break;
       case Can.END_TURN:
-        this.setTimerValue(8)
-        this.timerEvolving()
-        this.setTurnStatus(Can.START)
+        this.setTimerValue(2)
+        this.setTurnStatus(Can.START_GAME)
         break;
     }
   }
@@ -244,7 +255,7 @@ export class GameSessionServices {
     return start * (1 - t) + end * t;
   }
 
-  move(cell: Cells,index:number): void {
+  move(cell: Cells, index: number): void {
     const targetX = cell.y;
     const targetY = cell.x;
     let t = 0;
@@ -393,5 +404,21 @@ export class GameSessionServices {
 
   setNowPosition(value: boolean) {
     this.#nowPosition.set(value);
+  }
+
+  getMessageByAction() {
+    return this.messageByActionSignal();
+  }
+
+  setMessageByAction(message: string) {
+    this.#messageByAction.set(message);
+  }
+
+  getCalled() {
+    return this.calledSignal();
+  }
+
+  setCalled(value: boolean) {
+    this.#called.set(value);
   }
 }

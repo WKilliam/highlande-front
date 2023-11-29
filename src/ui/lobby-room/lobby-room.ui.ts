@@ -9,13 +9,18 @@ import {LobbyRoomUiServices} from "./lobby-room.ui.services";
   imports: [CommonModule, SwiperCardUi],
   template: `
       <div>
+
           <div class="card text-center card-header">
+            <p style="font-size: 3rem; font-family: irish-grover; color: red" *ngIf="lobbyRoomUiServices.getStartTimer()">
+              {{lobbyRoomUiServices.getTimerValue()}}
+            </p>
               <div class="circles-container card-header">
                   <div *ngFor="let circle of lobbyRoomUiServices.grayCircles; let i = index" class="circle">
                       <img [src]="circle" alt="Gray Circle" *ngIf="circle">
                   </div>
               </div>
               <div class="image-content">
+
               </div>
               <div class="card-footer text-muted">
                   <button class="btn btn-lg btn-primary pull-xs-right"

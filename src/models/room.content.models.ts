@@ -1,6 +1,7 @@
 import {CardByEntityPlaying} from "./cards.models";
 import {Cells, Maps} from "./maps.models";
 import {PlayerLobby} from "./player.models";
+import {CurrentTurnAction} from "./formatSocket.models";
 
 export enum StatusGame {
   LOBBY = "LOBBY",
@@ -47,9 +48,10 @@ export interface SessionStatusGame {
   room: string;
   teamNames: Array<string>;
   status: StatusGame;
-  turnCount: number;
-  lobby: Array<PlayerLobby>
-  entityTurn: Array<TurnListEntity>
+  turnCount: number
+  lobby:Array<PlayerLobby>
+  entityTurn : Array<TurnListEntity>,
+  currentTurnEntity: CurrentTurnAction
 }
 
 export interface Game {
@@ -80,6 +82,7 @@ export enum EntityCategorie {
 
 
 export interface TurnListEntity {
+  team?: string
   pseudo: string
   teamIndex: number
   cardIndex: number

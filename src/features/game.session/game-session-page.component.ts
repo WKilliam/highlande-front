@@ -41,6 +41,12 @@ import {GameSessionServices} from "./game-session-services";
                     Timer : {{gameSessionServices.getTimerValue()}} -
                     Status : {{gameSessionServices.getTurnStatus()}}
                   </p>
+                  <p class="text" style="color: red;">Entity :
+                    {{gameSessionServices.localStore.getCurrentTurn().pseudo}}
+                  </p>
+                  <p class="text" style="color: red;">Entity :
+                    {{gameSessionServices.getMessageByAction()}}
+                  </p>
                 </div>
               </div>
             </div>
@@ -52,7 +58,7 @@ import {GameSessionServices} from "./game-session-services";
               <div style="font-family: irish-grover; font-size: 3rem;color: #FFFFFF">{{gameSessionServices.getDiceResult()}}</div>
             </div>
             <div>
-              <p>{{gameSessionServices.localStore.getCurrentTurn().turnEntity.pseudo}}</p>
+<!--              <p>{{gameSessionServices.localStore.getCurrentTurn().turnEntity.pseudo}}</p>-->
             </div>
           </div>
           <div class="col-3">

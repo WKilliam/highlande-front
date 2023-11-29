@@ -63,9 +63,4 @@ export class TesteurIOComponent {
   protected loginUser: UsersLogin = {email: '', password: ''};
   protected textMap: TextConstante = inject(TextConstante)
 
-  private readonly appServices = inject(AppServices);
-
-  constructor() {
-    this.appServices.httpGetIfUserInsideRoom()
-  }
 }

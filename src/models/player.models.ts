@@ -1,4 +1,5 @@
 import {CardByEntityPlaying, CardEntitySimplify, CardsRestApi} from "./cards.models";
+import {CharacterUiComponent} from "../ui/character/character.ui.component";
 
 export interface PlayerCards {
     avatar: string;

@@ -1,6 +1,6 @@
 export enum Can {
-  START = "START",
-  CREATE_TURN = "CREATE_TURN",
+  START_GAME = "START_GAME",
+  START_TURN = "START_TURN",
   WHO_TURN = "WHO_TURN",
   SEND_DICE = "SEND_DICE",
   CHOOSE_MOVE = "CHOOSE_MOVE",
@@ -8,3 +8,4 @@ export enum Can {
   END_MOVE = "END_MOVE",
   END_TURN = "END_TURN",
 }
+

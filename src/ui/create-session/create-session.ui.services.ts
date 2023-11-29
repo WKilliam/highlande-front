@@ -1,5 +1,5 @@
 import {effect, inject, Injectable, signal} from '@angular/core';
-import {SessionCreated, SessionCreatedBase} from "../../models/room.content.models";
+import {SessionCreated, SessionCreatedBase, SessionGame} from "../../models/room.content.models";
 import {LocalstorageServices} from "../../services/localsotrage/localstorage.services";
 import {StoreServicesApi} from "../../services/store-Api/store.services.api";
 import {FormatRestApiModels} from "../../models/formatRestApi.models";
@@ -24,12 +24,8 @@ export class CreateSessionUiServices {
 
   constructor() {
     this.httpGetMaps()
-    this.appServices.httpGetIfUserInsideRoom()
-    effect(() => {
-      if(this.localStore.getSessionStatusGame() !== null){
-        this.appServices.httpGetIfUserInsideRoom()
-      }
-    })
+    this.localStore.resetNullAllStorage()
+    this.appServices.initCheck()
   }
 
   httpGetMaps() {
@@ -43,7 +39,6 @@ export class CreateSessionUiServices {
   }
 
   createSession(sessionBody: SessionCreatedBase) {
-    console.log("sessionBody",sessionBody)
     let session : SessionCreated = {
       name:sessionBody.name,
       mapId:sessionBody.mapId,
@@ -54,14 +49,17 @@ export class CreateSessionUiServices {
     session.teamNames.push(sessionBody.teamTwoName)
     session.teamNames.push(sessionBody.teamThreeName)
     session.teamNames.push(sessionBody.teamFourName)
+
     this.storeApi.createSession(session).subscribe((response: FormatRestApiModels) => {
       if(response.code >= 200 && response.code < 300) {
         if(response.data.sessionStatusGame.room !== null){
+          let sessionGame : SessionGame = response.data
           let joinSessionSocket:JoinSessionSocket = {
-            room:response.data.sessionStatusGame.room,
+            room:sessionGame.sessionStatusGame.room,
             token:this.localStore.getUser().token
           }
           this.storeSocket.joinRoom(joinSessionSocket)
+
         }else{
           console.log('error',response)
         }
@@ -79,6 +77,5 @@ export class CreateSessionUiServices {
       return maps
     }
   }
-
 
 }
