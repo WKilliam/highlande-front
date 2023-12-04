@@ -1,8 +1,7 @@
-import {Component, effect, inject, OnInit} from '@angular/core';
+import {Component,} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {CreateSessionUi} from "../../ui/create-session/create-session.ui";
-import {AppServices} from "../../app/app.services";
-import {LocalstorageServices} from "../../services/localsotrage/localstorage.services";
+
 
 @Component({
   selector: 'app-game.create.session',

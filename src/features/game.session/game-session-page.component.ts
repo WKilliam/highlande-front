@@ -41,9 +41,17 @@ import {GameSessionServices} from "./game-session-services";
                     Timer : {{gameSessionServices.getTimerValue()}} -
                     Status : {{gameSessionServices.getTurnStatus()}}
                   </p>
-                  <p class="text" style="color: red;">Entity :
-                    {{gameSessionServices.localStore.getCurrentTurn().pseudo}}
-                  </p>
+                  <div *ngIf="gameSessionServices.localStore.getCurrentTurn().pseudo !== 'monster-1'
+                  || gameSessionServices.localStore.getCurrentTurn().pseudo !== 'monster-0'">
+                    <p class="text" style="color: red;">Entity :
+                      {{gameSessionServices.localStore.getCurrentTurn().team}}
+                    </p>
+                  </div>
+                  <ng-template>
+                    <p class="text" style="color: red;">Entity :
+                      {{gameSessionServices.localStore.getCurrentTurn().pseudo}}
+                    </p>
+                  </ng-template>
                   <p class="text" style="color: red;">Entity :
                     {{gameSessionServices.getMessageByAction()}}
                   </p>

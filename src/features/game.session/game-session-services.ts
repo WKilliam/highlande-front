@@ -7,6 +7,7 @@ import {CurrentTurnAction} from "../../models/formatSocket.models";
 import {Character} from "../../models/player.models";
 import {CardByEntityPlaying, CardsRestApi} from "../../models/cards.models";
 import {AppServices} from "../../app/app.services";
+import {SocketEndpoint} from "../../app/socket.endpoint";
 
 @Injectable({
   providedIn: 'root',
@@ -18,6 +19,7 @@ export class GameSessionServices {
   private readonly imgSrcCard = 'https://cdn.discordapp.com/attachments/1060501071056879618/1168479278174830602/kyrasw_the_frame_of_a_back_tarot_card_game_rpg_in_png_format_or_379c9eb1-9bea-4ea4-bd56-c5629407e849.png?ex=65645f21&is=6551ea21&hm=d18e7e7f839624cb7c13e4137e8b18ebd37daa96993f61ff4bd6399a1a688ef6&'
   private storeSocket: StoreServicesSocket = inject(StoreServicesSocket)
   private appServices: AppServices = inject(AppServices)
+  private readonly socketEndpointJoin= inject(SocketEndpoint)
 
   readonly #timerValueSignal = signal<number>(5);
   readonly #timerSignal = signal<any>(null);
@@ -53,25 +55,22 @@ export class GameSessionServices {
   readonly calledSignal = this.#called.asReadonly()
 
   constructor() {
-
-    // const position = this.localStore.getPlayerPosition()
-    // this.initCharacters()
-    // const cards = this.localStore.getGame().teams[position.teamTag].cardsPlayer ?? []
-    // if (position !== null) {
-    //   this.setimgSrcCardOne(cards[0].imageSrc === '' ? this.imgSrcCard : cards[0].imageSrc)
-    //   this.setimgSrcCardTwo(cards[1].imageSrc === '' ? this.imgSrcCard : cards[1].imageSrc)
-    //   this.setrarityCardOne(cards[0].rarity.toLowerCase() === '' ? 'common' : cards[0].rarity.toLowerCase())
-    //   this.setrarityCardTwo(cards[1].rarity.toLowerCase() === '' ? 'common' : cards[1].rarity.toLowerCase())
-    // }
-    // // this.storeSocket.whoIsTurn()
-    // this.gameTurn()
+    this.socketEndpointJoin.instanceRoomConnect('GameSessionServices')
+    const position = this.localStore.getPlayerPosition()
+    this.initCharacters()
+    const cards = this.localStore.getGame().teams[position.teamTag].cardsPlayer ?? []
+    this.setimgSrcCardOne(cards[0].imageSrc === '' ? this.imgSrcCard : cards[0].imageSrc)
+    this.setimgSrcCardTwo(cards[1].imageSrc === '' ? this.imgSrcCard : cards[1].imageSrc)
+    this.setrarityCardOne(cards[0].rarity.toLowerCase() === '' ? 'common' : cards[0].rarity.toLowerCase())
+    this.setrarityCardTwo(cards[1].rarity.toLowerCase() === '' ? 'common' : cards[1].rarity.toLowerCase())
+    // this.storeSocket.whoIsTurn()
+    this.gameTurn()
     // this.timerEvolving()
   }
 
   gameTurn() {
     let entity = this.localStore.getSessionStatusGame().entityTurn[0]
     this.localStore.setCurrentTurn(entity)
-    this.storeSocket.joinRoom({room: this.localStore.getSessionStatusGame().room, token: this.localStore.getUser().token})
     if(this.localStore.getSessionStatusGame().currentTurnEntity.currentAction !== ''){
       this.setTurnStatus(this.localStore.getSessionStatusGame().currentTurnEntity.currentAction)
     }

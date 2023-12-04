@@ -5,6 +5,7 @@ import {TextConstante} from "../../app/text.constante";
 import {Router} from "@angular/router";
 import {StoreServicesSocket} from "../../services/store-Socket/store.services.socket";
 import {AppServices} from "../../app/app.services";
+import {SocketEndpoint} from "../../app/socket.endpoint";
 
 @Injectable({
   providedIn: 'root'
@@ -18,14 +19,16 @@ export class LobbyRoomUiServices{
   private readonly router = inject(Router)
   readonly storeSocketServices = inject(StoreServicesSocket);
   readonly appServices = inject(AppServices);
+  private readonly socketEndpoint= inject(SocketEndpoint)
 
-  readonly #timerValue = signal(10)
+  readonly #timerValue = signal(2)
   readonly #startTimer = signal(false)
   readonly #timerValueRef = this.#timerValue.asReadonly()
   readonly #startTimerRef = this.#startTimer.asReadonly()
 
   constructor() {
     this.appServices.setRoom(this.localStorage.getSessionStatusGame().room)
+    this.socketEndpoint.instanceRoomConnect('LobbyRoomUiServices')
     if(this.localStorage.getSessionStatusGame() !== null){
       if (this.localStorage.getSessionStatusGame().lobby !== null) {
         // Remplissage des pastilles avec les avatars des joueurs

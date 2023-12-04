@@ -1,6 +1,7 @@
 import {PlayerLobby} from "../models/player.models";
 import {EntityPlaying} from "../models/room.content.models";
 import {UserPosition} from "../models/users.models";
+import _ from 'lodash';
 
 export class Utils {
   static indexLobbyPosition(
@@ -49,5 +50,9 @@ export class Utils {
       teamTag: -1,
       cardTag: -1
     };
+  }
+
+  static jsonDifference(json1: any, json2: any): any {
+    return !_.isEqual(json1, json2);
   }
 }

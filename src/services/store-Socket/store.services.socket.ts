@@ -21,18 +21,6 @@ export class StoreServicesSocket {
   private readonly socket: SocketService = inject(SocketService);
   private localStore = inject(LocalstorageServices)
 
-  joinDefaultRoom() {
-    this.socket.joinDefaultRoom()
-  }
-
-  joinRoom(join: JoinSessionSocket) {
-    this.socket.joinRoom(join);
-  }
-
-  joinEvent(room: string) {
-    this.socket.joinEvent(room)
-  }
-
   joinTeam(cardPosition: number, teamTag: number) {
     let lobbyPosition = Utils.indexLobbyPosition(this.localStore.getSessionStatusGame().lobby, this.localStore.getUser().pseudo, this.localStore.getUser().avatar)
     if (lobbyPosition === -1) {

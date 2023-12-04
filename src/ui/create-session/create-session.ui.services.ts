@@ -1,5 +1,5 @@
 import {effect, inject, Injectable, signal} from '@angular/core';
-import {SessionCreated, SessionCreatedBase, SessionGame} from "../../models/room.content.models";
+import {SessionCreated, SessionCreatedBase, SessionDto, SessionGame} from "../../models/room.content.models";
 import {LocalstorageServices} from "../../services/localsotrage/localstorage.services";
 import {StoreServicesApi} from "../../services/store-Api/store.services.api";
 import {FormatRestApiModels} from "../../models/formatRestApi.models";
@@ -8,6 +8,7 @@ import {Router} from "@angular/router";
 import {StoreServicesSocket} from "../../services/store-Socket/store.services.socket";
 import {AppServices} from "../../app/app.services";
 import {JoinSessionSocket} from "../../models/formatSocket.models";
+import {SocketEndpoint} from "../../app/socket.endpoint";
 
 @Injectable({
   providedIn: 'root',
@@ -21,11 +22,12 @@ export class CreateSessionUiServices {
   readonly eventMaps = this.#map.asReadonly();
   readonly localStore: LocalstorageServices = inject(LocalstorageServices)
   readonly router = inject(Router)
+  private readonly socketEndpointJoin= inject(SocketEndpoint)
 
   constructor() {
     this.httpGetMaps()
     this.localStore.resetNullAllStorage()
-    this.appServices.initCheck()
+    this.socketEndpointJoin.instanceRoomConnect('CreateSessionUiServices')
   }
 
   httpGetMaps() {
@@ -52,14 +54,10 @@ export class CreateSessionUiServices {
 
     this.storeApi.createSession(session).subscribe((response: FormatRestApiModels) => {
       if(response.code >= 200 && response.code < 300) {
-        if(response.data.sessionStatusGame.room !== null){
-          let sessionGame : SessionGame = response.data
-          let joinSessionSocket:JoinSessionSocket = {
-            room:sessionGame.sessionStatusGame.room,
-            token:this.localStore.getUser().token
-          }
-          this.storeSocket.joinRoom(joinSessionSocket)
-
+        if(response.data.game.sessionStatusGame.room !== null){
+          console.log('response',response)
+          let sessionGame : string = response.data.game.sessionStatusGame.room
+          this.socketEndpointJoin.instanceRoomConnect('CreateSessionUiServices->createSession',sessionGame)
         }else{
           console.log('error',response)
         }

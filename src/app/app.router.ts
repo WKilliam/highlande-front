@@ -7,7 +7,6 @@ import {inject, Injectable} from "@angular/core";
 
 export const routes: Routes = [
   {path: '', redirectTo: 'testeurio', pathMatch: 'full'},
-  // {path: 'app', component: AppComponent,},
   {
     path: 'lobby/:sessionKey',
     component: GameLobbyPage,

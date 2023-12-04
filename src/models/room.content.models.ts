@@ -38,6 +38,11 @@ export interface SessionCreated {
   teamNames: Array<string>;
 }
 
+export interface SessionDto {
+  id: number;
+  game: SessionGame;
+}
+
 export interface SessionGame {
   sessionStatusGame: SessionStatusGame;
   game: Game;

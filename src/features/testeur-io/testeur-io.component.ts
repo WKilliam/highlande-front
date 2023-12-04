@@ -1,11 +1,9 @@
-import {Component, effect, inject, OnInit, signal} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {TesteurIoService} from "./testeur-io.service";
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {UsersLogin} from "../../models/users.models";
-import {StoreServicesApi} from "../../services/store-Api/store.services.api";
 import {TextConstante} from "../../app/text.constante";
-import {AppServices} from "../../app/app.services";
 
 @Component({
   selector: 'app-testeur-io',
@@ -62,5 +60,6 @@ export class TesteurIOComponent {
   protected readonly testeurioService: TesteurIoService = inject(TesteurIoService);
   protected loginUser: UsersLogin = {email: '', password: ''};
   protected textMap: TextConstante = inject(TextConstante)
+
 
 }

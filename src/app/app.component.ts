@@ -1,6 +1,7 @@
 import {Component, inject, OnInit} from '@angular/core';
 import { RouterOutlet} from "@angular/router";
 import {AppServices} from "./app.services";
+import {StoreServicesSocket} from "../services/store-Socket/store.services.socket";
 
 @Component({
   selector: 'app-root',
@@ -15,13 +16,5 @@ import {AppServices} from "./app.services";
     RouterOutlet,
   ],
 })
-export class AppComponent
-  implements OnInit
-{
-
-  ngOnInit(): void {
-  }
-
-
-
+export class AppComponent {
 }

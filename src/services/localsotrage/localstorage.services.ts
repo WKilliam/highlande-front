@@ -10,13 +10,15 @@ import {Can} from "../../models/emus";
 })
 export class LocalstorageServices {
 
-  readonly #currentRoom = signal(window.localStorage.getItem('Room'))
+
   readonly #userSignal = signal(window.localStorage.getItem('User'))
-  readonly #gameSignal = signal(window.localStorage.getItem('Game'))
-  readonly #mapSignal = signal(window.localStorage.getItem('Map'))
-  readonly #sessionStatusGameSignal = signal(window.localStorage.getItem('Session'))
-  readonly #playerPosition = signal(window.localStorage.getItem('Position'))
-  readonly #currentTurn = signal(window.localStorage.getItem('Turn'))
+
+  readonly #currentRoom = signal(window.sessionStorage.getItem('Room'))
+  readonly #gameSignal = signal(window.sessionStorage.getItem('Game'))
+  readonly #mapSignal = signal(window.sessionStorage.getItem('Map'))
+  readonly #sessionStatusGameSignal = signal(window.sessionStorage.getItem('Session'))
+  readonly #playerPosition = signal(window.sessionStorage.getItem('Position'))
+  readonly #currentTurn = signal(window.sessionStorage.getItem('Turn'))
 
 
   readonly eventCurrentRoomSignal = this.#currentRoom.asReadonly()
@@ -30,35 +32,43 @@ export class LocalstorageServices {
 
   constructor() {
     if (this.eventUserSignal() === null) {
-      this.createStorageByKey('User', null)
+      this.createStorageLocalByKey('User', null)
     }
     if (this.eventSessionsSignal() === null) {
-      this.createStorageByKey('Session', null)
+      this.createStorageSessionByKey('Session', null)
     }
     if (this.eventGameSignal() === null) {
-      this.createStorageByKey('Game', null)
+      this.createStorageSessionByKey('Game', null)
     }
     if (this.eventMapSignal() === null) {
-      this.createStorageByKey('Map', null)
+      this.createStorageSessionByKey('Map', null)
     }
     if (this.eventPlayerPosition() === null) {
-      this.createStorageByKey('Position', null)
+      this.createStorageSessionByKey('Position', null)
     }
     if (this.eventCurrentTurn() === null) {
-      this.createStorageByKey('Turn', null)
+      this.createStorageSessionByKey('Turn', null)
+    }
+    if (this.eventCurrentRoomSignal() === null) {
+      this.createStorageSessionByKey('Room', null)
     }
   }
 
-  createStorageByKey(key: string, data: any) {
+  createStorageLocalByKey(key: string, data: any) {
     return localStorage.setItem(key, JSON.stringify(data));
   }
 
+  createStorageSessionByKey(key: string, data: any) {
+    return sessionStorage.setItem(key, JSON.stringify(data));
+  }
+
+
   resetNullAllStorage() {
-    this.createStorageByKey('Session', null)
-    this.createStorageByKey('Game', null)
-    this.createStorageByKey('Map', null)
-    this.createStorageByKey('Position', null)
-    this.createStorageByKey('Turn', null)
+    this.createStorageSessionByKey('Session', null)
+    this.createStorageSessionByKey('Game', null)
+    this.createStorageSessionByKey('Map', null)
+    this.createStorageSessionByKey('Position', null)
+    this.createStorageSessionByKey('Turn', null)
   }
 
   /***
@@ -81,7 +91,7 @@ export class LocalstorageServices {
   }
 
   setUser(user: UserFrontData) {
-    this.createStorageByKey('User', user)
+    this.createStorageLocalByKey('User', user)
     this.#userSignal.set(JSON.stringify(user))
   }
 
@@ -107,7 +117,7 @@ export class LocalstorageServices {
   }
 
   setGame(game: Game) {
-    this.createStorageByKey('Game', game)
+    this.createStorageSessionByKey('Game', game)
     this.#gameSignal.set(JSON.stringify(game))
   }
 
@@ -161,7 +171,7 @@ export class LocalstorageServices {
   }
 
   setSessionStatusGame(game: SessionStatusGame) {
-    this.createStorageByKey('Session', game)
+    this.createStorageSessionByKey('Session', game)
     this.#sessionStatusGameSignal.set(JSON.stringify(game))
   }
 
@@ -190,7 +200,7 @@ export class LocalstorageServices {
   }
 
   setMap(map: Maps) {
-    this.createStorageByKey('Map', map)
+    this.createStorageSessionByKey('Map', map)
     this.#mapSignal.set(JSON.stringify(map))
   }
 
@@ -212,7 +222,7 @@ export class LocalstorageServices {
   }
 
   setPlayerPosition(position: UserPosition) {
-    this.createStorageByKey('Position', position)
+    this.createStorageSessionByKey('Position', position)
     this.#playerPosition.set(JSON.stringify(position))
   }
 
@@ -242,7 +252,25 @@ export class LocalstorageServices {
   }
 
   setCurrentTurn(turn: TurnListEntity) {
-    this.createStorageByKey('Turn', turn)
+    this.createStorageSessionByKey('Turn', turn)
     this.#currentTurn.set(JSON.stringify(turn))
+  }
+
+  /**
+   * Room
+   */
+
+  getRoom(): string {
+    let turn = this.eventCurrentRoomSignal()
+    if (turn === null) {
+      return ''
+    } else {
+      return JSON.parse(turn)
+    }
+  }
+
+  setRoom(value: string) {
+    this.createStorageSessionByKey('Room', value)
+    this.#currentRoom.set(JSON.stringify(value))
   }
 }
