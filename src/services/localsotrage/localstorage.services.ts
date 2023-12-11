@@ -19,6 +19,8 @@ export class LocalstorageServices {
   readonly #sessionStatusGameSignal = signal(window.sessionStorage.getItem('Session'))
   readonly #playerPosition = signal(window.sessionStorage.getItem('Position'))
   readonly #currentTurn = signal(window.sessionStorage.getItem('Turn'))
+  readonly #nowStatus = signal(window.sessionStorage.getItem('NowStatus'))
+  readonly #nextStatus = signal(window.sessionStorage.getItem('NextStatus'))
 
 
   readonly eventCurrentRoomSignal = this.#currentRoom.asReadonly()
@@ -28,6 +30,8 @@ export class LocalstorageServices {
   readonly eventSessionsSignal = this.#sessionStatusGameSignal.asReadonly()
   readonly eventPlayerPosition = this.#playerPosition.asReadonly()
   readonly eventCurrentTurn = this.#currentTurn.asReadonly()
+  readonly eventNowStatus = this.#nowStatus.asReadonly()
+  readonly eventNextStatus = this.#nextStatus.asReadonly()
 
 
   constructor() {
@@ -52,6 +56,12 @@ export class LocalstorageServices {
     if (this.eventCurrentRoomSignal() === null) {
       this.createStorageSessionByKey('Room', null)
     }
+    if (this.eventNowStatus() === null) {
+      this.#nowStatus.set(Can.WHO_IS_TURN)
+    }
+    if (this.eventNextStatus() === null) {
+      this.#nextStatus.set(Can.WHO_IS_TURN)
+    }
   }
 
   createStorageLocalByKey(key: string, data: any) {
@@ -69,6 +79,9 @@ export class LocalstorageServices {
     this.createStorageSessionByKey('Map', null)
     this.createStorageSessionByKey('Position', null)
     this.createStorageSessionByKey('Turn', null)
+    this.createStorageSessionByKey('Room', null)
+    this.createStorageSessionByKey('NowStatus', Can.WHO_IS_TURN)
+    this.createStorageSessionByKey('NextStatus', Can.WHO_IS_TURN)
   }
 
   /***
@@ -116,7 +129,7 @@ export class LocalstorageServices {
     }
   }
 
-  setGame(game: Game) {
+  setGame(game: Game | null) {
     this.createStorageSessionByKey('Game', game)
     this.#gameSignal.set(JSON.stringify(game))
   }
@@ -146,13 +159,13 @@ export class LocalstorageServices {
             teamIndex: -1,
             cardIndex: -1,
             luk: 0,
-            typeEntity: EntityCategorie.HUMAIN
-          },
-          currentCell: {
-            id: -1,
-            x: -1,
-            y: -1,
-            value: 0
+            typeEntity: EntityCategorie.HUMAIN,
+            cellPosition: {
+              id: -1,
+              x: -1,
+              y: -1,
+              value: 0
+            }
           },
           dice: -1,
           move: {
@@ -170,7 +183,7 @@ export class LocalstorageServices {
     }
   }
 
-  setSessionStatusGame(game: SessionStatusGame) {
+  setSessionStatusGame(game: SessionStatusGame | null) {
     this.createStorageSessionByKey('Session', game)
     this.#sessionStatusGameSignal.set(JSON.stringify(game))
   }
@@ -244,14 +257,20 @@ export class LocalstorageServices {
         teamIndex: -1,
         cardIndex: -1,
         typeEntity: EntityCategorie.HUMAIN,
-        luk: -100000
+        luk: -100000,
+        cellPosition: {
+          id: -1,
+          x: -1,
+          y: -1,
+          value: 0
+        }
       }
     } else {
       return JSON.parse(turn)
     }
   }
 
-  setCurrentTurn(turn: TurnListEntity) {
+  setCurrentTurn(turn: TurnListEntity | null) {
     this.createStorageSessionByKey('Turn', turn)
     this.#currentTurn.set(JSON.stringify(turn))
   }
@@ -272,5 +291,37 @@ export class LocalstorageServices {
   setRoom(value: string) {
     this.createStorageSessionByKey('Room', value)
     this.#currentRoom.set(JSON.stringify(value))
+  }
+
+  /**
+   * Status
+   */
+
+  getNowStatus(): Can {
+    let status = this.eventNowStatus()
+    if (status === null) {
+      return Can.WHO_IS_TURN
+    } else {
+      return JSON.parse(status)
+    }
+  }
+
+  setNowStatus(value: Can) {
+    this.createStorageSessionByKey('NowStatus', value)
+    this.#nowStatus.set(JSON.stringify(value))
+  }
+
+  getNextStatus(): Can {
+    let status = this.eventNextStatus()
+    if (status === null) {
+      return Can.WHO_IS_TURN
+    } else {
+      return JSON.parse(status)
+    }
+  }
+
+  setNextStatus(value: Can) {
+    this.createStorageSessionByKey('NextStatus', value)
+    this.#nextStatus.set(JSON.stringify(value))
   }
 }

@@ -92,5 +92,12 @@ export interface TurnListEntity {
   teamIndex: number
   cardIndex: number
   typeEntity: EntityCategorie
-  luk: number
+  luk: number,
+  cellPosition: Cells
+}
+
+
+export interface Session {
+  id:number,
+  game:SessionGame
 }

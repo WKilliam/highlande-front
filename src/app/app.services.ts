@@ -31,28 +31,6 @@ export class AppServices {
     this.socketEndpoint.instanceRoomConnect('AppServices')
   }
 
-
-  // initCheck(){
-  //   if(this.localStorage.getUser() !== null){
-  //     const token = this.#localStore.getUser().token
-  //     this.storeApi.getIfUserInsideRoom(token).subscribe((response: FormatRestApiModels) => {
-  //       if (response !== null) {
-  //         if (response.code >= 200 && response.code < 300 && response.data !== null) {
-  //           this.socketEndpoint.instanceRoomConnect('AppServices',response.data.sessionStatusGame.room)
-  //         } else {
-  //           console.log('code not 200-300', response)
-  //         }
-  //       } else {
-  //         console.log('response null', response)
-  //         this.#router.navigate(['/testeurio'])
-  //       }
-  //     })
-  //   }else{
-  //     console.log('user not found')
-  //     this.#router.navigate(['/testeurio'])
-  //   }
-  // }
-
   getRoom(): string {
     return this.#room()
   }

@@ -5,12 +5,15 @@ import {
   CurrentTurnAction,
   JoinSessionSocket,
   JoinSessionTeam,
-  JoinSessionTeamCard, SocketTurn
+  JoinSessionTeamCard
 } from "../../models/formatSocket.models";
 import {LocalstorageServices} from "../localsotrage/localstorage.services";
 import {Utils} from "../Utils";
 import {CardByEntityPlaying, CardsRestApi} from "../../models/cards.models";
 import {UserPosition} from "../../models/users.models";
+import {Can} from "../../models/emus";
+import {Cells} from "../../models/maps.models";
+import {Session} from "../../models/room.content.models";
 
 @Injectable({
   providedIn: 'root',
@@ -65,29 +68,19 @@ export class StoreServicesSocket {
     this.socket.createTurnList()
   }
 
-  whoIsTurn() {
-    let room = this.localStore.getSessionStatusGame().room
-    this.socket.whoIsTurn(room)
+  botTurnSuccessSend() {
+    return this.socket.botTurnSuccessSend()
   }
 
-  startTurn(data:SocketTurn) {
-    this.socket.startTurn(data)
+  humainTurnSuccessSend(action: CurrentTurnAction) {
+    this.socket.humainTurnSuccessSend(action)
   }
 
-  sendDice(data: SocketTurn) {
-    this.socket.sendDice(data)
+  getMap() {
+    return this.socket.getMap()
   }
 
-  chooseMove(data: SocketTurn) {
-    this.socket.chooseMove(data)
+  setMap(map:Map<string,Session>) {
+    this.socket.setMap(map)
   }
-
-  endMove(data: SocketTurn) {
-    this.socket.endMove(data)
-  }
-
-  endTurn(data: SocketTurn) {
-    this.socket.endTurn(data)
-  }
-
 }

@@ -1,24 +1,20 @@
-import {EffectRef, inject, Injectable, signal} from "@angular/core";
-import {io} from "socket.io-client";
-import {Socket} from "socket.io-client";
+import {inject, Injectable, signal} from "@angular/core";
+import {io, Socket} from "socket.io-client";
 import {
   CurrentTurnAction,
   FormatSocketModels,
   JoinSessionSocket,
   JoinSessionTeam,
-  JoinSessionTeamCard, SocketTurn
+  JoinSessionTeamCard
 } from "../../models/formatSocket.models";
 import {LocalstorageServices} from "../localsotrage/localstorage.services";
 import {Router} from "@angular/router";
 import {Utils} from "../Utils";
-import {UserPosition} from "../../models/users.models";
-import {Game, SessionGame, SessionStatusGame} from "../../models/room.content.models";
-import {Maps} from "../../models/maps.models";
 import {StoreServicesApi} from "../store-Api/store.services.api";
 import {FormatRestApiModels} from "../../models/formatRestApi.models";
-import {
-  logBuilderStatusWarnings
-} from "@angular-devkit/build-angular/src/builders/browser-esbuild/builder-status-warnings";
+import {Can} from "../../models/emus";
+import {Game, Session, SessionGame, TurnListEntity} from "../../models/room.content.models";
+import {Maps} from "../../models/maps.models";
 
 @Injectable({
   providedIn: 'root',
@@ -29,6 +25,10 @@ export class SocketService {
   private localStore: LocalstorageServices = inject(LocalstorageServices)
   private storeHttpService = inject(StoreServicesApi)
   private router = inject(Router)
+  private sessionDTOMap: Map<string, Session> = new Map();
+
+  readonly #mapForBot = signal<Map<string, Session>>(new Map<string, Session>())
+  readonly #eventMapForBot = this.#mapForBot.asReadonly()
 
   constructor() {
     this.socket = io('http://localhost:3000', {transports: ['websocket']});
@@ -36,62 +36,41 @@ export class SocketService {
 
   currentRoom(roomJoin: string | null = null) {
     if (roomJoin !== null) {
-      console.log('currentRoom', roomJoin)
       this.localStore.setRoom(roomJoin)
-      this.joinRoom({
-        room: roomJoin,
-        token: this.localStore.getUser().token
-      })
     } else {
       if (this.localStore.getSessionStatusGame() !== null) {
         this.storeHttpService
           .getSessions(this.localStore.getSessionStatusGame().room)
           .subscribe((response: FormatRestApiModels) => {
             if (response !== null) {
-              console.log('getSessions', response)
               if (response.code >= 200 && response.code < 300) {
-                console.log('status 200')
                 let roomString: string = response.data.sessionStatusGame.room
                 this.localStore.setRoom(roomString)
-                console.log('roomString', roomString)
-                this.joinRoom({
-                  room: roomString,
-                  token: this.localStore.getUser().token
-                })
               } else {
                 if (!this.defaultPart()) {
                   this.localStore.setRoom('default')
-                  this.joinRoom({
-                    room: 'default',
-                    token: this.localStore.getUser().token
-                  })
                 }
               }
             } else {
               if (!this.defaultPart()) {
                 this.localStore.setRoom('default')
-                this.joinRoom({
-                  room: 'default',
-                  token: this.localStore.getUser().token
-                })
               }
             }
           })
       } else {
         if (!this.defaultPart()) {
           this.localStore.setRoom('default')
-          this.joinRoom({
-            room: 'default',
-            token: this.localStore.getUser().token
-          })
         }
       }
     }
-    if (!this.defaultPart()) {
-      console.log('joinEvent', this.localStore.getRoom())
+    if (!this.defaultPart() && this.localStore.getRoom() !== null) {
+      this.getRoom()
       this.joinEvent(this.localStore.getRoom())
     } else {
-      console.log('defaultPart', this.localStore.getRoom())
+      this.joinRoom({
+        room: this.localStore.getRoom(),
+        token: this.localStore.getUser().token
+      })
     }
   }
 
@@ -99,15 +78,25 @@ export class SocketService {
     return this.localStore.getRoom() === 'default';
   }
 
-  socketSecurityConnectToRoom() {
-    console.log(this.localStore.getSessionStatusGame())
-    if (this.localStore.getSessionStatusGame() !== null) {
-      console.log("joinRoom")
-      this.joinRoom({room: this.localStore.getSessionStatusGame().room, token: this.localStore.getUser().token})
-    } else {
-      console.log("joinDefaultRoom")
-      this.joinRoom({room: 'default', token: this.localStore.getUser().token})
-    }
+  getRoom() {
+    this.joinRoom({
+      room: this.localStore.getRoom(),
+      token: this.localStore.getUser().token
+    })
+    this.socket.emit('room', this.localStore.getRoom());
+    this.socket.on(`room-${this.localStore.getRoom()}`, (data) => {
+      if (data !== 'default') {
+        if (this.localStore.getRoom() !== data) {
+          this.localStore.setRoom(data)
+        }
+      } else if (data === 'default') {
+        if (this.localStore.getRoom() !== 'default') {
+          this.localStore.setRoom('default')
+        }
+      } else {
+        console.log('error data', data)
+      }
+    })
   }
 
   joinRoom(join: JoinSessionSocket) {
@@ -116,31 +105,25 @@ export class SocketService {
 
   joinEvent(room: string) {
     this.socket.on(`${room}`, (data: FormatSocketModels) => {
-      console.log('data joinEvent', data)
       if (data.code === 200) {
-        // this.socketLoadData(data)
         let sessionDiff = Utils.jsonDifference(data.data.game?.sessionStatusGame, this.localStore.getSessionStatusGame())
         let gameDiff = Utils.jsonDifference(data.data.game?.game, this.localStore.getGame())
         let mapDiff = Utils.jsonDifference(data.data.game?.maps, this.localStore.getMap())
-        sessionDiff ? this.localStore.setSessionStatusGame(data.data.game?.sessionStatusGame) : console.log('no difference session')
-        gameDiff ? this.localStore.setGame(data.data.game?.game) : console.log('no difference game')
-        mapDiff ? this.localStore.setMap(data.data.game?.maps) : console.log('no difference map')
-        console.log('session', this.localStore.getSessionStatusGame())
-        console.log('game', this.localStore.getGame())
-        console.log('map', this.localStore.getMap())
+        sessionDiff ? this.localStore.setSessionStatusGame(data.data.game?.sessionStatusGame) : false
+        gameDiff ? this.localStore.setGame(data.data.game?.game) : false
+        mapDiff ? this.localStore.setMap(data.data.game?.maps) : false
         if (this.localStore.getGame() !== null) {
           let position = Utils.findPlayerIndex(
             this.localStore.getGame().teams,
             this.localStore.getUser().pseudo,
             this.localStore.getUser().avatar)
           let positionDiff = Utils.jsonDifference(position, this.localStore.getPlayerPosition())
-          positionDiff ? this.localStore.setPlayerPosition(position) : console.log('no difference position')
+          positionDiff ? this.localStore.setPlayerPosition(position) : false
           switch (data.data.game?.sessionStatusGame?.status) {
             case 'LOBBY':
               if (this.localStore.getSessionStatusGame() !== null && this.localStore.getMap() !== null && this.localStore.getGame() !== null) {
                 this.router.navigate([`/lobby/${data.data.game?.sessionStatusGame?.room}`]);
               } else {
-                console.log('error session or map or game null')
                 this.router.navigate([`/testeurio`]);
               }
               break;
@@ -153,7 +136,6 @@ export class SocketService {
               }
               break;
             default:
-              console.log('error status not found', data.data.game?.sessionStatusGame?.status)
               this.router.navigate([`/testeurio`]);
           }
         } else {
@@ -163,34 +145,6 @@ export class SocketService {
         console.log('data null or code not 200-299', data)
       }
     });
-  }
-
-  socketLoadData(data: FormatSocketModels) {
-    const sessionGame = data.data.game?.sessionStatusGame ?? null
-    const game = data.data.game?.game ?? null
-    const map = data.data.game?.maps ?? null
-    console.log('sessionGame', sessionGame)
-    console.log('game', game)
-    console.log('map', map)
-    this.localStore.setSessionStatusGame(sessionGame)
-    const roomString: string = sessionGame?.room ?? 'none'
-    this.localStore.setGame(game)
-    this.localStore.setMap(map)
-    let position = Utils.findPlayerIndex(
-      this.localStore.getGame().teams,
-      this.localStore.getUser().pseudo,
-      this.localStore.getUser().avatar)
-    if (position.teamTag !== -1 && position.cardTag !== -1) {
-      this.localStore.setPlayerPosition(position)
-    }
-    switch (sessionGame.status) {
-      case 'LOBBY':
-        this.router.navigate([`/lobby/${sessionGame.room}`]);
-        break;
-      default:
-        console.log('error status not found', sessionGame.status)
-    }
-
   }
 
   joinTeam(join: JoinSessionTeam) {
@@ -210,36 +164,64 @@ export class SocketService {
     });
   }
 
-  whoIsTurn(room: string) {
-    this.socketSecurityConnectToRoom()
-    console.log('whoIsTurn', room)
-    this.socket.emit('whoIsTurn', {room: room});
+
+  /**
+   * Turn
+   */
+
+  botTurnSuccessSend() {
+    this.socket.emit('botTurn', {
+      room: this.localStore.getSessionStatusGame().room,
+      seconds: 50,
+      entityTurn: {
+        turnEntity: this.localStore.getSessionStatusGame().entityTurn[0],
+        dice: 0,
+        moves: [],
+        move: {
+          x: 0,
+          y: 0,
+          z: 0,
+        },
+        currentAction: Can.WHO_IS_TURN
+      }
+    })
+    this.extract()
   }
 
-  startTurn(data: SocketTurn) {
-    this.socketSecurityConnectToRoom()
-    this.socket.emit('startTurn', data);
+  humainTurnSuccessSend(humainAction: CurrentTurnAction) {
+    this.socket.emit('humainTurn', {
+      room: this.localStore.getRoom(),
+      action: humainAction
+    })
+    this.extract()
   }
 
-  sendDice(data: SocketTurn) {
-    this.socketSecurityConnectToRoom()
-    this.socket.emit('sendDice', data);
+  private extract() {
+    this.socket.onAny((eventName, ...args) => {
+      if (eventName === `${this.localStore.getRoom()}-turn`) {
+        let sessionDto: FormatRestApiModels = args[0]
+        console.log('sessionDto', sessionDto.data.game.sessionStatusGame.currentTurnEntity.currentAction)
+        this.addElementMap(sessionDto.data.game.sessionStatusGame.currentTurnEntity.currentAction, sessionDto.data)
+      }
+    });
   }
 
-  chooseMove(data: SocketTurn) {
-    this.socketSecurityConnectToRoom()
-    this.socket.emit('chooseMove', data);
+  /**
+   * Map
+   */
+
+  getMap() {
+    return this.#eventMapForBot()
   }
 
-  endMove(data: SocketTurn) {
-    this.socketSecurityConnectToRoom()
-    this.socket.emit('endMove', data);
+  addElementMap(key: string, value: Session) {
+    this.#mapForBot.update((map) => {
+      map.set(key, value)
+      return map
+    })
   }
 
-  endTurn(data: SocketTurn) {
-    this.socketSecurityConnectToRoom()
-    this.socket.emit('endTurn', data);
+  setMap(map: Map<string, Session>) {
+    this.#mapForBot.set(map)
   }
-
-
 }

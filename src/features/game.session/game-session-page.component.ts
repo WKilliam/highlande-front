@@ -18,74 +18,81 @@ import {GameSessionServices} from "./game-session-services";
     NgIf
   ],
   template: `
-    <div class="page-container">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-3">
-            <div class="position-content">
-              <ui-cards-fight
-                class="card-center"
-                [link]="gameSessionServices.getimgSrcCardOne()"
-                [rarity]="gameSessionServices.getrarityCardOne()"
-              ></ui-cards-fight>
-              <div class="life-bar-position">
-              </div>
-            </div>
-          </div>
-          <div class="col-6">
-            <div class="row">
-              <div class="col-12">
-                <div class="timeOutPrint">
-                  <p class="text">
-                    Turn : {{gameSessionServices.localStore.getSessionStatusGame().turnCount}} -
-                    Timer : {{gameSessionServices.getTimerValue()}} -
-                    Status : {{gameSessionServices.getTurnStatus()}}
-                  </p>
-                  <div *ngIf="gameSessionServices.localStore.getCurrentTurn().pseudo !== 'monster-1'
-                  || gameSessionServices.localStore.getCurrentTurn().pseudo !== 'monster-0'">
-                    <p class="text" style="color: red;">Entity :
-                      {{gameSessionServices.localStore.getCurrentTurn().team}}
-                    </p>
+      <div class="page-container">
+          <div class="container-fluid">
+              <div class="row">
+                  <div class="col-3">
+                      <div class="position-content">
+                          <ui-cards-fight
+                                  class="card-center"
+                                  [link]="gameSessionServices.getimgSrcCardOne()"
+                                  [rarity]="gameSessionServices.getrarityCardOne()"
+                          ></ui-cards-fight>
+                          <div class="life-bar-position">
+                          </div>
+                      </div>
                   </div>
-                  <ng-template>
-                    <p class="text" style="color: red;">Entity :
-                      {{gameSessionServices.localStore.getCurrentTurn().pseudo}}
-                    </p>
-                  </ng-template>
-                  <p class="text" style="color: red;">Entity :
-                    {{gameSessionServices.getMessageByAction()}}
-                  </p>
-                </div>
+                  <div class="col-6">
+                      <div class="row" style="margin:1rem;">
+                          <div class="col-12">
+                              <div class="timeOutPrint">
+                                  <p class="text">
+                                      Turn : {{ gameSessionServices.localStore.getSessionStatusGame().turnCount }} -
+                                      Timer : {{ gameSessionServices.getTimerValue() }} -
+                                      Status : {{ gameSessionServices.getTurnStatus() }}
+                                  </p>
+                                  <div class="row">
+                                      <div class="col-4" style="margin-bottom:5px;">
+                                          Entity :
+                                      </div>
+                                      <div class="col-8" style="margin-bottom:5px;">
+                                          {{ gameSessionServices.localStore.getCurrentTurn().team }} - {{ gameSessionServices.localStore.getCurrentTurn().pseudo }}
+                                      </div>
+                                      <div class="col-4" style=" margin-bottom:5px;">
+                                          Action :
+                                      </div>
+                                      <div class="col-8" style="margin-bottom:5px;">
+                                          {{ gameSessionServices.getMessageByAction() }}
+                                      </div>
+                                      <div class="col-4" style=" margin-bottom:5px;">
+                                          Dice Value :
+                                      </div>
+                                      <div class="col-8" style="margin-bottom:5px;"
+                                           *ngIf="gameSessionServices.getDiceResult() !== -1">
+                                          {{ gameSessionServices.getDiceResult() }}
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <ui-map
+                              [canMovePosition]="gameSessionServices.getallCanMovePosition()"
+                      ></ui-map>
+                      <div *ngIf="gameSessionServices.getHiddenDice()">
+                          <ui-dice (click)="gameSessionServices.roollingDice()"></ui-dice>
+                          <div
+                                  style="font-family: irish-grover; font-size: 3rem;color: #FFFFFF">{{ gameSessionServices.getDiceResult() }}
+                          </div>
+                      </div>
+                      <div>
+                          <!--              <p>{{gameSessionServices.localStore.getCurrentTurn().turnEntity.pseudo}}</p>-->
+                      </div>
+                  </div>
+                  <div class="col-3">
+                      <div class="position-content">
+                          <ui-cards-fight
+                                  [link]="gameSessionServices.getimgSrcCardTwo()"
+                                  [rarity]="gameSessionServices.getrarityCardTwo()"
+                                  class="card-center"></ui-cards-fight>
+                      </div>
+                  </div>
               </div>
-            </div>
-            <ui-map
-              [canMovePosition]="gameSessionServices.getallCanMovePosition()"
-            ></ui-map>
-            <div *ngIf="gameSessionServices.getHiddenDice()">
-              <ui-dice (click)="gameSessionServices.roollingDice()"></ui-dice>
-              <div style="font-family: irish-grover; font-size: 3rem;color: #FFFFFF">{{gameSessionServices.getDiceResult()}}</div>
-            </div>
-            <div>
-<!--              <p>{{gameSessionServices.localStore.getCurrentTurn().turnEntity.pseudo}}</p>-->
-            </div>
           </div>
-          <div class="col-3">
-            <div class="position-content">
-              <ui-cards-fight
-                [link]="gameSessionServices.getimgSrcCardTwo()"
-                [rarity]="gameSessionServices.getrarityCardTwo()"
-                class="card-center"></ui-cards-fight>
-              <div class="life-bar-position">
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
-    </div>
   `,
   styleUrls: ['./game.session.scss']
 })
 export class GameSessionPage {
 
-  readonly gameSessionServices:GameSessionServices = inject(GameSessionServices);
+  readonly gameSessionServices: GameSessionServices = inject(GameSessionServices);
 }
