@@ -185,6 +185,7 @@ export class SocketService {
   }
 
   humainTurnSuccessSend(humainAction: CurrentTurnAction) {
+    console.log('humainTurnSuccessSend', humainAction)
     this.socket.emit('humainTurn', {
       room: this.localStore.getRoom(),
       action: humainAction

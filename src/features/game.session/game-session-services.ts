@@ -58,7 +58,6 @@ export class GameSessionServices {
   constructor() {
     this.socketEndpointJoin.instanceRoomConnect('GameSessionServices')
     const position = this.localStore.getPlayerPosition()
-    this.initCharacters()
     const cards = this.localStore.getGame().teams[position.teamTag].cardsPlayer ?? []
     this.setimgSrcCardOne(cards[0].imageSrc === '' ? this.imgSrcCard : cards[0].imageSrc)
     this.setimgSrcCardTwo(cards[1].imageSrc === '' ? this.imgSrcCard : cards[1].imageSrc)
@@ -69,6 +68,7 @@ export class GameSessionServices {
 
   timerEvolving() {
     this.setTimerValue(50)
+    this.initCharacters()
     this.timer = setInterval(() => {
       this.setTimerValue(this.getTimerValue() - 1)
       if (this.getTimerValue() === 0) {
@@ -94,11 +94,11 @@ export class GameSessionServices {
   ping(type: boolean) {
     if (type) {
       // Computer turn
-      console.log(`computer playing status is ${this.getTurnStatus()}...`)
+      // console.log(`computer playing status is ${this.getTurnStatus()}...`)
       this.botLogic()
     } else {
       // Player turn
-      console.log(`humain playing status is ${this.getTurnStatus()}...`)
+      // console.log(`humain playing status is ${this.getTurnStatus()}...`)
       this.playerLogic()
     }
   }
@@ -118,12 +118,13 @@ export class GameSessionServices {
         const endTurnEvent = this.storeSocket.getMap().get(Can.END_TURN)
         const nextTurnEvent = this.storeSocket.getMap().get(Can.NEXT_TURN)
         const delays = [4000, 8000, 12000, 16000, 20000, 24000]
-        console.log('map size : ', this.storeSocket.getMap())
+        // console.log('map size : ', this.storeSocket.getMap())
         setTimeout(() => {
           // SEND_DICE
           this.setMessageByAction(`${this.localStore.getCurrentTurn().team} - ${this.localStore.getCurrentTurn().pseudo} send dice`)
           this.setDiceResult(chooseMoveEvent?.game.sessionStatusGame.currentTurnEntity.dice ?? -1)
           this.localStore.setSessionStatusGame(sendDiceEvent?.game.sessionStatusGame ?? null)
+          this.localStore.setCurrentTurn(sendDiceEvent?.game.sessionStatusGame.currentTurnEntity.turnEntity ?? null)
           this.setTurnStatus(Can.SEND_DICE)
         }, delays[0])
         setTimeout(() => {
@@ -132,6 +133,7 @@ export class GameSessionServices {
           const allMoves = chooseMoveEvent?.game.sessionStatusGame.currentTurnEntity.moves ?? []
           this.setallCanMovePosition(allMoves)
           this.localStore.setSessionStatusGame(chooseMoveEvent?.game.sessionStatusGame ?? null)
+          this.localStore.setCurrentTurn(chooseMoveEvent?.game.sessionStatusGame.currentTurnEntity.turnEntity ?? null)
           this.setTurnStatus(Can.CHOOSE_MOVE)
         }, delays[1])
         setTimeout(() => {
@@ -145,6 +147,7 @@ export class GameSessionServices {
           this.setallCanMovePosition([move])
           this.move(move, findIndex)
           this.localStore.setSessionStatusGame(moveEvent?.game.sessionStatusGame ?? null)
+          this.localStore.setCurrentTurn(moveEvent?.game.sessionStatusGame.currentTurnEntity.turnEntity ?? null)
           this.setTurnStatus(Can.MOVE)
         }, delays[2])
         setTimeout(() => {
@@ -154,28 +157,34 @@ export class GameSessionServices {
           this.setallCanMovePosition([])
           this.setMove({id: -1, x: -1, y: -1, value: -1})
           this.localStore.setSessionStatusGame(endMoveEvent?.game.sessionStatusGame ?? null)
+          this.localStore.setCurrentTurn(endMoveEvent?.game.sessionStatusGame.currentTurnEntity.turnEntity ?? null)
+          this.localStore.setGame(endMoveEvent?.game.game ?? null)
           this.setTurnStatus(Can.END_MOVE)
         }, delays[3])
         setTimeout(() => {
           // END_TURN
           this.setMessageByAction(`${this.localStore.getCurrentTurn().team} - ${this.localStore.getCurrentTurn().pseudo} end turn`)
           this.localStore.setSessionStatusGame(endTurnEvent?.game.sessionStatusGame ?? null)
+          this.localStore.setCurrentTurn(endTurnEvent?.game.sessionStatusGame.currentTurnEntity.turnEntity ?? null)
           this.setTurnStatus(Can.END_TURN)
         }, delays[4])
         setTimeout(() => {
           // NEXT_TURN
           this.setMessageByAction(`${this.localStore.getCurrentTurn().team} - ${this.localStore.getCurrentTurn().pseudo} next turn`)
-          console.log('next turn', nextTurnEvent?.game.sessionStatusGame.currentTurnEntity)
+          // console.log('next turn', nextTurnEvent?.game.sessionStatusGame.currentTurnEntity)
           this.localStore.setSessionStatusGame(nextTurnEvent?.game.sessionStatusGame ?? null)
           this.localStore.setCurrentTurn(nextTurnEvent?.game.sessionStatusGame.currentTurnEntity.turnEntity ?? null)
           this.setTurnStatus(Can.NEXT_TURN)
           this.storeSocket.botLeaveQueue()
+          this.setallCanMovePosition([])
+          this.setDiceResult(-1)
+          this.setMove({id: -1, x: -1, y: -1, value: -1})
           if (nextTurnEvent?.game.sessionStatusGame.currentTurnEntity.turnEntity.typeEntity === 'HUMAIN') {
             this.setCalled(true)
             this.setTimerValue(50)
-            this.storeSocket.setMap(new Map<string, Session>())
             this.setTurnStatus(Can.WHO_IS_TURN)
             this.setMessageByAction(`${this.localStore.getCurrentTurn().team} - ${this.localStore.getCurrentTurn().pseudo} turn`)
+            this.storeSocket.setMap(new Map<string, Session>())
           }
         }, delays[5])
       }, 1000)
@@ -183,9 +192,12 @@ export class GameSessionServices {
       if (this.getTurnStatus() === Can.NEXT_TURN) {
         this.setCalled(true)
         this.setTimerValue(50)
-        this.storeSocket.setMap(new Map<string, Session>())
+        this.setDiceResult(-1)
+        this.setallCanMovePosition([])
+        this.setMove({id: -1, x: -1, y: -1, value: -1})
         this.setTurnStatus(Can.WHO_IS_TURN)
         this.setMessageByAction(`${this.localStore.getCurrentTurn().team} - ${this.localStore.getCurrentTurn().pseudo} turn`)
+        this.storeSocket.setMap(new Map<string, Session>())
       }
     }
   }
@@ -204,7 +216,7 @@ export class GameSessionServices {
             this.setCalled(false)
           } else {
             if (this.storeSocket.getMap().size === 1) {
-              console.log('map size : ', this.storeSocket.getMap())
+              // console.log('map size : ', this.storeSocket.getMap())
               this.setTurnStatus(Can.SEND_DICE)
               this.setCalled(true)
               this.setHiddenDice(true)
@@ -218,6 +230,7 @@ export class GameSessionServices {
             this.setCalled(false)
           } else {
             if (this.getDiceResult() !== -1 && this.storeSocket.getMap().size === 1) {
+              // console.log('player', this.localStore.getSessionStatusGame().currentTurnEntity)
               this.storeSocket.humainTurnSuccessSend({
                 ...this.localStore.getSessionStatusGame().currentTurnEntity,
                 currentAction: Can.SEND_DICE,
@@ -225,7 +238,7 @@ export class GameSessionServices {
               })
             } else {
               if (this.storeSocket.getMap().size === 2) {
-                console.log('map size : ', this.storeSocket.getMap())
+                // console.log('map size : ', this.storeSocket.getMap())
                 this.setTurnStatus(Can.CHOOSE_MOVE)
                 this.setCalled(true)
               }
@@ -233,13 +246,15 @@ export class GameSessionServices {
           }
           break
         case Can.CHOOSE_MOVE:
-          console.log('CHOOSE_MOVE')
+          // console.log('CHOOSE_MOVE')
           if (this.getCalled()) {
             this.setMessageByAction(`${this.localStore.getCurrentTurn().team} - ${this.localStore.getCurrentTurn().pseudo} choose move`)
             const allMoves = this.storeSocket.getMap().get(Can.CHOOSE_MOVE)?.game.sessionStatusGame.currentTurnEntity.moves ?? []
+            this.localStore.setSessionStatusGame(this.storeSocket.getMap().get(Can.CHOOSE_MOVE)?.game.sessionStatusGame ?? null)
             this.setallCanMovePosition(allMoves)
             this.setCalled(false)
           } else {
+            // console.log('move', this.getMove())
             if (this.getMove().id !== -1 && this.storeSocket.getMap().size === 2) {
               this.storeSocket.humainTurnSuccessSend({
                 ...this.localStore.getSessionStatusGame().currentTurnEntity,
@@ -264,6 +279,7 @@ export class GameSessionServices {
               break
             }
             this.move(this.getMove(), findIndex)
+            this.localStore.setSessionStatusGame(this.storeSocket.getMap().get(Can.MOVE)?.game.sessionStatusGame ?? null)
             this.storeSocket.humainTurnSuccessSend({
               ...this.localStore.getSessionStatusGame().currentTurnEntity,
               currentAction: Can.MOVE,
@@ -271,8 +287,7 @@ export class GameSessionServices {
             this.setCalled(false)
           } else {
             if (this.storeSocket.getMap().size === 4) {
-              console.log('map size : ', this.storeSocket.getMap())
-              this.setMove({id: -1, x: -1, y: -1, value: -1})
+              // console.log('map size : ', this.storeSocket.getMap())
               this.setallCanMovePosition([])
               this.setTurnStatus(Can.END_MOVE)
               this.setCalled(true)
@@ -290,7 +305,7 @@ export class GameSessionServices {
             this.setCalled(false)
           } else {
             if (this.storeSocket.getMap().size === 5) {
-              console.log('map size : ', this.storeSocket.getMap())
+              // console.log('map size : ', this.storeSocket.getMap())
               this.setTurnStatus(Can.END_TURN)
               this.setCalled(true)
             }
@@ -307,7 +322,7 @@ export class GameSessionServices {
             this.setCalled(false)
           } else {
             if (this.storeSocket.getMap().size === 6) {
-              console.log('map size : ', this.storeSocket.getMap())
+              // console.log('map size : ', this.storeSocket.getMap())
               this.setTurnStatus(Can.NEXT_TURN)
               this.setCalled(true)
             }
@@ -317,16 +332,17 @@ export class GameSessionServices {
           console.log('NEXT_TURN')
           const nextTurnEvent = this.storeSocket.getMap().get(Can.NEXT_TURN)?.game.sessionStatusGame ?? null
           const currentTurnEvent = this.storeSocket.getMap().get(Can.NEXT_TURN)?.game.sessionStatusGame.currentTurnEntity.turnEntity ?? null
-          console.log('next turn', nextTurnEvent)
-          console.log('current turn', currentTurnEvent)
+          // console.log('next turn', nextTurnEvent)
+          // console.log('current turn', currentTurnEvent)
           if (nextTurnEvent !== null && currentTurnEvent !== null) {
             this.localStore.setSessionStatusGame(nextTurnEvent)
             this.localStore.setCurrentTurn(currentTurnEvent)
             this.setMessageByAction(`${this.localStore.getCurrentTurn().team} - ${this.localStore.getCurrentTurn().pseudo} turn`)
+            this.setMove({id: -1, x: -1, y: -1, value: -1})
             this.setTimerValue(50)
             this.storeSocket.setMap(new Map<string, Session>())
             this.setTurnStatus(Can.WHO_IS_TURN)
-          }else{
+          } else {
             console.log('error next turn')
           }
           break
@@ -340,24 +356,6 @@ export class GameSessionServices {
     }
   }
 
-  startStatus() {
-    if (this.localStore.getNextStatus() === Can.WHO_IS_TURN && this.localStore.getNowStatus() === Can.WHO_IS_TURN) {
-      return true
-    } else return this.localStore.getNextStatus() === this.localStore.getNowStatus();
-  }
-
-  roolingStatus() {
-    if (this.localStore.getSessionStatusGame().currentTurnEntity.currentAction === "") {
-      this.setTurnStatus(Can.WHO_IS_TURN)
-    } else {
-      this.setTurnStatus(this.localStore.getSessionStatusGame().currentTurnEntity.currentAction)
-    }
-  }
-
-  getIfUserPlay() {
-    return this.localStore.getCurrentTurn().pseudo === this.localStore.getUser().pseudo &&
-      this.localStore.getCurrentTurn().typeEntity === "HUMAIN";
-  }
 
   stopTimer(): void {
     clearInterval(this.timer);
@@ -402,13 +400,13 @@ export class GameSessionServices {
     const characters = [...players, ...monsters]
     let content: Array<Character> = []
     for (let i = 0; i < characters.length; i++) {
-      if (characters[i].cellPosition.x !== -1 &&
-        content.findIndex((character) => character.pseudo === characters[i].name) === -1
-      ) {
+      if (characters[i].commonMaxLife !== -1) {
+        const valueX = characters[i].cellPosition.y === -1 ? 0 : characters[i].cellPosition.y
+        const valueY = characters[i].cellPosition.x === -1 ? 0 : characters[i].cellPosition.x
         let character: Character = {
           pseudo: characters[i].name,
-          X: characters[i].cellPosition.y,
-          Y: characters[i].cellPosition.x,
+          X: valueX,
+          Y: valueY,
           render: './../../assets/character/button.gif'
         }
         content.push(character)

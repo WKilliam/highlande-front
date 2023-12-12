@@ -42,19 +42,23 @@ import {GameSessionServices} from "./game-session-services";
                                       Status : {{ gameSessionServices.getTurnStatus() }}
                                   </p>
                                   <div class="row">
-                                      <div class="col-4" style="margin-bottom:5px;">
+                                      <div class="col-2" style="margin-bottom:5px;">
                                           Entity :
                                       </div>
                                       <div class="col-8" style="margin-bottom:5px;">
                                           {{ gameSessionServices.localStore.getCurrentTurn().team }} - {{ gameSessionServices.localStore.getCurrentTurn().pseudo }}
                                       </div>
-                                      <div class="col-4" style=" margin-bottom:5px;">
+                                  </div>
+                                  <div class="row">
+                                      <div class="col-2" style=" margin-bottom:5px;">
                                           Action :
                                       </div>
                                       <div class="col-8" style="margin-bottom:5px;">
                                           {{ gameSessionServices.getMessageByAction() }}
                                       </div>
-                                      <div class="col-4" style=" margin-bottom:5px;">
+                                  </div>
+                                  <div class="row">
+                                      <div class="col-2" style=" margin-bottom:5px;">
                                           Dice Value :
                                       </div>
                                       <div class="col-8" style="margin-bottom:5px;"
