@@ -119,6 +119,7 @@ export class SocketService {
             this.localStore.getUser().avatar)
           let positionDiff = Utils.jsonDifference(position, this.localStore.getPlayerPosition())
           positionDiff ? this.localStore.setPlayerPosition(position) : false
+          this.localStore.setCurrentTurn(data.data.game?.sessionStatusGame?.currentTurnEntity.turnEntity)
           switch (data.data.game?.sessionStatusGame?.status) {
             case 'LOBBY':
               if (this.localStore.getSessionStatusGame() !== null && this.localStore.getMap() !== null && this.localStore.getGame() !== null) {
@@ -129,7 +130,7 @@ export class SocketService {
               break;
             case 'GAME':
               if (this.localStore.getSessionStatusGame() !== null && this.localStore.getMap() !== null && this.localStore.getGame() !== null) {
-                this.router.navigate([`/game`]);
+                  this.router.navigate([`/game`]);
               } else {
                 console.log('error session or map or game null')
                 this.router.navigate([`/testeurio`]);
@@ -169,23 +170,18 @@ export class SocketService {
    * Turn
    */
 
-  botTurnSuccessSend() {
+  botTurnSuccessSend(botAction: CurrentTurnAction) {
     this.socket.emit('botTurn', {
-      room: this.localStore.getSessionStatusGame().room,
-      seconds: 50,
-      entityTurn: {
-        turnEntity: this.localStore.getSessionStatusGame().entityTurn[0],
-        dice: 0,
-        moves: [],
-        move: {
-          x: 0,
-          y: 0,
-          z: 0,
-        },
-        currentAction: Can.WHO_IS_TURN
-      }
+      room: this.localStore.getRoom(),
+      action: botAction
     })
     this.extract()
+  }
+
+  botLeaveQueue() {
+    this.socket.emit('botLeaveQueue', {
+      room: this.localStore.getRoom(),
+    })
   }
 
   humainTurnSuccessSend(humainAction: CurrentTurnAction) {
@@ -200,7 +196,6 @@ export class SocketService {
     this.socket.onAny((eventName, ...args) => {
       if (eventName === `${this.localStore.getRoom()}-turn`) {
         let sessionDto: FormatRestApiModels = args[0]
-        console.log('sessionDto', sessionDto.data.game.sessionStatusGame.currentTurnEntity.currentAction)
         this.addElementMap(sessionDto.data.game.sessionStatusGame.currentTurnEntity.currentAction, sessionDto.data)
       }
     });
@@ -224,4 +219,6 @@ export class SocketService {
   setMap(map: Map<string, Session>) {
     this.#mapForBot.set(map)
   }
+
+
 }

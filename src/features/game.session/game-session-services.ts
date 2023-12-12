@@ -7,6 +7,7 @@ import {Character} from "../../models/player.models";
 import {SocketEndpoint} from "../../app/socket.endpoint";
 import {Game, Session, SessionGame, SessionStatusGame} from "../../models/room.content.models";
 import {CurrentTurnAction} from "../../models/formatSocket.models";
+import {bsDatepickerReducer} from "ngx-bootstrap/datepicker/reducer/bs-datepicker.reducer";
 
 @Injectable({
   providedIn: 'root',
@@ -28,7 +29,7 @@ export class GameSessionServices {
   readonly #rarityCardTwo = signal('')
   readonly #diceResult = signal(-1)
   readonly #allCanMovePosition = signal<Array<Cells>>([])
-  readonly #moveLocation = signal<Cells>({id: -1, x: -1, y: -1, value: 0,})
+  readonly #moveLocation = signal<Cells>({id: -1, x: -1, y: -1, value: -1,})
   readonly #turnStatus = signal<string>(Can.WHO_IS_TURN)
   readonly #characters = signal<Array<Character>>([])
   readonly #hiddenDice = signal<boolean>(false)
@@ -57,7 +58,6 @@ export class GameSessionServices {
   constructor() {
     this.socketEndpointJoin.instanceRoomConnect('GameSessionServices')
     const position = this.localStore.getPlayerPosition()
-    this.localStore.setCurrentTurn(this.localStore.getSessionStatusGame().entityTurn[0])
     this.initCharacters()
     const cards = this.localStore.getGame().teams[position.teamTag].cardsPlayer ?? []
     this.setimgSrcCardOne(cards[0].imageSrc === '' ? this.imgSrcCard : cards[0].imageSrc)
@@ -72,7 +72,13 @@ export class GameSessionServices {
     this.timer = setInterval(() => {
       this.setTimerValue(this.getTimerValue() - 1)
       if (this.getTimerValue() === 0) {
-        this.timerEvolving()
+        console.log("map ", this.storeSocket.getMap())
+        console.log("turn ", this.localStore.getCurrentTurn())
+        // if(this.getTurnStatus() !== Can.WHO_IS_TURN){
+        //   this.setTurnStatus(Can.END_TURN)
+        // }else{
+        //   this.timerEvolving()
+        // }
       } else {
         if (this.localStore.getCurrentTurn().typeEntity === 'COMPUTER') {
           this.ping(true)
@@ -86,212 +92,251 @@ export class GameSessionServices {
   }
 
   ping(type: boolean) {
-    // Computer turn
     if (type) {
-      if (this.getCalled()) {
-        this.setCalled(false)
-        this.storeSocket.botTurnSuccessSend()
-        // WAITING RECEIVE DATA
+      // Computer turn
+      console.log(`computer playing status is ${this.getTurnStatus()}...`)
+      this.botLogic()
+    } else {
+      // Player turn
+      console.log(`humain playing status is ${this.getTurnStatus()}...`)
+      this.playerLogic()
+    }
+  }
+
+  botLogic() {
+    if (this.getCalled()) {
+      this.storeSocket.botTurnSuccessSend({
+        ...this.localStore.getSessionStatusGame().currentTurnEntity,
+        currentAction: Can.WHO_IS_TURN,
+      })
+      this.setCalled(false)
+      setTimeout(() => {
+        const sendDiceEvent = this.storeSocket.getMap().get(Can.SEND_DICE)
+        const chooseMoveEvent = this.storeSocket.getMap().get(Can.CHOOSE_MOVE)
+        const moveEvent = this.storeSocket.getMap().get(Can.MOVE)
+        const endMoveEvent = this.storeSocket.getMap().get(Can.END_MOVE)
+        const endTurnEvent = this.storeSocket.getMap().get(Can.END_TURN)
+        const nextTurnEvent = this.storeSocket.getMap().get(Can.NEXT_TURN)
+        const delays = [4000, 8000, 12000, 16000, 20000, 24000]
+        console.log('map size : ', this.storeSocket.getMap())
         setTimeout(() => {
-          console.log('map : ', this.storeSocket.getMap())
-          if (this.storeSocket.getMap().size === 6) {
-            let dice = this.storeSocket.getMap().get(Can.CHOOSE_MOVE)?.game.sessionStatusGame.currentTurnEntity.dice ?? -1
-            let moves = this.storeSocket.getMap().get(Can.CHOOSE_MOVE)?.game.sessionStatusGame.currentTurnEntity.moves ?? []
-            let move = this.storeSocket.getMap().get(Can.MOVE)?.game.sessionStatusGame.currentTurnEntity.move ?? {
-              id: -1,
-              x: -1,
-              y: -1,
-              value: 0,
-            }
-            let next = this.storeSocket.getMap().get(Can.NEXT_TURN)?.game.sessionStatusGame.currentTurnEntity
-            let session: SessionStatusGame | null = null
-            let game: Game | null = null
-            // SEND DICE
-            setTimeout(() => {
-              this.setMessageByAction(`Computer ${this.localStore.getCurrentTurn().team}-${this.localStore.getCurrentTurn().pseudo} send dice`)
-              this.setDiceResult(dice)
-              this.setTurnStatus(Can.SEND_DICE)
-              session = this.storeSocket.getMap().get(Can.SEND_DICE)?.game.sessionStatusGame ?? null
-              game = this.storeSocket.getMap().get(Can.SEND_DICE)?.game.game ?? null
-              this.localStore.setGame(game)
-              this.localStore.setSessionStatusGame(session)
-            }, 6000)
-            // CHOOSE MOVE
-            setTimeout(() => {
-              this.setMessageByAction(`Computer ${this.localStore.getCurrentTurn().team}-${this.localStore.getCurrentTurn().pseudo} choose move`)
-              this.setallCanMovePosition(moves)
-              this.setTurnStatus(Can.CHOOSE_MOVE)
-            }, 8000)
-            // MOVE
-            setTimeout(() => {
-              this.setMessageByAction(`Computer ${this.localStore.getCurrentTurn().team}-${this.localStore.getCurrentTurn().pseudo} move`)
-              this.setallCanMovePosition([move])
-              this.setTurnStatus(Can.MOVE)
-            }, 15000)
-            // END MOVE
-            setTimeout(() => {
-              this.setMessageByAction(`Computer ${this.localStore.getCurrentTurn().team}-${this.localStore.getCurrentTurn().pseudo} end move`)
-              let findIndex = this.getCharacters().findIndex((character) => character.pseudo === this.localStore.getCurrentTurn().team)
-              this.move(move, findIndex)
-              this.setTurnStatus(Can.END_MOVE)
-            }, 20000)
-            // END TURN
-            setTimeout(() => {
-              this.setMessageByAction(`Computer ${this.localStore.getCurrentTurn().team}-${this.localStore.getCurrentTurn().pseudo} end turn`)
-              this.setDiceResult(-1)
-              this.setallCanMovePosition([])
-              this.storeSocket.setMap(new Map<string, Session>())
-              this.setTurnStatus(Can.NEXT_TURN)
-              if (next?.turnEntity.typeEntity === 'HUMAIN') {
-                this.setCalled(true)
-                this.setTimer(0)
-                this.localStore.setCurrentTurn(next.turnEntity)
-              }
-              this.setCalled(true)
-              this.setTimer(0)
-            }, 25000)
+          // SEND_DICE
+          this.setMessageByAction(`${this.localStore.getCurrentTurn().team} - ${this.localStore.getCurrentTurn().pseudo} send dice`)
+          this.setDiceResult(chooseMoveEvent?.game.sessionStatusGame.currentTurnEntity.dice ?? -1)
+          this.localStore.setSessionStatusGame(sendDiceEvent?.game.sessionStatusGame ?? null)
+          this.setTurnStatus(Can.SEND_DICE)
+        }, delays[0])
+        setTimeout(() => {
+          // CHOOSE_MOVE
+          this.setMessageByAction(`${this.localStore.getCurrentTurn().team} - ${this.localStore.getCurrentTurn().pseudo} choose move`)
+          const allMoves = chooseMoveEvent?.game.sessionStatusGame.currentTurnEntity.moves ?? []
+          this.setallCanMovePosition(allMoves)
+          this.localStore.setSessionStatusGame(chooseMoveEvent?.game.sessionStatusGame ?? null)
+          this.setTurnStatus(Can.CHOOSE_MOVE)
+        }, delays[1])
+        setTimeout(() => {
+          // MOVE
+          this.setMessageByAction(`${this.localStore.getCurrentTurn().team} - ${this.localStore.getCurrentTurn().pseudo} move`)
+          const findIndex = this.getCharacters().findIndex((character) => character.pseudo === this.localStore.getCurrentTurn().team)
+          if (findIndex === -1) {
+            return
           }
-        }, 4000);
+          let move = moveEvent?.game.sessionStatusGame.currentTurnEntity.move ?? {id: -1, x: -1, y: -1, value: -1}
+          this.setallCanMovePosition([move])
+          this.move(move, findIndex)
+          this.localStore.setSessionStatusGame(moveEvent?.game.sessionStatusGame ?? null)
+          this.setTurnStatus(Can.MOVE)
+        }, delays[2])
+        setTimeout(() => {
+          // END_MOVE
+          this.setMessageByAction(`${this.localStore.getCurrentTurn().team} - ${this.localStore.getCurrentTurn().pseudo} end move`)
+          this.setDiceResult(-1)
+          this.setallCanMovePosition([])
+          this.setMove({id: -1, x: -1, y: -1, value: -1})
+          this.localStore.setSessionStatusGame(endMoveEvent?.game.sessionStatusGame ?? null)
+          this.setTurnStatus(Can.END_MOVE)
+        }, delays[3])
+        setTimeout(() => {
+          // END_TURN
+          this.setMessageByAction(`${this.localStore.getCurrentTurn().team} - ${this.localStore.getCurrentTurn().pseudo} end turn`)
+          this.localStore.setSessionStatusGame(endTurnEvent?.game.sessionStatusGame ?? null)
+          this.setTurnStatus(Can.END_TURN)
+        }, delays[4])
+        setTimeout(() => {
+          // NEXT_TURN
+          this.setMessageByAction(`${this.localStore.getCurrentTurn().team} - ${this.localStore.getCurrentTurn().pseudo} next turn`)
+          console.log('next turn', nextTurnEvent?.game.sessionStatusGame.currentTurnEntity)
+          this.localStore.setSessionStatusGame(nextTurnEvent?.game.sessionStatusGame ?? null)
+          this.localStore.setCurrentTurn(nextTurnEvent?.game.sessionStatusGame.currentTurnEntity.turnEntity ?? null)
+          this.setTurnStatus(Can.NEXT_TURN)
+          this.storeSocket.botLeaveQueue()
+          if (nextTurnEvent?.game.sessionStatusGame.currentTurnEntity.turnEntity.typeEntity === 'HUMAIN') {
+            this.setCalled(true)
+            this.setTimerValue(50)
+            this.storeSocket.setMap(new Map<string, Session>())
+            this.setTurnStatus(Can.WHO_IS_TURN)
+            this.setMessageByAction(`${this.localStore.getCurrentTurn().team} - ${this.localStore.getCurrentTurn().pseudo} turn`)
+          }
+        }, delays[5])
+      }, 1000)
+    } else {
+      if (this.getTurnStatus() === Can.NEXT_TURN) {
+        this.setCalled(true)
+        this.setTimerValue(50)
+        this.storeSocket.setMap(new Map<string, Session>())
+        this.setTurnStatus(Can.WHO_IS_TURN)
+        this.setMessageByAction(`${this.localStore.getCurrentTurn().team} - ${this.localStore.getCurrentTurn().pseudo} turn`)
       }
     }
-    // Humain turn
-    else {
-      if (this.localStore.getCurrentTurn().pseudo === this.localStore.getUser().pseudo) {
-        switch (this.getTurnStatus()) {
-          case Can.WHO_IS_TURN:
-            console.log('inside who is turn')
-            if (this.getCalled()) {
-              this.setMessageByAction(`${this.localStore.getCurrentTurn().team} - ${this.localStore.getCurrentTurn().pseudo} turn`)
-              this.storeSocket.humainTurnSuccessSend({
-                turnEntity: this.localStore.getCurrentTurn(),
-                currentAction: Can.WHO_IS_TURN,
-                dice: -1,
-                moves: [],
-                move: {
-                  id: -1,
-                  x: -1,
-                  y: -1,
-                  value: 0,
-                }
-              })
-              this.setCalled(false)
-            } else {
-              if (this.storeSocket.getMap().size === 1) {
-                console.log('map size : ', this.storeSocket.getMap())
-                this.setTurnStatus(Can.SEND_DICE)
-                this.setCalled(true)
-                this.setHiddenDice(true)
-              }
-            }
-            break
-          case Can.NEXT_TURN:
-            console.log('inside next turn')
-            if (this.getCalled()) {
-              this.storeSocket.humainTurnSuccessSend({
-                turnEntity: this.localStore.getCurrentTurn(),
-                currentAction: Can.WHO_IS_TURN,
-                dice: -1,
-                moves: [],
-                move: {
-                  id: -1,
-                  x: -1,
-                  y: -1,
-                  value: 0,
-                }
-              })
-              let turnEntity = this.storeSocket.getMap().get(Can.SEND_DICE)?.game.sessionStatusGame.currentTurnEntity.turnEntity ?? null
-              if (turnEntity !== null) {
-                this.localStore.setCurrentTurn(turnEntity)
-              } else {
-                console.log('inside next turn')
-              }
-              this.setCalled(false)
-            } else {
-              console.log('wait your turn')
-              // if(this.storeSocket.getMap().get())
-            }
-            break;
-          case Can.SEND_DICE:
-            if (this.getCalled()) {
-              this.setMessageByAction(`${this.localStore.getCurrentTurn().team} - ${this.localStore.getCurrentTurn().pseudo} send dice`)
-              this.setCalled(false)
-            } else {
-              if (this.getDiceResult() !== -1) {
-                this.setTurnStatus(Can.CHOOSE_MOVE)
-                this.storeSocket.humainTurnSuccessSend({
-                  turnEntity: this.localStore.getCurrentTurn(),
-                  currentAction: Can.CHOOSE_MOVE,
-                  dice: this.getDiceResult(),
-                  moves: [],
-                  move: {
-                    id: -1,
-                    x: -1,
-                    y: -1,
-                    value: 0,
-                  }
-                })
-                this.setDiceResult(-1)
-              }else{
-                if(this.storeSocket.getMap().size === 2){
-                  console.log('map size : ', this.storeSocket.getMap())
-                  this.setTurnStatus(Can.CHOOSE_MOVE)
-                  this.setCalled(true)
-                }
-              }
-            }
-            break
-          case Can.CHOOSE_MOVE:
-            console.log('CHOOSE_MOVE')
-            break;
-          // case Can.WHO_IS_TURN:
-          //   console.log('WHO_IS_TURN')
-          //   break;
-          // case Can.SEND_DICE:
-          //   if(this.getCalled()) {
-          //     this.setTurnStatus(Can.SEND_DICE)
-          //     this.setHiddenDice(true)
-          //     this.setCalled(false)
-          //   }else{
-          //     if(this.getDiceResult() !== -1){
-          //       this.setTurnStatus(Can.CHOOSE_MOVE)
-          //       this.storeSocket.humainTurnSuccessSend({
-          //         turnEntity: this.localStore.getCurrentTurn(),
-          //         currentAction: Can.CHOOSE_MOVE,
-          //         dice: this.getDiceResult(),
-          //         moves: [],
-          //         move: {
-          //           id: -1,
-          //           x: -1,
-          //           y: -1,
-          //           value: 0,
-          //         }
-          //       })
-          //       this.setCalled(true)
-          //     }
-          //   }
-          //   break;
+  }
 
-          // case Can.MOVE:
-          //   console.log('MOVE')
-          //   break;
-          // case Can.END_MOVE:
-          //   console.log('END_MOVE')
-          //   break;
-          // case Can.END_TURN:
-          //   console.log('END_TURN')
-          //   break;
-          //
-          // case Can.END_GAME:
-          //   console.log('END_GAME')
-          //   break;
-          default:
-            console.log('error')
-            console.log('get turn status : ', this.getTurnStatus())
-            break;
-        }
-      } else {
-        console.log('wait your turn')
+  playerLogic() {
+    if (this.localStore.getCurrentTurn().pseudo === this.localStore.getUser().pseudo) {
+      switch (this.getTurnStatus()) {
+        case Can.WHO_IS_TURN:
+          console.log('WHO_IS_TURN')
+          if (this.getCalled()) {
+            this.setMessageByAction(`${this.localStore.getCurrentTurn().team} - ${this.localStore.getCurrentTurn().pseudo} turn`)
+            this.storeSocket.humainTurnSuccessSend({
+              ...this.localStore.getSessionStatusGame().currentTurnEntity,
+              currentAction: Can.WHO_IS_TURN,
+            })
+            this.setCalled(false)
+          } else {
+            if (this.storeSocket.getMap().size === 1) {
+              console.log('map size : ', this.storeSocket.getMap())
+              this.setTurnStatus(Can.SEND_DICE)
+              this.setCalled(true)
+              this.setHiddenDice(true)
+            }
+          }
+          break
+        case Can.SEND_DICE:
+          console.log('SEND_DICE')
+          if (this.getCalled()) {
+            this.setMessageByAction(`${this.localStore.getCurrentTurn().team} - ${this.localStore.getCurrentTurn().pseudo} send dice`)
+            this.setCalled(false)
+          } else {
+            if (this.getDiceResult() !== -1 && this.storeSocket.getMap().size === 1) {
+              this.storeSocket.humainTurnSuccessSend({
+                ...this.localStore.getSessionStatusGame().currentTurnEntity,
+                currentAction: Can.SEND_DICE,
+                dice: this.getDiceResult(),
+              })
+            } else {
+              if (this.storeSocket.getMap().size === 2) {
+                console.log('map size : ', this.storeSocket.getMap())
+                this.setTurnStatus(Can.CHOOSE_MOVE)
+                this.setCalled(true)
+              }
+            }
+          }
+          break
+        case Can.CHOOSE_MOVE:
+          console.log('CHOOSE_MOVE')
+          if (this.getCalled()) {
+            this.setMessageByAction(`${this.localStore.getCurrentTurn().team} - ${this.localStore.getCurrentTurn().pseudo} choose move`)
+            const allMoves = this.storeSocket.getMap().get(Can.CHOOSE_MOVE)?.game.sessionStatusGame.currentTurnEntity.moves ?? []
+            this.setallCanMovePosition(allMoves)
+            this.setCalled(false)
+          } else {
+            if (this.getMove().id !== -1 && this.storeSocket.getMap().size === 2) {
+              this.storeSocket.humainTurnSuccessSend({
+                ...this.localStore.getSessionStatusGame().currentTurnEntity,
+                currentAction: Can.CHOOSE_MOVE,
+                move: this.getMove()
+              })
+              this.setallCanMovePosition([this.getMove()])
+            } else {
+              if (this.storeSocket.getMap().size === 3) {
+                this.setCalled(true)
+                console.log('map size : ', this.storeSocket.getMap())
+                this.setTurnStatus(Can.MOVE)
+              }
+            }
+          }
+          break;
+        case Can.MOVE:
+          console.log('MOVE')
+          if (this.getCalled()) {
+            const findIndex = this.getCharacters().findIndex((character) => character.pseudo === this.localStore.getCurrentTurn().team)
+            if (findIndex === -1) {
+              break
+            }
+            this.move(this.getMove(), findIndex)
+            this.storeSocket.humainTurnSuccessSend({
+              ...this.localStore.getSessionStatusGame().currentTurnEntity,
+              currentAction: Can.MOVE,
+            })
+            this.setCalled(false)
+          } else {
+            if (this.storeSocket.getMap().size === 4) {
+              console.log('map size : ', this.storeSocket.getMap())
+              this.setMove({id: -1, x: -1, y: -1, value: -1})
+              this.setallCanMovePosition([])
+              this.setTurnStatus(Can.END_MOVE)
+              this.setCalled(true)
+            }
+          }
+          break;
+        case Can.END_MOVE:
+          console.log('END_MOVE')
+          if (this.getCalled()) {
+            this.setMessageByAction(`${this.localStore.getCurrentTurn().team} - ${this.localStore.getCurrentTurn().pseudo} end move`)
+            this.storeSocket.humainTurnSuccessSend({
+              ...this.localStore.getSessionStatusGame().currentTurnEntity,
+              currentAction: Can.END_MOVE,
+            })
+            this.setCalled(false)
+          } else {
+            if (this.storeSocket.getMap().size === 5) {
+              console.log('map size : ', this.storeSocket.getMap())
+              this.setTurnStatus(Can.END_TURN)
+              this.setCalled(true)
+            }
+          }
+          break;
+        case Can.END_TURN:
+          console.log('END_TURN')
+          if (this.getCalled()) {
+            this.setMessageByAction(`${this.localStore.getCurrentTurn().team} - ${this.localStore.getCurrentTurn().pseudo} end turn`)
+            this.storeSocket.humainTurnSuccessSend({
+              ...this.localStore.getSessionStatusGame().currentTurnEntity,
+              currentAction: Can.END_TURN,
+            })
+            this.setCalled(false)
+          } else {
+            if (this.storeSocket.getMap().size === 6) {
+              console.log('map size : ', this.storeSocket.getMap())
+              this.setTurnStatus(Can.NEXT_TURN)
+              this.setCalled(true)
+            }
+          }
+          break;
+        case Can.NEXT_TURN:
+          console.log('NEXT_TURN')
+          const nextTurnEvent = this.storeSocket.getMap().get(Can.NEXT_TURN)?.game.sessionStatusGame ?? null
+          const currentTurnEvent = this.storeSocket.getMap().get(Can.NEXT_TURN)?.game.sessionStatusGame.currentTurnEntity.turnEntity ?? null
+          console.log('next turn', nextTurnEvent)
+          console.log('current turn', currentTurnEvent)
+          if (nextTurnEvent !== null && currentTurnEvent !== null) {
+            this.localStore.setSessionStatusGame(nextTurnEvent)
+            this.localStore.setCurrentTurn(currentTurnEvent)
+            this.setMessageByAction(`${this.localStore.getCurrentTurn().team} - ${this.localStore.getCurrentTurn().pseudo} turn`)
+            this.setTimerValue(50)
+            this.storeSocket.setMap(new Map<string, Session>())
+            this.setTurnStatus(Can.WHO_IS_TURN)
+          }else{
+            console.log('error next turn')
+          }
+          break
+        default:
+          console.log('error')
+          console.log('get turn status : ', this.getTurnStatus())
+          break;
       }
+    } else {
+      console.log('wait your turn')
     }
   }
 

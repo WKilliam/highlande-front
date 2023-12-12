@@ -15,13 +15,13 @@ export class CreateSessionUi{
 
   protected readonly createSessionUiServices: CreateSessionUiServices = inject(CreateSessionUiServices);
   protected sessionBody:SessionCreatedBase = {
-    name: '',
+    name: 'NO NAME',
     password: '',
-    mapId: -1,
-    teamOneName: '',
-    teamTwoName: '',
-    teamThreeName: '',
-    teamFourName: '',
+    mapId: 1,
+    teamOneName: 'Alpha',
+    teamTwoName: 'Beta',
+    teamThreeName: 'Charlie',
+    teamFourName: 'Delta',
   }
 
 

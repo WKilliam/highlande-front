@@ -68,8 +68,12 @@ export class StoreServicesSocket {
     this.socket.createTurnList()
   }
 
-  botTurnSuccessSend() {
-    return this.socket.botTurnSuccessSend()
+  botTurnSuccessSend(action: CurrentTurnAction) {
+    return this.socket.botTurnSuccessSend(action)
+  }
+
+  botLeaveQueue() {
+    this.socket.botLeaveQueue()
   }
 
   humainTurnSuccessSend(action: CurrentTurnAction) {

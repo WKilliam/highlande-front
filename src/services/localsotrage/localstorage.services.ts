@@ -167,6 +167,7 @@ export class LocalstorageServices {
               value: 0
             }
           },
+          indexInsideArray: -1,
           dice: -1,
           move: {
             id: -1,

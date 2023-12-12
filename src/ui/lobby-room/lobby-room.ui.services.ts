@@ -43,7 +43,6 @@ export class LobbyRoomUiServices{
   }
 
   startGameSession(){
-    this.storeSocketServices.createTurnList()
     this.timerEvolving()
   }
 
@@ -56,11 +55,7 @@ export class LobbyRoomUiServices{
         this.stopTimer()
         this.setStartTimer(false)
         console.log('timer end')
-        if(this.localStorage.getSessionStatusGame().entityTurn.length > 1){
-          this.router.navigate([`/game`]);
-        }else{
-          console.log('error entityTurn length < 1')
-        }
+        this.storeSocketServices.createTurnList()
       }
     }, 1000);
   }
