@@ -1,7 +1,5 @@
-import {Component, inject, OnInit} from '@angular/core';
-import { RouterOutlet} from "@angular/router";
-import {AppServices} from "./app.services";
-import {StoreServicesSocket} from "../services/store-Socket/store.services.socket";
+import {Component} from '@angular/core';
+import {RouterOutlet} from "@angular/router";
 
 @Component({
   selector: 'app-root',
@@ -17,4 +15,6 @@ import {StoreServicesSocket} from "../services/store-Socket/store.services.socke
   ],
 })
 export class AppComponent {
+
+
 }

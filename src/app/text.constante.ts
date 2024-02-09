@@ -15,7 +15,7 @@ export class TextConstante {
     ['sessionNamePlaceholder', 'Last Adventure'],
 
     ['sessionTeamLabel', 'Name of the team :'],
-    ['sessionTeamOnePlaceholder', 'The Red Pickles'],
+    ['sessionTeamPlaceholder', 'The Red Pickles'],
 
     ['sessionPrivateLabel', 'Whrite a password for your session if you want it to be private'],
     ['sessionPrivatePlaceholder', 'Password123'],
@@ -25,6 +25,15 @@ export class TextConstante {
 
     ['sessionBtnLabel', 'Create the session'],
 
-    ['Start','Start Game']
+    ['Start','Start Game'],
+
+    ['sessionNameDefault', 'NO NAME'],
+    ['sessionTeamOneDefault', 'Alpha'],
+    ['sessionTeamTwoDefault', 'Beta'],
+    ['sessionTeamThreeDefault', 'Charlie'],
+    ['sessionTeamFourDefault', 'Delta'],
+
+
+
   ])
 }

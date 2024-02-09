@@ -1,40 +1,33 @@
 import {effect, inject, Injectable} from "@angular/core";
-import {LocalstorageServices} from "../../services/localsotrage/localstorage.services";
-import {StoreServicesApi} from "../../services/store-Api/store.services.api";
 import {Router} from "@angular/router";
-import {UserFrontData, UsersLogin} from "../../models/users.models";
-import {FormatRestApiModels} from "../../models/formatRestApi.models";
-import {StoreServicesSocket} from "../../services/store-Socket/store.services.socket";
-import {SocketEndpoint} from "../../app/socket.endpoint";
+import { UsersLogin} from "../../models/users.models";
+import {DispatcherHttp} from "../../services/dispatchers/dispatcher-http/dispatcher-http";
+import {DispatcherSocket} from "../../services/dispatchers/dispatcher-socket/dispatcher-socket";
+import {StorageManagerApp} from "../../services/storageManagerApp/storageManagerApp";
 
 @Injectable({
   providedIn: 'root',
 })
 export class TesteurIoService {
 
-  readonly #localStorage: LocalstorageServices = inject(LocalstorageServices)
-  readonly #storeApi: StoreServicesApi = inject(StoreServicesApi);
-  readonly #router = inject(Router);
-  private readonly socketEndpoint= inject(SocketEndpoint)
 
-  constructor() {
-    this.#localStorage.resetNullAllStorage()
-    this.socketEndpoint.instanceRoomConnect('TesteurIoService')
+  readonly #router = inject(Router);
+  readonly #dispatcherHttp = inject(DispatcherHttp);
+  readonly #dispatcherSocket = inject(DispatcherSocket);
+  readonly #storageManagerApp = inject(StorageManagerApp);
+
+  constructor(route:Router) {
+    this.#storageManagerApp.setCurrentActiveRoute(route.url)
   }
 
   login(userLogin: UsersLogin) {
-    this.#storeApi.login(userLogin).subscribe((response: FormatRestApiModels) => {
-      if (response.code >= 200 && response.code < 300) {
-        this.#localStorage.setUser(response.data)
-      }
-    })
+    this.#dispatcherHttp.login(userLogin)
   }
-
   getUser() {
-    return this.#localStorage.getUser();
+    return this.#dispatcherHttp.getUser()
   }
 
   moveCreateSession() {
-    this.#router.navigate(['/session']);
+    this.#router.navigate(['/create_session']);
   }
 }

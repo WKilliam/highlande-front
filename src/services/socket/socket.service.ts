@@ -1,20 +1,14 @@
-import {inject, Injectable, signal} from "@angular/core";
+import {inject, Injectable} from "@angular/core";
 import {io, Socket} from "socket.io-client";
-import {
-  CurrentTurnAction,
-  FormatSocketModels,
-  JoinSessionSocket,
-  JoinSessionTeam,
-  JoinSessionTeamCard
-} from "../../models/formatSocket.models";
-import {LocalstorageServices} from "../localsotrage/localstorage.services";
+import {StorageManagerApp} from "../storageManagerApp/storageManagerApp";
+import {deburr} from "lodash";
+import {UserCanJoin, UserIdentitiesGame, UserSocketConnect} from "../../models/users.models";
+import {Utils} from "../utils";
+import {FormatRestApi} from "../../models/formatRestApi";
+import {SessionModels} from "../../models/session.models";
 import {Router} from "@angular/router";
-import {Utils} from "../Utils";
-import {StoreServicesApi} from "../store-Api/store.services.api";
-import {FormatRestApiModels} from "../../models/formatRestApi.models";
-import {Can} from "../../models/emus";
-import {Game, Session, SessionGame, TurnListEntity} from "../../models/room.content.models";
-import {Maps} from "../../models/maps.models";
+import {UtilsSocketReceived} from "../dispatchers/dispatcher-socket/utils.socket.received";
+
 
 @Injectable({
   providedIn: 'root',
@@ -22,204 +16,58 @@ import {Maps} from "../../models/maps.models";
 export class SocketService {
 
   private socket: Socket;
-  private localStore: LocalstorageServices = inject(LocalstorageServices)
-  private storeHttpService = inject(StoreServicesApi)
-  private router = inject(Router)
-  private sessionDTOMap: Map<string, Session> = new Map();
-
-  readonly #mapForBot = signal<Map<string, Session>>(new Map<string, Session>())
-  readonly #eventMapForBot = this.#mapForBot.asReadonly()
+  readonly #storageManagerApp = inject(StorageManagerApp);
+  readonly #router = inject(Router)
 
   constructor() {
     this.socket = io('http://localhost:3000', {transports: ['websocket']});
   }
 
-  currentRoom(roomJoin: string | null = null) {
-    if (roomJoin !== null) {
-      this.localStore.setRoom(roomJoin)
-    } else {
-      if (this.localStore.getSessionStatusGame() !== null) {
-        this.storeHttpService
-          .getSessions(this.localStore.getSessionStatusGame().room)
-          .subscribe((response: FormatRestApiModels) => {
-            if (response !== null) {
-              if (response.code >= 200 && response.code < 300) {
-                let roomString: string = response.data.sessionStatusGame.room
-                this.localStore.setRoom(roomString)
-              } else {
-                if (!this.defaultPart()) {
-                  this.localStore.setRoom('default')
-                }
-              }
-            } else {
-              if (!this.defaultPart()) {
-                this.localStore.setRoom('default')
-              }
-            }
-          })
-      } else {
-        if (!this.defaultPart()) {
-          this.localStore.setRoom('default')
-        }
-      }
-    }
-    if (!this.defaultPart() && this.localStore.getRoom() !== null) {
-      this.getRoom()
-      this.joinEvent(this.localStore.getRoom())
-    } else {
-      this.joinRoom({
-        room: this.localStore.getRoom(),
-        token: this.localStore.getUser().token
-      })
-    }
-  }
-
-  defaultPart() {
-    return this.localStore.getRoom() === 'default';
-  }
-
-  getRoom() {
-    this.joinRoom({
-      room: this.localStore.getRoom(),
-      token: this.localStore.getUser().token
-    })
-    this.socket.emit('room', this.localStore.getRoom());
-    this.socket.on(`room-${this.localStore.getRoom()}`, (data) => {
-      if (data !== 'default') {
-        if (this.localStore.getRoom() !== data) {
-          this.localStore.setRoom(data)
-        }
-      } else if (data === 'default') {
-        if (this.localStore.getRoom() !== 'default') {
-          this.localStore.setRoom('default')
-        }
-      } else {
-        console.log('error data', data)
-      }
-    })
-  }
-
-  joinRoom(join: JoinSessionSocket) {
-    this.socket.emit('join', join);
-  }
-
-  joinEvent(room: string) {
-    this.socket.on(`${room}`, (data: FormatSocketModels) => {
-      if (data.code === 200) {
-        let sessionDiff = Utils.jsonDifference(data.data.game?.sessionStatusGame, this.localStore.getSessionStatusGame())
-        let gameDiff = Utils.jsonDifference(data.data.game?.game, this.localStore.getGame())
-        let mapDiff = Utils.jsonDifference(data.data.game?.maps, this.localStore.getMap())
-        sessionDiff ? this.localStore.setSessionStatusGame(data.data.game?.sessionStatusGame) : false
-        gameDiff ? this.localStore.setGame(data.data.game?.game) : false
-        mapDiff ? this.localStore.setMap(data.data.game?.maps) : false
-        if (this.localStore.getGame() !== null) {
-          let position = Utils.findPlayerIndex(
-            this.localStore.getGame().teams,
-            this.localStore.getUser().pseudo,
-            this.localStore.getUser().avatar)
-          let positionDiff = Utils.jsonDifference(position, this.localStore.getPlayerPosition())
-          positionDiff ? this.localStore.setPlayerPosition(position) : false
-          this.localStore.setCurrentTurn(data.data.game?.sessionStatusGame?.currentTurnEntity.turnEntity)
-          switch (data.data.game?.sessionStatusGame?.status) {
-            case 'LOBBY':
-              if (this.localStore.getSessionStatusGame() !== null && this.localStore.getMap() !== null && this.localStore.getGame() !== null) {
-                this.router.navigate([`/lobby/${data.data.game?.sessionStatusGame?.room}`]);
-              } else {
-                this.router.navigate([`/testeurio`]);
-              }
-              break;
-            case 'GAME':
-              if (this.localStore.getSessionStatusGame() !== null && this.localStore.getMap() !== null && this.localStore.getGame() !== null) {
-                  this.router.navigate([`/game`]);
-              } else {
-                console.log('error session or map or game null')
-                this.router.navigate([`/testeurio`]);
-              }
-              break;
-            default:
-              this.router.navigate([`/testeurio`]);
-          }
-        } else {
-          console.log('game null')
-        }
-      } else {
-        console.log('data null or code not 200-299', data)
-      }
-    });
-  }
-
-  joinTeam(join: JoinSessionTeam) {
-    this.socket.emit('join-team', join);
-    this.joinEvent(join.room)
-  }
-
-  joinCard(joinCard: JoinSessionTeamCard) {
-    this.socket.emit('join-card', joinCard);
-    this.joinEvent(joinCard.room)
-  }
-
-  createTurnList() {
-    console.log('createTurnList', this.localStore.getSessionStatusGame().room)
-    this.socket.emit('createTurnList', {
-      room: this.localStore.getSessionStatusGame().room
-    });
-  }
-
-
-  /**
-   * Turn
-   */
-
-  botTurnSuccessSend(botAction: CurrentTurnAction) {
-    this.socket.emit('botTurn', {
-      room: this.localStore.getRoom(),
-      action: botAction
-    })
-    this.extract()
-  }
-
-  botLeaveQueue() {
-    this.socket.emit('botLeaveQueue', {
-      room: this.localStore.getRoom(),
-    })
-  }
-
-  humainTurnSuccessSend(humainAction: CurrentTurnAction) {
-    console.log('humainTurnSuccessSend', humainAction)
-    this.socket.emit('humainTurn', {
-      room: this.localStore.getRoom(),
-      action: humainAction
-    })
-    this.extract()
-  }
-
-  private extract() {
+  socketCallReceived() {
+    const room = this.#storageManagerApp.getRoom()
     this.socket.onAny((eventName, ...args) => {
-      if (eventName === `${this.localStore.getRoom()}-turn`) {
-        let sessionDto: FormatRestApiModels = args[0]
-        this.addElementMap(sessionDto.data.game.sessionStatusGame.currentTurnEntity.currentAction, sessionDto.data)
+      const argsOjb: FormatRestApi = args[0]
+      switch (eventName) {
+        case `${room}-can-join`:
+          console.log('can-join', argsOjb)
+          UtilsSocketReceived.receivedCanJoin(argsOjb,this.#storageManagerApp,this.#router,this.#storageManagerApp.getCurrentActiveRoute())
+          break
+        case `default-can-join`:
+          console.log('can-join', argsOjb)
+          UtilsSocketReceived.receivedCanJoin(argsOjb,this.#storageManagerApp,this.#router,this.#storageManagerApp.getCurrentActiveRoute())
+          break
+        case `${room}-join`:
+          console.log('join', argsOjb)
+          UtilsSocketReceived.receivedJoin(argsOjb,this.#storageManagerApp,this.#router)
+          break
+        case `${room}-join-team`:
+          console.log('join-team', argsOjb)
+          UtilsSocketReceived.receivedJoinTeam(argsOjb,this.#storageManagerApp,this.#router)
+          break
       }
     });
   }
 
-  /**
-   * Map
-   */
-
-  getMap() {
-    return this.#eventMapForBot()
+  // check with call can-join if user inside session this  methode return session but if user not inside session this methode return message
+  connect() {
+    console.log('connect')
+    const user : UserCanJoin = {
+      token: this.#storageManagerApp.getUser().token,
+      pseudo: this.#storageManagerApp.getUser().pseudo,
+      avatar: this.#storageManagerApp.getUser().avatar,
+      room: this.#storageManagerApp.getRoom()
+    }
+    this.socket.emit('can-join', user);
+    this.socketCallReceived()
   }
 
-  addElementMap(key: string, value: Session) {
-    this.#mapForBot.update((map) => {
-      map.set(key, value)
-      return map
-    })
+  joinSession(user: UserSocketConnect) {
+    this.socket.emit('join', user);
+    this.socketCallReceived()
   }
 
-  setMap(map: Map<string, Session>) {
-    this.#mapForBot.set(map)
+  joinTeam(user: UserIdentitiesGame) {
+    this.socket.emit('join-team', user);
+    this.socketCallReceived()
   }
-
-
 }

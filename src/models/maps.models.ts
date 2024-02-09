@@ -1,5 +1,5 @@
 export interface Maps {
-    id: number;
+    id?: number;
     backgroundImg: string;
     cellsGrid: Array<Cells>;
     height: number;
@@ -16,7 +16,7 @@ export interface MapsSimplify {
 }
 
 export interface Cells {
-    id: number;
+    id?: number;
     x: number;
     y: number;
     value: number;
@@ -32,4 +32,51 @@ export interface GridLimit {
     maxX: number,
     minY: number,
     maxY: number
+}
+
+export class  MapsModels {
+    static initMaps() : Maps {
+        return {
+            id: 0,
+            backgroundImg: '',
+            cellsGrid: [],
+            height: 0,
+            width: 0,
+            name: ''
+        }
+    }
+
+    static initCells() : Cells{
+        return {
+            id: -1,
+            x: -1,
+            y: -1,
+            value: -1
+        }
+    }
+
+    static initCellsGrid() : CellsGrid {
+        return {
+            cellsGrid: []
+        }
+    }
+
+    static initGridLimit(): GridLimit{
+        return {
+            minX: 0,
+            maxX: 0,
+            minY: 0,
+            maxY: 0
+        }
+    }
+
+    static initMapsSimplify(): MapsSimplify{
+        return {
+            id: 0,
+            backgroundImage: '',
+            height: 0,
+            width: 0,
+            name: ''
+        }
+    }
 }

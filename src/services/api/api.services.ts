@@ -1,8 +1,13 @@
 import {inject, Injectable} from "@angular/core";
 import {HttpClient, HttpParams} from "@angular/common/http";
-import {Observable} from "rxjs";
-import {FormatRestApiModels} from "../../models/formatRestApi.models";
-import {UsersLogin} from "../../models/users.models";
+import {Observable, of, switchMap} from "rxjs";
+import {UserFrontData, UsersLogin, UserSocketConnect} from "../../models/users.models";
+import {FormatRestApi} from "../../models/formatRestApi";
+import {StorageManagerApp} from "../storageManagerApp/storageManagerApp";
+import {SessionCreated} from "../../models/session.models";
+import {CardEntitySimplify} from "../../models/cards.models";
+// import {FormatRestApiModels} from "../../models/formatRestApi.models";
+// import {UsersLogin} from "../../../src/models/users.models";
 
 
 @Injectable({
@@ -17,34 +22,33 @@ export class ApiServices {
   readonly apiURLUser: string = 'http://localhost:3000/user';
   readonly apiURLEvent: string = 'http://localhost:3000/events';
   readonly apiURLJson: string = 'http://localhost:3000/json';
+  readonly apiURLSocket: string = 'http://localhost:3000/socket';
 
   readonly httpClient: HttpClient = inject(HttpClient);
+  readonly #storeManagerApp = inject(StorageManagerApp);
 
   /**
    * User
    */
-  login(user: UsersLogin): Observable<FormatRestApiModels> {
-    return this.httpClient.post<FormatRestApiModels>(`${this.apiURLUser}/login`, {email: user.email, password: user.password})
+  login(user: UsersLogin):Observable<FormatRestApi> {
+    return this.httpClient.post<FormatRestApi>(`${this.apiURLUser}/login`, user)
   }
 
   /*
    * Session
    */
 
-  getSessions(room: string): Observable<FormatRestApiModels> {
+  getSessions(room: string): Observable<FormatRestApi> {
     let params = new HttpParams().set('room', room);
-    return this.httpClient.get<FormatRestApiModels>(`${this.apiURLSession}`, {params})
+    return this.httpClient.get<any>(`${this.apiURLSession}`, {params})
   }
 
-  createSession(session: any): Observable<FormatRestApiModels> {
-    return this.httpClient.post<FormatRestApiModels>(`${this.apiURLSession}/new`, session)
+  createSession(session: SessionCreated): Observable<FormatRestApi> {
+    return this.httpClient.post<any>(`${this.apiURLSession}/new`, session)
   }
 
-  getMaps(): Observable<FormatRestApiModels> {
-    return this.httpClient.get<FormatRestApiModels>(`${this.apiURLMaps}/allMaps`)
+  getMaps(): Observable<FormatRestApi> {
+    return this.httpClient.get<FormatRestApi>(`${this.apiURLMaps}/allMaps`)
   }
 
-  getIfUserInsideRoom(token: string) {
-    return this.httpClient.post<FormatRestApiModels>(`${this.apiURLSession}/activeForPlayer`,{token: token})
-  }
 }

@@ -1,7 +1,7 @@
 import {Component, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {TesteurIoService} from "./testeur-io.service";
-import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from "@angular/forms";
+import { FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {UsersLogin} from "../../models/users.models";
 import {TextConstante} from "../../app/text.constante";
 
@@ -51,6 +51,12 @@ import {TextConstante} from "../../app/text.constante";
           (click)="testeurioService.moveCreateSession()">
           {{textMap.textUi.get('goToSession')}}</button>
       </div>
+<!--      <button-->
+<!--        class="btn btn-lg btn-primary pull-xs-right"-->
+<!--        (click)="testeurioService.getTimer()">-->
+<!--        Start Timer-->
+<!--      </button>-->
+<!--      <p>{{testeurioService.timer}}</p>-->
     </div>
   `,
   styleUrls: ['./testeur-io.component.scss']

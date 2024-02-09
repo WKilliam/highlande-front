@@ -1,103 +1,82 @@
-import {CardByEntityPlaying} from "./cards.models";
-import {Cells, Maps} from "./maps.models";
-import {PlayerLobby} from "./player.models";
-import {CurrentTurnAction} from "./formatSocket.models";
-
-export enum StatusGame {
-  LOBBY = "LOBBY",
-  START = "START",
-  GAME = "GAME",
-  END = "END",
-}
-
-export enum EntityStatus {
-  ALIVE = "ALIVE",
-  DEAD = "DEAD",
-  WIN = "WIN",
-  LOSE = "LOSE",
-  FIGTHING = "FIGTHING",
-  DONJON = "DONJON",
-  DONJON_FIGHTING = "DONJON_FIGHTING",
-}
-
-export interface SessionCreatedBase {
-  name: string,
-  password: string,
-  mapId: number,
-  teamOneName: string;
-  teamTwoName: string;
-  teamThreeName: string;
-  teamFourName: string;
-}
 
 export interface SessionCreated {
-  createdAt?: string
-  name: string,
-  password: string,
-  mapId: number,
-  teamNames: Array<string>;
+    createdAt: string
+    name: string,
+    password: string,
+    mapId: number,
+    teamNames: Array<string>;
 }
 
-export interface SessionDto {
-  id: number;
-  game: SessionGame;
+export interface DiceRolling {
+    room: string,
+    luk: number, // max 20 min -20
+    arrayLimit:Array<number>,
+    min:number,
+    max:number
 }
 
-export interface SessionGame {
-  sessionStatusGame: SessionStatusGame;
-  game: Game;
-  maps: Maps;
+export interface PartieInitChrono {
+    room: string,
+    timer:any
+    initAfterStart: number,
+    initInGame: number
 }
 
-export interface SessionStatusGame {
-  room: string;
-  teamNames: Array<string>;
-  status: StatusGame;
-  turnCount: number
-  lobby:Array<PlayerLobby>
-  entityTurn : Array<TurnListEntity>,
-  currentTurnEntity: CurrentTurnAction
+export interface PartieFightChrono {
+    room: string,
+    fightAfterStart: number,
+    fightInGame: number
 }
 
-export interface Game {
-  teams: Array<EntityPlaying>
-  monsters: Array<EntityPlaying>
-  fightings: Array<Array<TurnListEntity>>
-}
-
-
-export interface EntityPlaying {
-  name: string;
-  commonLife: number;
-  commonMaxLife: number;
-  commonAttack: number;
-  commonDefense: number;
-  commonLuck: number;
-  commonSpeed: number;
-  cellPosition: Cells
-  entityStatus: EntityStatus
-  cardsPlayer?: Array<CardByEntityPlaying>;
-  cardsMonster?: Array<CardByEntityPlaying>;
-}
-
-export enum EntityCategorie {
-  HUMAIN ='HUMAIN',
-  COMPUTER = 'COMPUTER'
+export interface Parties {
+    parties : PartieInitChrono
+    partiesFight : PartieFightChrono
 }
 
 
-export interface TurnListEntity {
-  team?: string
-  pseudo: string
-  teamIndex: number
-  cardIndex: number
-  typeEntity: EntityCategorie
-  luk: number,
-  cellPosition: Cells
-}
 
+export class RoomContentModels {
+    static initSessionCreated(): SessionCreated {
+        return {
+            createdAt: '',
+            name: '',
+            password: '',
+            mapId: 0,
+            teamNames: []
+        }
+    }
 
-export interface Session {
-  id:number,
-  game:SessionGame
+    static initDiceRolling(): DiceRolling {
+        return {
+            room: '',
+            luk: 0,
+            arrayLimit:[],
+            min:0,
+            max:0
+        }
+    }
+
+    static initPartieInitChrono(): PartieInitChrono {
+        return {
+            room: '',
+            timer: null,
+            initAfterStart: 15,
+            initInGame: 50
+        }
+    }
+
+    static initPartieFightChrono(): PartieFightChrono {
+        return {
+            room: '',
+            fightAfterStart: 15,
+            fightInGame: 30
+        }
+    }
+
+    static initParties(): Parties {
+        return {
+            parties: RoomContentModels.initPartieInitChrono(),
+            partiesFight: RoomContentModels.initPartieFightChrono()
+        }
+    }
 }
