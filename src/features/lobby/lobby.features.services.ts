@@ -16,4 +16,8 @@ export class LobbyFeaturesServices {
   getRoom() {
     return this.#storageManagerApp.getRoom()
   }
+
+  getUserName() {
+    return this.#storageManagerApp.getUser().pseudo;
+  }
 }

@@ -30,4 +30,8 @@ export class TesteurIoService {
   moveCreateSession() {
     this.#router.navigate(['/create_session']);
   }
+
+  joinRoom(room: string) {
+    this.#dispatcherSocket.joinSession(room)
+  }
 }

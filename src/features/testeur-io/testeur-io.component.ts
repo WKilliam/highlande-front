@@ -34,11 +34,27 @@ import {TextConstante} from "../../app/text.constante";
               password
             />
           </fieldset>
+          <fieldset class="form-group">
+            <input
+              [(ngModel)]="joinRoom"
+              class="form-control form-control-lg"
+              type="text"
+              name="joinRoom"
+              placeholder="Join Room"
+            />
+          </fieldset>
           <button
             type="submit"
             class="btn btn-lg btn-primary pull-xs-right"
           >
             {{textMap.textUi.get('login')}}
+          </button>
+          <button
+            type="submit"
+            class="btn btn-lg btn-primary pull-xs-right"
+            (click)="testeurioService.joinRoom(joinRoom)"
+          >
+            Join Room
           </button>
         </form>
       </div>
@@ -51,12 +67,6 @@ import {TextConstante} from "../../app/text.constante";
           (click)="testeurioService.moveCreateSession()">
           {{textMap.textUi.get('goToSession')}}</button>
       </div>
-<!--      <button-->
-<!--        class="btn btn-lg btn-primary pull-xs-right"-->
-<!--        (click)="testeurioService.getTimer()">-->
-<!--        Start Timer-->
-<!--      </button>-->
-<!--      <p>{{testeurioService.timer}}</p>-->
     </div>
   `,
   styleUrls: ['./testeur-io.component.scss']
@@ -65,6 +75,7 @@ export class TesteurIOComponent {
 
   protected readonly testeurioService: TesteurIoService = inject(TesteurIoService);
   protected loginUser: UsersLogin = {email: '', password: ''};
+  protected joinRoom: string = '';
   protected textMap: TextConstante = inject(TextConstante)
 
 

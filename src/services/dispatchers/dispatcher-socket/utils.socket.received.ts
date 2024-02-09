@@ -10,44 +10,49 @@ import {Utils} from "../../utils";
 export class UtilsSocketReceived {
 
 
-  static routingDirection(route:string, query?:any) {
+  static routingDirection(route: string, query?: any) {
     console.log('routingMoveByContext')
   }
 
-  static receivedCanJoin(data: FormatRestApi,storageManagerApp:StorageManagerApp,router:Router,currentUrl:string) {
-    console.log('can-join')
-    console.log('message',data)
+  static receivedJoinStep(data: FormatRestApi, storageManagerApp: StorageManagerApp, router: Router) {
+    console.log('if join storageManagerApp.getSession().sessionStatusGame.room', storageManagerApp.getSession().sessionStatusGame.room)
+    console.log('if join data.data.game.sessionStatusGame.room', data.data.game.sessionStatusGame.room)
     const isNotValid = Utils.codeErrorChecking(data.code)
-    if(isNotValid) { // error
-      console.log('can-join is Valid', data.code)
+    if (isNotValid) { // error
       storageManagerApp.setAlerte(data)
       router.navigate(['/testeurio'])
-    } else { // valid
-      // storageManagerApp.setSessionAndLinkStorage(data.data.game)
-      if(data.data.game.sessionStatusGame.room !== ''){
+    } else {
+      const neewRoom = data.data.game.sessionStatusGame.room
+      if (neewRoom !== 'default') {
         storageManagerApp.setSessionAndLinkStorage(data.data.game)
         router.navigate([`/lobby/${data.data.game.sessionStatusGame.room}`])
-      }else{
-        router.navigate([currentUrl])
       }
     }
   }
 
-  static receivedJoin(data: FormatRestApi,storageManagerApp:StorageManagerApp,router:Router) {
-    console.log('join')
+  static receivedJoin(data: FormatRestApi, storageManagerApp: StorageManagerApp, router: Router) {
+
     const isNotValid = Utils.codeErrorChecking(data.code)
-    if(isNotValid) { // error
+    if (isNotValid) { // error
       storageManagerApp.setAlerte(data)
       router.navigate(['/testeurio'])
     } else { // valid
-      storageManagerApp.setSessionAndLinkStorage(data.data.game)
-      router.navigate([`/lobby/${data.data.game.sessionStatusGame.room}`])
+
+      if (storageManagerApp.getSession().sessionStatusGame.room !== 'default') {
+        console.log('join not default', data)
+        storageManagerApp.setSessionAndLinkStorage(data.data.game)
+        router.navigate([`/lobby/${data.data.game.sessionStatusGame.room}`])
+      }else{
+        console.log('join default', data)
+        storageManagerApp.setSessionAndLinkStorage(data.data.game)
+        router.navigate(['/testeurio'])
+      }
     }
   }
 
   static receivedJoinTeam(data: FormatRestApi, storageManagerApp: StorageManagerApp, router: Router) {
     const isNotValid = Utils.codeErrorChecking(data.code)
-    if(isNotValid) { // error
+    if (isNotValid) { // error
       storageManagerApp.setAlerte(data)
       router.navigate(['/testeurio'])
     } else { // valid
@@ -55,4 +60,6 @@ export class UtilsSocketReceived {
       storageManagerApp.setSessionAndLinkStorage(data.data.game)
     }
   }
+
+
 }

@@ -32,11 +32,6 @@ import {LobbyRoomUi} from "../../ui/component/lobby-room/lobby-room.ui";
             class="col d-flex justify-content-center align-items-center"
             style="height: 80vh;">
             <ui-lobby-room></ui-lobby-room>
-<!--            <ui-swiper-card-->
-<!--              class="select-card"-->
-<!--              *ngIf="this.appServices.getOpenSelectorCard()"-->
-<!--            >-->
-<!--            </ui-swiper-card>-->
           </div>
           <div class="col">
             <div class="row">

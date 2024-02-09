@@ -36,4 +36,15 @@ export class DispatcherSocket {
     }
     this.apiSocketService.joinTeam(userIdentitiesGame)
   }
+
+  selectCard(cardIndex:number,teamTag: number, cardTag: number) {
+    const userIdentitiesGame : UserIdentitiesGame = {
+      room: this.#storeManagerApp.getRoom(),
+      positionPlayerInLobby: this.#storeManagerApp.getLobby().findIndex((player) => player.pseudo === this.#storeManagerApp.getUser().pseudo),
+      teamSelectedPerPlayer: teamTag,
+      cardPositionInsideTeamCards: cardTag,
+      cardSelectedForPlay: cardIndex
+    }
+    this.apiSocketService.selectCard(userIdentitiesGame)
+  }
 }

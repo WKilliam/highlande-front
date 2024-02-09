@@ -31,7 +31,6 @@ export class CreateSessionUiServices {
 
   constructor(route:Router) {
     this.#storageManagerApp.setCurrentActiveRoute(route.url)
-    this.#dispatcherSocket.connect()
     this.#dispatcherHttp.getMaps().subscribe((res:FormatRestApi) => {
       if(Utils.codeErrorChecking(res.code)) {
         this.#dispatcherHttp.setAlerte(res)
@@ -40,11 +39,9 @@ export class CreateSessionUiServices {
       }
     })
     effect(() => {
-      const room = this.#storageManagerApp.getRoom()
-      if (room !== '' && !this.callNumber) {
+      if (this.#storageManagerApp.getRoom() && !this.callNumber) {
         this.#dispatcherSocket.joinSession(this.#storageManagerApp.getRoom())
         this.callNumber = true
-        console.log(this.callNumber)
       }
     });
   }
@@ -62,8 +59,6 @@ export class CreateSessionUiServices {
     this.callNumber = false
     this.#dispatcherHttp.createSession(session)
   }
-
-
 
   // Getters
 

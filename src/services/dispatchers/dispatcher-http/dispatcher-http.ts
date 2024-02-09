@@ -47,6 +47,7 @@ export class DispatcherHttp {
       if(Utils.codeErrorChecking(res.code)){
         this.setAlerte(res)
       }else{
+        console.log('new session createSession', res.data.game)
         this.#storageManagerApp.setSessionAndLinkStorage(res.data.game)
       }
     })

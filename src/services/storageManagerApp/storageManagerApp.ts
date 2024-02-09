@@ -34,19 +34,17 @@ export class StorageManagerApp {
     }else{
       this.#userLogin.update(value => user)
     }
-
-    const sessionStorage = this.getSessionStorage('Session') ? JSON.parse(this.getSessionStorage('Session') || '{}') : SessionModels.initSessionGame()
-
-    if(sessionStorage.sessionStatusGame.room !== ''){
-      this.setSessionAndLinkStorage(sessionStorage)
-    }else{
-      this.setSessionAndLinkStorage(SessionModels.initSessionGame())
-    }
+    this.setSessionAndLinkStorage(SessionModels.initSessionGame())
     this.setAlerte(FormatRestApiModels.initFormatRestApi())
   }
 
   getSessionStorage(key: string){
-    return sessionStorage.getItem(key)
+    let session = sessionStorage.getItem(key)
+    if (session !== null) {
+      return JSON.parse(session)
+    }else{
+      return SessionModels.initSessionGame()
+    }
   }
 
   // Alert
@@ -88,7 +86,7 @@ export class StorageManagerApp {
   }
 
   setSessionAndLinkStorage(data: SessionGame) {
-    console.log('data',data)
+    // console.log('init session', data)
     sessionStorage.setItem('Session', JSON.stringify(data))
     this.#session.set(data)
     sessionStorage.setItem('Lobby', JSON.stringify(this.getSession().sessionStatusGame.lobby))
@@ -103,11 +101,8 @@ export class StorageManagerApp {
     sessionStorage.setItem('Team-Two', JSON.stringify(this.getSession().game.challenger[1]))
     sessionStorage.setItem('Team-Three', JSON.stringify(this.getSession().game.challenger[2]))
     sessionStorage.setItem('Team-Four', JSON.stringify(this.getSession().game.challenger[3]))
-    if(this.getSession().sessionStatusGame.room !== '') {
-      this.setRoom(`${this.getSession().sessionStatusGame.room}`)
-    }else{
-      this.setRoom('default')
-    }
+    console.log('room setSessionAndLinkStorage', this.getSession().sessionStatusGame.room)
+    this.setRoom(data.sessionStatusGame.room)
   }
 
   // Getters sessionStorage
@@ -167,7 +162,7 @@ export class StorageManagerApp {
 
   setCurrentActiveRoute(route: string) {
     this.#currentActiveRoute.set(route)
-    console.log('route',route)
+    // console.log('route',route)
     sessionStorage.setItem('CurrentActiveRoute', JSON.stringify(route))
   }
 

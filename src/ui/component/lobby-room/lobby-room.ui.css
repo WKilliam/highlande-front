@@ -29,7 +29,7 @@
 .image-content {
   width: 450px;
   height: 450px;
-  background-image: url('../../../assets/map/lobby.png');
+  background-image: url("../../../assets/map/lobby.png");
   background-size: cover;
   position: relative;
 }
@@ -41,3 +41,5 @@
   padding: 2.5rem;
   font-family: irish-grover, sans-serif;
 }
+
+/*# sourceMappingURL=lobby-room.ui.css.map */

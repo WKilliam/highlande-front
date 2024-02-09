@@ -28,13 +28,10 @@ export class SocketService {
     this.socket.onAny((eventName, ...args) => {
       const argsOjb: FormatRestApi = args[0]
       switch (eventName) {
-        case `${room}-can-join`:
-          console.log('can-join', argsOjb)
-          UtilsSocketReceived.receivedCanJoin(argsOjb,this.#storageManagerApp,this.#router,this.#storageManagerApp.getCurrentActiveRoute())
-          break
-        case `default-can-join`:
-          console.log('can-join', argsOjb)
-          UtilsSocketReceived.receivedCanJoin(argsOjb,this.#storageManagerApp,this.#router,this.#storageManagerApp.getCurrentActiveRoute())
+        case `${args[0].data.game.sessionStatusGame.room}-join`:
+          console.log('join step', argsOjb)
+          console.log(this.#storageManagerApp.getSession().sessionStatusGame.room)
+          UtilsSocketReceived.receivedJoinStep(argsOjb,this.#storageManagerApp,this.#router)
           break
         case `${room}-join`:
           console.log('join', argsOjb)
@@ -50,15 +47,14 @@ export class SocketService {
 
   // check with call can-join if user inside session this  methode return session but if user not inside session this methode return message
   connect() {
-    console.log('connect')
-    const user : UserCanJoin = {
+    const user : UserSocketConnect = {
       token: this.#storageManagerApp.getUser().token,
       pseudo: this.#storageManagerApp.getUser().pseudo,
       avatar: this.#storageManagerApp.getUser().avatar,
-      room: this.#storageManagerApp.getRoom()
+      room: this.#storageManagerApp.getRoom(),
+      cards: this.#storageManagerApp.getUser().cards
     }
-    this.socket.emit('can-join', user);
-    this.socketCallReceived()
+    this.joinSession(user)
   }
 
   joinSession(user: UserSocketConnect) {
@@ -68,6 +64,11 @@ export class SocketService {
 
   joinTeam(user: UserIdentitiesGame) {
     this.socket.emit('join-team', user);
+    this.socketCallReceived()
+  }
+
+  selectCard(data: UserIdentitiesGame) {
+    this.socket.emit('join-team-card', data);
     this.socketCallReceived()
   }
 }

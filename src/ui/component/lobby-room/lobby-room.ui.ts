@@ -2,13 +2,13 @@
 import {CommonModule} from "@angular/common";
 import {Component, inject, Input} from "@angular/core";
 import {LobbyRoomUiServices} from "../../services/lobby-room/lobby-room.ui.services";
+import {SwiperCardUi} from "../swiper-card/swiper-card.ui";
+import {SwiperCardUiServices} from "../../services/swiper-card/swiper-card.ui.services";
 
 @Component({
   selector: 'ui-lobby-room',
   standalone: true,
-  imports: [CommonModule,
-    // SwiperCardUi
-  ],
+  imports: [CommonModule, SwiperCardUi],
   template: `
       <div>
           <div class="card text-center card-header">
@@ -20,15 +20,16 @@ import {LobbyRoomUiServices} from "../../services/lobby-room/lobby-room.ui.servi
                       <img [src]="circle" alt="Gray Circle" *ngIf="circle">
                   </div>
               </div>
+            <div class="tagName">
+             Session De : {{lobbyRoomUiServices.getName()}}
+            </div>
               <div class="image-content">
-
               </div>
-<!--              <div class="card-footer text-muted">-->
-<!--                  <button class="btn btn-lg btn-primary pull-xs-right"-->
-<!--                          (click)="lobbyRoomUiServices.startGameSession()">{{startBtnLabel}}</button>-->
-<!--              </div>-->
+              <div class="card-footer text-muted">
+                  <button class="btn btn-lg btn-primary pull-xs-right">startBtnLabel</button>
+              </div>
           </div>
-<!--          <ui-swiper-card *ngIf="isActiveSelectorCard" class="card-selector"></ui-swiper-card>-->
+          <ui-swiper-card *ngIf="swiperCardUiService.isActive" class="card-selector"></ui-swiper-card>
       </div>
   `,
   styleUrls: ['./lobby-room.ui.scss']
@@ -36,6 +37,7 @@ import {LobbyRoomUiServices} from "../../services/lobby-room/lobby-room.ui.servi
 export class LobbyRoomUi {
 
   readonly lobbyRoomUiServices = inject(LobbyRoomUiServices);
+  readonly swiperCardUiService = inject(SwiperCardUiServices);
 
 
 }

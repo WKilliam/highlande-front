@@ -2,7 +2,7 @@ import {Component, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {CardsFightUi} from "../../../../refonte/ui/cards-fight/cards-fight.ui";
 import {LittleCardSelectorUi} from "../little-card-selector/little-card-selector.ui";
-import {SwiperCardUiServices} from "./swiper-card.ui.services";
+import {SwiperCardUiServices} from "../../services/swiper-card/swiper-card.ui.services";
 import {CardByEntityPlaying} from "../../../models/cards.models";
 
 @Component({
@@ -12,25 +12,19 @@ import {CardByEntityPlaying} from "../../../models/cards.models";
   template: `
     <div class="content-carousel">
       <div class="container">
-        <div class="cards-container" *ngFor="let item of cardsList">
+        <div class="cards-container" *ngFor="let item of swiperCardUiServices.getCardPlayer(); let i = index">
           <ui-little-card-selector
-            [imageSrc]="item.imageSrc"
+            [imageSrc]="item.image"
             [raritySrc]="item.rarity"
-            (click)="swiperCardUiServices.selectedCard(item)"
+            (click)="swiperCardUiServices.selectecCard(i)"
           ></ui-little-card-selector>
         </div>
       </div>
     </div>
-
   `,
   styleUrls: ['./swiper-card.ui.scss']
 })
 export class SwiperCardUi{
   readonly swiperCardUiServices = inject(SwiperCardUiServices);
-  protected cardsList: Array<CardByEntityPlaying> = []
-
-  constructor() {
-    this.cardsList = this.swiperCardUiServices.cardsList
-  }
 
 }
