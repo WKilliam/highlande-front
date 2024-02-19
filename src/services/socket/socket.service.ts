@@ -17,7 +17,8 @@ export class SocketService {
   readonly #router = inject(Router)
 
   constructor() {
-    this.socket = io('http://localhost:3000', {transports: ['websocket']});
+    // this.socket = io('http://localhost:3000', {transports: ['websocket']});
+    this.socket = io('http://195.154.114.37:3000', {transports: ['websocket']});
   }
 
   socketCallReceived() {
