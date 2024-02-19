@@ -15,36 +15,44 @@ export class DispatcherSocket {
     this.apiSocketService.connect()
   }
 
+  joinRoom() {
+    this.apiSocketService.joinRoom()
+  }
+
   joinSession(room: string) {
-    const userSocketConnect : UserSocketConnect = {
+    const userSocketConnect: UserSocketConnect = {
       room: room,
       token: this.#storeManagerApp.getUser().token,
       pseudo: this.#storeManagerApp.getUser().pseudo,
-      avatar: this.#storeManagerApp.getUser().avatar,
-      cards: this.#storeManagerApp.getUser().cards,
     }
     this.apiSocketService.joinSession(userSocketConnect)
   }
 
-  joinTeam(teamTag: number, cardPosition: number){
+  joinTeam(teamTag: number, cardPosition: number) {
     const positionInsideLobby = this.#storeManagerApp.getLobby().findIndex((player) => player.pseudo === this.#storeManagerApp.getUser().pseudo)
-    const userIdentitiesGame = {
+    const userIdentitiesGame: UserIdentitiesGame = {
       room: this.#storeManagerApp.getRoom(),
       positionPlayerInLobby: positionInsideLobby,
-      teamSelectedPerPlayer: teamTag,
-      cardPositionInsideTeamCards: cardPosition
+      teamSelected: teamTag,
+      cardPositionInTeam: cardPosition
     }
     this.apiSocketService.joinTeam(userIdentitiesGame)
   }
 
-  selectCard(cardIndex:number,teamTag: number, cardTag: number) {
-    const userIdentitiesGame : UserIdentitiesGame = {
+  selectCard(cardIndex: number, teamTag: number, cardTag: number) {
+    const userIdentitiesGame: UserIdentitiesGame = {
       room: this.#storeManagerApp.getRoom(),
       positionPlayerInLobby: this.#storeManagerApp.getLobby().findIndex((player) => player.pseudo === this.#storeManagerApp.getUser().pseudo),
-      teamSelectedPerPlayer: teamTag,
-      cardPositionInsideTeamCards: cardTag,
-      cardSelectedForPlay: cardIndex
+      teamSelected: teamTag,
+      cardPositionInTeam: cardTag,
+      cardSelected: cardIndex
     }
+    console.log('userIdentitiesGame', userIdentitiesGame)
     this.apiSocketService.selectCard(userIdentitiesGame)
+  }
+
+
+  startGame() {
+    this.apiSocketService.startGame()
   }
 }

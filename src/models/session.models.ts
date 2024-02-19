@@ -39,7 +39,8 @@ export interface SessionCreated {
   name: string,
   password: string,
   mapId: number,
-  teamNames: Array<string>
+  teamNames: Array<string>;
+  token: string
 }
 
 export class SessionModels {
@@ -104,7 +105,8 @@ export class SessionModels {
       password: '',
       mapId: 0,
       teamNames: [],
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      token: ''
     }
   }
 }

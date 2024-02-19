@@ -25,7 +25,7 @@ export class CreateSessionUiServices {
   readonly eventTextContentForm = this.#textContentForm.asReadonly()
   readonly eventTextContentFormContent = this.#textContentFormContent.asReadonly()
   readonly eventGetMaps = this.#getMaps.asReadonly()
-  callNumber :boolean = false
+  isCall = false
 
 
 
@@ -39,9 +39,9 @@ export class CreateSessionUiServices {
       }
     })
     effect(() => {
-      if (this.#storageManagerApp.getRoom() && !this.callNumber) {
-        this.#dispatcherSocket.joinSession(this.#storageManagerApp.getRoom())
-        this.callNumber = true
+      if (this.#storageManagerApp.getSession() && !this.isCall){
+        this.isCall = true
+        this.#dispatcherSocket.joinRoom()
       }
     });
   }
@@ -54,9 +54,10 @@ export class CreateSessionUiServices {
       password: sessionBody.password,
       mapId: sessionBody.mapId,
       teamNames: [sessionBody.teamOneName, sessionBody.teamTwoName, sessionBody.teamThreeName, sessionBody.teamFourName],
-      createdAt: new Date().toDateString()
+      createdAt: new Date().toDateString(),
+      token: this.#storageManagerApp.getUser().token
     }
-    this.callNumber = false
+    this.isCall = false
     this.#dispatcherHttp.createSession(session)
   }
 

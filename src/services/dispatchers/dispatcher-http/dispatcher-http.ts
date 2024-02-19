@@ -7,6 +7,7 @@ import {Utils} from "../../utils";
 import {TextDefaultSession} from "../../../models/text.models";
 import {DispatcherSocket} from "../dispatcher-socket/dispatcher-socket";
 import {SessionCreated} from "../../../models/session.models";
+import {Router} from "@angular/router";
 
 @Injectable({
   providedIn: 'root',
@@ -15,6 +16,7 @@ export class DispatcherHttp {
 
   readonly #apiServices = inject(ApiServices);
   readonly #storageManagerApp = inject(StorageManagerApp);
+  readonly #router = inject(Router)
 
 
   constructor() {
@@ -47,8 +49,8 @@ export class DispatcherHttp {
       if(Utils.codeErrorChecking(res.code)){
         this.setAlerte(res)
       }else{
-        console.log('new session createSession', res.data.game)
         this.#storageManagerApp.setSessionAndLinkStorage(res.data.game)
+        this.#router.navigate([`/lobby/${res.data.game.sessionStatusGame.room}`])
       }
     })
   }

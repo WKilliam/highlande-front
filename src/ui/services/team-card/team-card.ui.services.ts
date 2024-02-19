@@ -147,7 +147,7 @@ export class TeamCardUiServices {
           this.playerName = this.#storageManagerApp.getTeamThree().cardsInfo[0].player.pseudo || 'Player #1'
           break
         case 3:
-          this.playerName = this.#storageManagerApp.getTeamFour().cardsInfo[0].player.pseudo.playerName || 'Player #1'
+          this.playerName = this.#storageManagerApp.getTeamFour().cardsInfo[0].player.pseudo || 'Player #1'
           break
         default:
           this.playerName = 'Player #1'
@@ -287,8 +287,8 @@ export class TeamCardUiServices {
     console.log('openSelectorCard')
     console.log('teamTag',teamTag)
     console.log('cardPosition',cardPosition)
-    // this.#switchCardService.isActive = true
-    // this.#switchCardService.teamTag = teamTag
-    // this.#switchCardService.cardTag = cardPosition
+    this.#switchCardService.isActive = true
+    this.#switchCardService.teamTag = teamTag
+    this.#switchCardService.cardTag = cardPosition
   }
 }

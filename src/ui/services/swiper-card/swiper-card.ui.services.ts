@@ -25,10 +25,10 @@ export class SwiperCardUiServices {
     return this.cardsList
   }
 
-  selectecCard(cardIndex: number) {
-    // console.log('card selected', cardIndex)
-    // console.log('card for team', this.teamTag)
-    // console.log('card for card', this.cardTag)
+  selectCardByPlayer(cardIndex: number) {
+    console.log('card selected', cardIndex)
+    console.log('card for team', this.teamTag)
+    console.log('card for card', this.cardTag)
     this.#dispatchersocket.selectCard(cardIndex, this.teamTag, this.cardTag)
   }
 

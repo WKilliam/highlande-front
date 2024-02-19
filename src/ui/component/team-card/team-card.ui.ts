@@ -37,7 +37,6 @@ import {TeamCardUiServices} from "../../services/team-card/team-card.ui.services
                   </button>
                 </div>
                 <ng-template #playerExist>
-<!--                  {{ teamCardUiServices.getIfYouareInThisPosition(teamTag,0) }}-->
                   <button
                     *ngIf="teamCardUiServices.getIfYouareInThisPosition(teamTag,0)"
                     type="button"
@@ -51,6 +50,7 @@ import {TeamCardUiServices} from "../../services/team-card/team-card.ui.services
                   </div>
                 </ng-template>
               </div>
+
             </div>
           </div>
           <div class="col-6">
@@ -67,7 +67,7 @@ import {TeamCardUiServices} from "../../services/team-card/team-card.ui.services
                 </div>
               </div>
               <div class="col">
-                <div *ngIf="teamCardUiServices.whatIsPlayerName(teamTag,1) === 'Player #2' else playerExist">
+                <div *ngIf="teamCardUiServices.whatIsPlayerName(teamTag,1) === 'Player #2' else playerExist2">
                   <button
                     type="button"
                     class="join-btn"
@@ -75,12 +75,11 @@ import {TeamCardUiServices} from "../../services/team-card/team-card.ui.services
                   >Join
                   </button>
                 </div>
-                <ng-template #playerExist>
-<!--                  {{ teamCardUiServices.getIfYouareInThisPosition(teamTag,1) }}-->
+                <ng-template #playerExist2>
                   <button
+                    *ngIf="teamCardUiServices.getIfYouareInThisPosition(teamTag,1)"
                     type="button"
                     class="join-btn"
-                    *ngIf="teamCardUiServices.getIfYouareInThisPosition(teamTag,0)"
                     (click)="teamCardUiServices.openSelectorCard(teamTag,1)"
                   >Select card
                   </button>
@@ -89,8 +88,8 @@ import {TeamCardUiServices} from "../../services/team-card/team-card.ui.services
                     <p>{{ teamCardUiServices.whatIsPlayerName(teamTag,1) }}</p>
                   </div>
                 </ng-template>
-
               </div>
+
             </div>
           </div>
         </div>

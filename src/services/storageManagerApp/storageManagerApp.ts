@@ -5,6 +5,8 @@ import {PlayerLobby} from "../../models/player.models";
 import {SessionGame, SessionModels} from "../../models/session.models";
 import {FormatRestApi, FormatRestApiModels} from "../../models/formatRestApi";
 import {DispatcherSocket} from "../dispatchers/dispatcher-socket/dispatcher-socket";
+import {CardByEntityPlaying, CardEntitySimplify} from "../../models/cards.models";
+import {PlayerCardsEntity} from "../../models/cards.player.entity.models";
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +21,8 @@ export class StorageManagerApp {
   readonly #room = signal<{ romeSession: string }>({romeSession: ''})
   readonly #alerte = signal<FormatRestApi>(FormatRestApiModels.initFormatRestApi())
   readonly #currentActiveRoute = signal<string>('')
+  readonly #connectRoom = signal<boolean>(false)
+  readonly #timer = signal<number>(0)
 
   // Events Signals
   readonly eventUserLogin = this.#userLogin.asReadonly()
@@ -26,6 +30,8 @@ export class StorageManagerApp {
   readonly eventRoom = this.#room.asReadonly()
   readonly eventAlerte = this.#alerte.asReadonly()
   readonly eventCurrentActiveRoute = this.#currentActiveRoute.asReadonly()
+  readonly eventConnectRoom = this.#connectRoom.asReadonly()
+  readonly eventTimer = this.#timer.asReadonly()
 
   constructor() {
     const user = this.getUser()
@@ -34,6 +40,7 @@ export class StorageManagerApp {
     }else{
       this.#userLogin.update(value => user)
     }
+    this.setConnectRoom(false)
     this.setSessionAndLinkStorage(SessionModels.initSessionGame())
     this.setAlerte(FormatRestApiModels.initFormatRestApi())
   }
@@ -74,6 +81,20 @@ export class StorageManagerApp {
   setUser(data: UserFrontData) {
     this.#userLogin.update(value => data)
     this.userStorage('User', data)
+  }
+
+  // Connect Room
+  setConnectRoom(data: boolean) {
+    this.#connectRoom.set(data)
+    localStorage.setItem('ConnectRoom', JSON.stringify(data))
+  }
+
+  getConnectRoomEvent() {
+    return this.eventConnectRoom()
+  }
+
+  getConnectRoomStore(): boolean {
+    return localStorage.getItem('ConnectRoom') ? JSON.parse(localStorage.getItem('ConnectRoom') || '{}') : false
   }
 
   // Session
@@ -168,6 +189,39 @@ export class StorageManagerApp {
 
   getCurrentActiveRoute() {
     return this.eventCurrentActiveRoute()
+  }
+
+  // Timer
+  setTimer(value: number) {
+    console.log('setTimer', value)
+    this.#timer.set(value)
+  }
+
+  getTimer() {
+    return this.eventTimer()
+  }
+
+  // StartPosibility
+
+  getStartPossibilityIsValide() {
+    const session = this.getSession().game.challenger;
+    let isValide = [false, false, false, false];
+
+    session.forEach((player: PlayerCardsEntity, index: number) => {
+      // Ici, au lieu de stocker si un joueur n'est pas valide,
+      // on stocke s'il est valide.
+      isValide[index] = this.checkPlayer(player);
+    });
+
+    // Retourne true si tous les joueurs sont valides
+    return isValide.every(val => val === true);
+  }
+
+  checkPlayer(player: PlayerCardsEntity) {
+    // La fonction vérifie si le joueur a au moins une carte valide
+    return player.cardsInfo?.some((card: CardByEntityPlaying) => {
+      return card.atk !== -21 && card.def !== -21 && card.spd !== -21 && card.luk !== -21 && card.player.avatar !== '' && card.player.pseudo !== '';
+    }) || false; // Retourne false si cardsInfo est vide ou si aucune carte valide n'a été trouvée
   }
 
 }

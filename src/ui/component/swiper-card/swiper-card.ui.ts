@@ -16,7 +16,7 @@ import {CardByEntityPlaying} from "../../../models/cards.models";
           <ui-little-card-selector
             [imageSrc]="item.image"
             [raritySrc]="item.rarity"
-            (click)="swiperCardUiServices.selectecCard(i)"
+            (click)="swiperCardUiServices.selectCardByPlayer(i)"
           ></ui-little-card-selector>
         </div>
       </div>

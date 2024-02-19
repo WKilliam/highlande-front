@@ -29,17 +29,16 @@ export interface UserSocketConnect{
   room: string;
   token: string;
   pseudo: string;
-  avatar: string;
-  cards:Array<CardEntitySimplify>;
 }
 
 export interface UserIdentitiesGame {
   room: string;
   positionPlayerInLobby: number;
-  teamSelectedPerPlayer: number;
-  cardPositionInsideTeamCards: number;
-  cardSelectedForPlay?: number
+  teamSelected: number;
+  cardPositionInTeam: number;
+  cardSelected?:number
 }
+
 
 export interface UserCanJoin {
   token: string;
@@ -89,8 +88,6 @@ export class UserModels {
       room: '',
       token: '',
       pseudo: '',
-      avatar: '',
-      cards: []
     }
   }
 
@@ -98,9 +95,8 @@ export class UserModels {
     return {
       room: '',
       positionPlayerInLobby: 0,
-      teamSelectedPerPlayer: 0,
-      cardPositionInsideTeamCards: 0,
-      cardSelectedForPlay: 0
+      teamSelected: 0,
+      cardPositionInTeam: 0
     }
   }
 
