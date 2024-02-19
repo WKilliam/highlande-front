@@ -54,4 +54,7 @@ export class ApiServices {
     return this.httpClient.get<FormatRestApi>(`${this.apiURLMaps}/allMaps`)
   }
 
+  test() {
+    return this.httpClient.get<any>(`${this.apiURLProd}/user/test`)
+  }
 }

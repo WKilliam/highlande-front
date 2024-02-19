@@ -34,4 +34,9 @@ export class TesteurIoService {
   joinRoom(room: string) {
     this.#dispatcherSocket.joinSession(room)
   }
+
+
+  test(){
+    this.#dispatcherHttp.test()
+  }
 }

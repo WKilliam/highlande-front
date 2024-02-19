@@ -67,6 +67,12 @@ import {TextConstante} from "../../app/text.constante";
           (click)="testeurioService.moveCreateSession()">
           {{textMap.textUi.get('goToSession')}}</button>
       </div>
+      <div class="btn btn-lg btn-primary pull-xs-right">
+        <button
+          class="btn btn-lg btn-primary pull-xs-right"
+          (click)="testeurioService.test()">
+          {{textMap.textUi.get('goToSession')}}</button>
+      </div>
     </div>
   `,
   styleUrls: ['./testeur-io.component.scss']

@@ -54,4 +54,10 @@ export class DispatcherHttp {
       }
     })
   }
+
+  test() {
+    this.#apiServices.test().subscribe((res:any) => {
+      console.log(res)
+    })
+  }
 }
