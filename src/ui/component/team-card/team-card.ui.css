@@ -1,0 +1,58 @@
+.card-effect {
+  border: 1px solid #003466;
+  border-radius: 14px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.rectangle {
+  width: 120px;
+  height: 224px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: rgb(204, 204, 204);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 5px;
+  font-family: irish-grover;
+}
+
+.join-btn {
+  background: var(--background-style);
+  border-radius: 4px;
+  /* padding: 5px; */
+  /* margin: 21px; */
+  margin-top: 5rem;
+  width: inherit;
+  cursor: pointer;
+  font-family: "irish-grover", sans-serif;
+  font-size: large;
+  color: #fff;
+}
+
+.team-text {
+  font-family: "irish-grover", sans-serif;
+  font-size: 32px;
+  color: #fff;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+.text-after-circle {
+  font-family: "irish-grover", sans-serif;
+  font-size: large;
+  color: #fff;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+/*# sourceMappingURL=team-card.ui.css.map */

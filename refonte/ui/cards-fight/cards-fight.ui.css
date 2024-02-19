@@ -1,0 +1,44 @@
+.rectangle {
+  width: 240px;
+  height: 448px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+}
+.rectangle img {
+  width: 100%; /* Remplit la largeur du conteneur */
+  height: 100%; /* Remplit la hauteur du conteneur */
+  object-fit: cover;
+}
+.rectangle .commun {
+  border-width: 2px;
+  border-style: solid;
+  border-image: var(--dl-commun-color);
+  border-image-slice: 1;
+}
+.rectangle .uncommon {
+  border-width: 2px;
+  border-style: solid;
+  border-image: var(--dl-peu-commun-color);
+  border-image-slice: 1;
+}
+.rectangle .rare {
+  border-width: 2px;
+  border-style: solid;
+  border-image: var(--dl-rare-color);
+  border-image-slice: 1;
+}
+.rectangle .super-rare {
+  border-width: 2px;
+  border-style: solid;
+  border-image: var(--dl-super-rare-color);
+  border-image-slice: 1;
+}
+.rectangle .legendary {
+  border-width: 2px;
+  border-style: solid;
+  border-image: var(--dl-legendary-color);
+  border-image-slice: 1;
+}
+
+/*# sourceMappingURL=cards-fight.ui.css.map */

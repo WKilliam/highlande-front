@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  web:
+  angular-app:
     build: .
     ports:
-      - "80:80"
+      - "9000:4200"
