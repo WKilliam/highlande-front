@@ -14,15 +14,17 @@ import {CardEntitySimplify} from "../../models/cards.models";
   providedIn: 'root',
 })
 export class ApiServices {
-  readonly apiURLSession: string = 'http://localhost:3000/sessions';
-  readonly apiURLCards: string = 'http://localhost:3000/cards';
-  readonly apiURLMaps: string = 'http://localhost:3000/maps';
-  readonly apiURLEffects: string = 'http://localhost:3000/effects';
-  readonly apiURLDeck: string = 'http://localhost:3000/decks';
-  readonly apiURLUser: string = 'http://localhost:3000/user';
-  readonly apiURLEvent: string = 'http://localhost:3000/events';
-  readonly apiURLJson: string = 'http://localhost:3000/json';
-  readonly apiURLSocket: string = 'http://localhost:3000/socket';
+  readonly apiURL: string = 'http://localhost:3000';
+  readonly apiURLProd: string = 'http://195.154.114.37:3000';
+  readonly apiURLSession: string = `${this.apiURLProd}/sessions`;
+  readonly apiURLCards: string = `${this.apiURLProd}/cards`;
+  readonly apiURLMaps: string = `${this.apiURLProd}/maps`;
+  readonly apiURLEffects: string = `${this.apiURLProd}/effects`;
+  readonly apiURLDeck: string = `${this.apiURLProd}/decks`;
+  readonly apiURLUser: string = `${this.apiURLProd}/user`;
+  readonly apiURLEvent: string = `${this.apiURLProd}/events`;
+  readonly apiURLJson: string = `${this.apiURLProd}/json`;
+  readonly apiURLSocket: string = `${this.apiURLProd}/socket`;
 
   readonly httpClient: HttpClient = inject(HttpClient);
   readonly #storeManagerApp = inject(StorageManagerApp);
@@ -31,7 +33,7 @@ export class ApiServices {
    * User
    */
   login(user: UsersLogin):Observable<FormatRestApi> {
-    return this.httpClient.post<FormatRestApi>(`${this.apiURLUser}/login`, user)
+    return this.httpClient.post<FormatRestApi>(`${this.apiURLProd}/login`, user)
   }
 
   /*
