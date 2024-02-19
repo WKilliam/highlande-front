@@ -33,7 +33,7 @@ export class ApiServices {
    * User
    */
   login(user: UsersLogin):Observable<FormatRestApi> {
-    return this.httpClient.post<FormatRestApi>(`${this.apiURLProd}/login`, user)
+    return this.httpClient.post<FormatRestApi>(`${this.apiURLProd}/user/login`, user)
   }
 
   /*
