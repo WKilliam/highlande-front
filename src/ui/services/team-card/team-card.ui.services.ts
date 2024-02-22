@@ -27,9 +27,19 @@ export class TeamCardUiServices {
 
   constructor() {
     effect(() => {
+      let test = this.#storageManagerApp.getSession()
       if (this.#storageManagerApp.getSession()) {
         this.#switchCardService.isActive = false
-        this.refreshData()
+        this.whatIsImageSrcCard(this.teamTag,0)
+        this.whatIsImageSrcCard(this.teamTag,1)
+        this.whatIsRarityCard(this.teamTag,0)
+        this.whatIsRarityCard(this.teamTag,1)
+        this.whatIsPlayerName(this.teamTag,0)
+        this.whatIsPlayerName(this.teamTag,1)
+        this.whatIsAtk(this.teamTag)
+        this.whatIsDef(this.teamTag)
+        this.whatIsSpd(this.teamTag)
+        this.whatIsLuck(this.teamTag)
       }
     });
   }
@@ -254,18 +264,6 @@ export class TeamCardUiServices {
         break
     }
     return this.luck
-  }
-  refreshData(){
-    this.whatIsImageSrcCard(this.teamTag,0)
-    this.whatIsImageSrcCard(this.teamTag,1)
-    this.whatIsRarityCard(this.teamTag,0)
-    this.whatIsRarityCard(this.teamTag,1)
-    this.whatIsPlayerName(this.teamTag,0)
-    this.whatIsPlayerName(this.teamTag,1)
-    this.whatIsAtk(this.teamTag)
-    this.whatIsDef(this.teamTag)
-    this.whatIsSpd(this.teamTag)
-    this.whatIsLuck(this.teamTag)
   }
 
   getIfYouareInThisPosition(teamTag:number, cardPosition: number){

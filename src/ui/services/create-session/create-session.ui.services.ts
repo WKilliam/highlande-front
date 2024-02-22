@@ -38,12 +38,12 @@ export class CreateSessionUiServices {
         this.#getMaps.set(res.data)
       }
     })
-    effect(() => {
-      if (this.#storageManagerApp.getSession() && !this.isCall){
-        this.isCall = true
-        this.#dispatcherSocket.joinRoom()
-      }
-    });
+    // effect(() => {
+    //   if (this.#storageManagerApp.getSession() && !this.isCall){
+    //     this.isCall = true
+    //     // this.#dispatcherSocket.joinRoom()
+    //   }
+    // });
   }
 
   // Methods
@@ -59,6 +59,9 @@ export class CreateSessionUiServices {
     }
     this.isCall = false
     this.#dispatcherHttp.createSession(session)
+    setTimeout(() => {
+      this.#dispatcherSocket.joinRoom()
+    },2000)
   }
 
   // Getters

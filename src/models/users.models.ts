@@ -39,7 +39,6 @@ export interface UserIdentitiesGame {
   cardSelected?:number
 }
 
-
 export interface UserCanJoin {
   token: string;
   pseudo: string;
@@ -47,9 +46,14 @@ export interface UserCanJoin {
   room: string;
 }
 
-
 export interface UserGamePlay {
   room: string;
+  action: EntityActionMoving;
+}
+
+export interface UserBotMasterSession {
+  room: string
+  user: string
   action: EntityActionMoving;
 }
 
@@ -87,7 +91,7 @@ export class UserModels {
     return {
       room: '',
       token: '',
-      pseudo: '',
+      pseudo: ''
     }
   }
 
@@ -121,6 +125,14 @@ export class UserModels {
       pseudo: '',
       avatar: '',
       room: ''
+    }
+  }
+
+  static initUserBotMasterSession() :UserBotMasterSession{
+    return {
+      room: '',
+      user: '',
+      action: ActionGameModels.initEntityActionMoving()
     }
   }
 }

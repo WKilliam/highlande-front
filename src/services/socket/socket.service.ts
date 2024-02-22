@@ -1,10 +1,12 @@
-import {inject, Injectable} from "@angular/core";
+import {inject, Injectable, signal} from "@angular/core";
 import {io, Socket} from "socket.io-client";
 import {StorageManagerApp} from "../storageManagerApp/storageManagerApp";
-import {UserIdentitiesGame, UserSocketConnect} from "../../models/users.models";
+import {UserGamePlay, UserIdentitiesGame, UserSocketConnect} from "../../models/users.models";
 import {Utils} from "../utils";
 import {FormatRestApi} from "../../models/formatRestApi";
 import {Router} from "@angular/router";
+import {DiceRolling} from "../../models/room.content.models";
+import {Cells, MapsModels} from "../../models/maps.models";
 
 
 @Injectable({
@@ -16,9 +18,19 @@ export class SocketService {
   readonly #storageManagerApp = inject(StorageManagerApp);
   readonly #router = inject(Router)
 
+
   constructor() {
     // this.socket = io('http://localhost:3000', {transports: ['websocket']});
-    this.socket = io('http://195.154.114.37:3000', {transports: ['websocket']});
+    this.socket = io(
+      // 'http://195.154.114.37:3000'
+      'http://localhost:3000'
+      , {
+      transports: ['websocket'],
+      // reconnection: true, // Activer la reconnexion automatique
+      // reconnectionAttempts: Infinity, // Nombre infini de tentatives de reconnexion
+      // reconnectionDelay: 1000, // Délai avant de tenter une reconnexion
+    });
+    this.socketCallReceived();
   }
 
   socketCallReceived() {
@@ -27,21 +39,16 @@ export class SocketService {
     this.socket.onAny((eventName, ...args) => {
       const argsOjb: any = args[0]
       switch (eventName) {
-        case `${pseudo}-whats`:
-          console.log(`${pseudo}-whats`, argsOjb)
-          break
         case `${pseudo}-join`:
           console.log(`${pseudo}-join`, argsOjb)
-          // UtilsSocketReceived.receivedDefault(argsOjb, this.#storageManagerApp, this.#router)
           this.#storageManagerApp.setConnectRoom(false)
           const isNotValidpseudo = Utils.codeErrorChecking(argsOjb.code)
           if (isNotValidpseudo) { // error
             this.#storageManagerApp.setAlerte(argsOjb)
             this.#router.navigate(['/testeurio'])
           } else { // valid
-            console.log('default-join', argsOjb)
+            // console.log('default-join', argsOjb)
             if (argsOjb.data.game.sessionStatusGame.room !== 'default') {
-              console.log('room equal default', argsOjb.data.game.sessionStatusGame.room)
               this.#storageManagerApp.setSessionAndLinkStorage(argsOjb.data.game)
               this.#storageManagerApp.setConnectRoom(true)
               const user: UserSocketConnect = {
@@ -50,9 +57,14 @@ export class SocketService {
                 room: this.#storageManagerApp.getRoom()
               }
               this.socket.emit('join-room', user);
-              this.#router.navigate([`/lobby/${argsOjb.data.game.sessionStatusGame.room}`])
+              if(argsOjb.data.game.game.challenger.length > 3 && argsOjb.data.game.sessionStatusGame.status === 'GAME'){
+                // this.initChronoGame()
+                this.#router.navigate([`/game/${argsOjb.data.game.sessionStatusGame.room}`])
+              }else{
+                this.#router.navigate([`/lobby/${argsOjb.data.game.sessionStatusGame.room}`])
+              }
             } else {
-              console.log('room not equal default', argsOjb.data.game.sessionStatusGame.room)
+              // console.log('room not equal default', argsOjb.data.game.sessionStatusGame.room)
               this.#storageManagerApp.setSessionAndLinkStorage(argsOjb.data.game)
               this.#router.navigate(['/testeurio'])
             }
@@ -90,13 +102,48 @@ export class SocketService {
           }
           break
         case `${room}-init-chrono-start`:
-          if(argsOjb === true){
-            console.log(`${room}-init-chrono-start`, argsOjb)
-            console.log('move to game')
+          console.log(`${room}-init-chrono-start`, argsOjb)
+          if(argsOjb.start === true){
+            // console.log(`${room}-init-chrono-start`, argsOjb)
+            console.log(`data`, argsOjb)
+            this.#storageManagerApp.setSessionAndLinkStorage(argsOjb.session.data.game)
+            this.#router.navigate([`/game/${room}`])
           }else{
             console.log(`${room}-init-chrono-start`, argsOjb)
             this.#storageManagerApp.setTimer(argsOjb)
           }
+          break
+        case `${room}-init-chrono-start-game`:
+          console.log(`${room}-init-chrono-start-game`, argsOjb)
+          this.#storageManagerApp.setTimer(argsOjb)
+
+          // this.#storageManagerApp.setSessionAndLinkStorage(argsOjb.data.game)
+          // this.#router.navigate([`/game/${room}`])
+          break
+        case `${room}-rolling`:
+          console.log(`${room}-dice-rolling`, argsOjb)
+          this.#storageManagerApp.setDiceRollingValue(argsOjb.data)
+          break
+        case `${room}-game`:
+          console.log(`${room}-game`, argsOjb)
+          this.#storageManagerApp.setSessionAndLinkStorage(argsOjb.data.game)
+          this.#router.navigate([`/game/${room}`])
+          break
+        case `${room}-game-humain`:
+          console.log(`${room}-game-humain`, argsOjb)
+          this.#storageManagerApp.setSessionAndLinkStorage(argsOjb.data.game)
+          this.#router.navigate([`/game/${room}`])
+          break
+        case `${room}-game-bot`:
+          console.log(`${room}-game-bot`, argsOjb)
+          this.#storageManagerApp.setSessionAndLinkStorage(argsOjb.data.game)
+          this.#router.navigate([`/game/${room}`])
+          break
+        case `${room}-bot-move`:
+          console.log(`${room}-game-bot`, argsOjb)
+
+          // this.playingTurnBot
+          // this.socket.emit('bot-selection-move', {cells: argsOjb.data,room: room});
           break
       }
     });
@@ -109,14 +156,12 @@ export class SocketService {
       pseudo: this.#storageManagerApp.getUser().pseudo,
       room: this.#storageManagerApp.getRoom()
     }
-    console.log('connect', user)
     if (this.#storageManagerApp.getConnectRoomStore() && this.#storageManagerApp.getRoom() !== 'default') {
-      this.socket.emit('join-room', this.#storageManagerApp.getRoom());
-      this.socketCallReceived()
+      this.socket.emit('join-room', user);
     } else {
       this.socket.emit('default-join', user);
-      this.socketCallReceived()
     }
+    this.socketCallReceived()
   }
 
   joinRoom() {
@@ -126,9 +171,11 @@ export class SocketService {
       room: this.#storageManagerApp.getRoom()
     }
     if (this.#storageManagerApp.getRoom() !== 'default') {
-      this.socket.emit('join-room', this.#storageManagerApp.getRoom());
+      // console.log('join-room difff', user.room)
+      this.socket.emit('join-room', user);
       this.socketCallReceived()
     } else {
+      // console.log('default-join difff', user)
       this.socket.emit('default-join', user);
       this.socketCallReceived()
     }
@@ -154,4 +201,47 @@ export class SocketService {
     this.socket.emit('init-game', {room:this.#storageManagerApp.getRoom()});
     this.socketCallReceived()
   }
+
+  initChronoGame() {
+    this.socket.emit('chrono-game', {room: this.#storageManagerApp.getSession().sessionStatusGame.room,user:this.#storageManagerApp.getUser().pseudo});
+    this.socketCallReceived()
+  }
+
+  checkTurn() {
+    this.socket.emit('check-turn', {room: this.#storageManagerApp.getSession().sessionStatusGame.room});
+    this.socketCallReceived()
+  }
+
+
+  playingTurn(userGamePlay: UserGamePlay) {
+    console.log('playingTurn', userGamePlay)
+    this.socket.emit('humain-action', userGamePlay);
+    this.socketCallReceived()
+  }
+
+  playingTurnBot(userGamePlay: UserGamePlay) {
+    console.log('playingTurn', userGamePlay)
+    this.socket.emit('bot-action', userGamePlay);
+    this.socketCallReceived()
+  }
+
+  rollingDice(diceRoll: DiceRolling) {
+    console.log('rollingDice', diceRoll)
+    this.socket.emit('rolling-dice', diceRoll);
+    this.socketCallReceived()
+  }
+
+  resetChronoGame() {
+    this.socket.emit('reset-timer-next-turn', {room: this.#storageManagerApp.getSession().sessionStatusGame.room});
+    this.socketCallReceived()
+  }
+
+  botSelectedMove(movingCellList: Array<Cells>) {
+    this.socket.emit('bot-selection-move', {cells: movingCellList,room: this.#storageManagerApp.getSession().sessionStatusGame.room});
+  }
+
+
+
+
+
 }

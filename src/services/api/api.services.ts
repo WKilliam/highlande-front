@@ -15,7 +15,9 @@ import {CardEntitySimplify} from "../../models/cards.models";
 })
 export class ApiServices {
   readonly apiURL: string = 'http://localhost:3000';
-  readonly apiURLProd: string = 'http://195.154.114.37:3000';
+  readonly apiURLProd: string =
+    this.apiURL
+    // 'http://195.154.114.37:3000';
   readonly apiURLSession: string = `${this.apiURLProd}/sessions`;
   readonly apiURLCards: string = `${this.apiURLProd}/cards`;
   readonly apiURLMaps: string = `${this.apiURLProd}/maps`;
@@ -34,7 +36,7 @@ export class ApiServices {
    */
   login(user: UsersLogin):Observable<FormatRestApi> {
     // return this.httpClient.post<FormatRestApi>(`${this.apiURLProd}/user/login`, user)
-    return this.httpClient.post<FormatRestApi>(`http://195.154.114.37:3000/user/login`, user)
+    return this.httpClient.post<FormatRestApi>(`${this.apiURLUser}/login`, user)
   }
 
   /*

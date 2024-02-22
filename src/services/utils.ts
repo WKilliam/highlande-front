@@ -29,4 +29,12 @@ export class Utils {
       }
     }
   }
+
+  static calculatePercentage(valeurVoulue: number, valeurTotale: number): number {
+    if (valeurTotale === 0) {
+      console.error("La valeur totale ne peut pas être zéro.");
+      return 0; // Pour éviter la division par zéro
+    }
+    return (valeurVoulue / valeurTotale) * 100;
+  }
 }

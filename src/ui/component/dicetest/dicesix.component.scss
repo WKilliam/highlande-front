@@ -1,0 +1,51 @@
+/* dice.component.css */
+.dice {
+  width: 50px; /* Taille réduite de moitié */
+  height: 50px; /* Taille réduite de moitié */
+  background-color: rgb(240, 243, 244);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 1em; /* Ajusté pour correspondre à la nouvelle taille */
+  border: 2px solid #333; /* Ajusté pour une apparence proportionnelle */
+  border-radius: 7.5px; /* Rayon des bords ajusté */
+  margin: auto;
+  perspective: 500px; /* Ajusté pour l'effet de perspective */
+  transition: transform 0.2s;
+  box-shadow: 0 2.5px 7.5px rgba(0,0,0,0.3); /* Ajusté pour une ombre plus subtile */
+  user-select: none;
+  position: relative;
+}
+
+.dot {
+  position: absolute;
+  width: 7px; /* Taille réduite de moitié */
+  height: 7px; /* Taille réduite de moitié */
+  background-color: #000;
+  border-radius: 50%;
+  display: block;
+  border: 2.5px solid #333; /* Bordure ajustée */
+}
+
+/* Ajustement des positions des points pour correspondre à la taille réduite */
+.top-left { top: 10%; left: 10%; }
+.top-right { top: 10%; right: 10%; }
+.center { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+.bottom-left { bottom: 10%; left: 10%; }
+.bottom-right { bottom: 10%; right: 10%; }
+.mid-left { top: 50%; left: 10%; transform: translateY(-50%); }
+.mid-right { top: 50%; right: 10%; transform: translateY(-50%); }
+
+@keyframes rotateDice {
+  0% {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+  100% {
+    transform: rotateX(360deg) rotateY(360deg);
+  }
+}
+
+.rolling {
+  animation: rotateDice 2s ease-in-out;
+}

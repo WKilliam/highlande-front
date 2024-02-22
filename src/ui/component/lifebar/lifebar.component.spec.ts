@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DiceUiComponent } from './dice.ui.component';
+import { LifebarComponent } from './lifebar.component';
 
-describe('DiceUiComponent', () => {
-  let component: DiceUiComponent;
-  let fixture: ComponentFixture<DiceUiComponent>;
+describe('LifebarComponent', () => {
+  let component: LifebarComponent;
+  let fixture: ComponentFixture<LifebarComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [DiceUiComponent]
+      imports: [LifebarComponent]
     });
-    fixture = TestBed.createComponent(DiceUiComponent);
+    fixture = TestBed.createComponent(LifebarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

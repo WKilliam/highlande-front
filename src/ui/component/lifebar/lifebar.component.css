@@ -1,0 +1,21 @@
+@charset "UTF-8";
+/* vertical-progress-bar.component.scss */
+.progress-container {
+  width: 40px;
+  height: 700px;
+  background-color: transparent;
+  border: 2px solid #ccc; /* Bordure pour délimiter l'espace de la barre de progression */
+  border-radius: 5px;
+  position: relative;
+  display: flex;
+  flex-direction: column-reverse; /* Inverser la direction pour remplir de bas en haut */
+}
+
+.progress-bar {
+  background-color: #4CAF50; /* Vert par défaut, ajustez selon besoin */
+  width: 100%;
+  position: absolute;
+  bottom: 0; /* Début du remplissage depuis le bas */
+}
+
+/*# sourceMappingURL=lifebar.component.css.map */

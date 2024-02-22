@@ -13,6 +13,7 @@ export class AppInitService {
     return new Promise<void>((resolve, reject) => {
       try {
         this.dispatcherSocket.connect();
+        // this.dispatcherSocket.listenAllSocket()
         resolve(); // Résoudre la promesse si la connexion est réussie
       } catch (error) {
         reject(error); // Rejeter la promesse en cas d'erreur
