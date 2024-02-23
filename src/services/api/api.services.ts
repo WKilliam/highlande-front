@@ -16,8 +16,8 @@ import {CardEntitySimplify} from "../../models/cards.models";
 export class ApiServices {
   readonly apiURL: string = 'http://localhost:3000';
   readonly apiURLProd: string =
-    // this.apiURL
-    'http://195.154.114.37:3000';
+    this.apiURL
+    // 'http://195.154.114.37:3000';
   readonly apiURLSession: string = `${this.apiURLProd}/sessions`;
   readonly apiURLCards: string = `${this.apiURLProd}/cards`;
   readonly apiURLMaps: string = `${this.apiURLProd}/maps`;

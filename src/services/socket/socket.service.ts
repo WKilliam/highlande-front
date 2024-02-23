@@ -22,8 +22,8 @@ export class SocketService {
   constructor() {
     // this.socket = io('http://localhost:3000', {transports: ['websocket']});
     this.socket = io(
-      'http://195.154.114.37:3000'
-      // 'http://localhost:3000'
+      // 'http://195.154.114.37:3000'
+      'http://localhost:3000'
       , {
       transports: ['websocket'],
       // reconnection: true, // Activer la reconnexion automatique
